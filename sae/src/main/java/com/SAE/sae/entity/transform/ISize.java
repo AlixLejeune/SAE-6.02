@@ -1,5 +1,8 @@
 package com.SAE.sae.entity.transform;
 
-public class ISize {
-    
-}
+public interface ISize
+    {
+        public double sizeX = 0;
+        public double sizeY = 0;
+        public double sizeZ = 0;
+    }

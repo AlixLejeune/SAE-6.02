@@ -8,26 +8,26 @@ import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;
 
 @Entity
-@Table(name = "t_e_window_win")
+@Table(name = "t_e_table_tab")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Window  extends RoomObject implements IPosition, ISize {
-    @Column(name = "doo_posx")
+public class DataTable extends RoomObject implements IPosition, ISize {
+    @Column(name = "tab_posx")
     private Double posX;
-    
-    @Column(name = "doo_posy")
+
+    @Column(name = "tab_posy")
     private Double posY;
-    
-    @Column(name = "doo_posz")
+
+    @Column(name = "tab_posz")
     private Double posZ;
-        
-    @Column(name = "doo_sizex")
+
+    @Column(name = "tab_sizex")
     private Double sizeX;
-    
-    @Column(name = "doo_sizey")
+
+    @Column(name = "tab_sizey")
     private Double sizeY;
-    
-    @Column(name = "doo_sizez")
+
+    @Column(name = "tab_sizez")
     private Double sizeZ;
 }

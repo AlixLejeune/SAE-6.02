@@ -1,5 +1,5 @@
 package com.SAE.sae.repository;
 
-public class IDataRepository {
+public interface IDataRepository {
     
 }

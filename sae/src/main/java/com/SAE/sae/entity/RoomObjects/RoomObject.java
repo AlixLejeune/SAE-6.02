@@ -1,19 +1,19 @@
 package com.SAE.sae.entity.RoomObjects;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import com.SAE.sae.entity.Room;
-import com.SAE.sae.entity.transform.IPosition;
-import com.SAE.sae.entity.transform.ISize;
 
-public class RoomObject {
+import jakarta.persistence.*;
+import lombok.Data;
 
-    private Number id;
+@Data
+@Entity
+@Inheritance( strategy = InheritanceType.TABLE_PER_CLASS )
+public abstract class RoomObject {
+    @Id
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    protected int id;
 
-    private String CustomName;
-
-    public Number IdRoom;
+    protected String CustomName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_room")

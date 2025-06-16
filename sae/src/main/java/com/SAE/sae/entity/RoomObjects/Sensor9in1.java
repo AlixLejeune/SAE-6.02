@@ -1,11 +1,17 @@
-package com.SAE.sae.entity.RoomObjects.ConnectedObjects;
+package com.SAE.sae.entity.RoomObjects;
 
 import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;
-
+import jakarta.persistence.*;
+import lombok.*;
 import jakarta.persistence.Column;
 
-public class Sensor9in1  extends ConnectedObject implements IPosition, ISize{
+@Entity
+@Table(name = "t_e_sensor9in1_nio")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Sensor9in1  extends RoomObject implements IPosition, ISize{
      @Column(name = "nio_posx")
     private Double posX;
 

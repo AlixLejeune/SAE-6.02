@@ -1,17 +1,16 @@
-package com.SAE.sae.entity.RoomObjects.ConnectedObjects;
+package com.SAE.sae.entity.RoomObjects;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;
 
 @Entity
-@Table(name = "t_e_door_doo")
+@Table(name = "t_e_lamp_lam")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Lamp extends ConnectedObject implements IPosition, ISize{
+public class Lamp extends RoomObject implements IPosition, ISize{
     @Column(name = "lam_posx")
     private Double posX;
 

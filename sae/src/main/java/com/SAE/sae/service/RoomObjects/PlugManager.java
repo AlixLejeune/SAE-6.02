@@ -54,8 +54,8 @@ public class PlugManager {
     /**
      * Récupérer les Plugs par ID de salle
      */
-    public List<Plug> findByIdRoom(Number roomId) {
-        return PlugRepository.findByIdRoom(roomId);
+    public List<Plug> findByRoomId(Integer  roomId) {
+        return PlugRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class PlugManager {
      * Supprimer toutes les Plugs d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        PlugRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        PlugRepository.deleteByRoomId(roomId);
     }
 
     /**

@@ -17,7 +17,7 @@ public interface WindowRepository extends JpaRepository<Window, Integer> {
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<Window> findByIdRoom(Number roomId);
+    List<Window> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface WindowRepository extends JpaRepository<Window, Integer> {
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

@@ -17,7 +17,7 @@ public interface DataTableRepository extends JpaRepository<DataTable, Integer> {
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<DataTable> findByIdRoom(Number roomId);
+    List<DataTable> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface DataTableRepository extends JpaRepository<DataTable, Integer> {
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

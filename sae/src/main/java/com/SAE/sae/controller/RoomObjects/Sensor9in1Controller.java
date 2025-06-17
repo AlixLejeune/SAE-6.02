@@ -100,11 +100,11 @@ public class Sensor9in1Controller {
      * @param roomId ID de la salle.
      * @return Message de confirmation.
      */
-    @DeleteMapping("/by-room/{roomId}")
+      @DeleteMapping("/by-room/{roomId}")
     @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Number roomId) {
-        Sensor9in1Repository.deleteByIdRoom(roomId);
-        return ResponseEntity.ok("Toutes les Sensor9in1s de la salle ont été supprimées");
+    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
+        Sensor9in1Repository.deleteByRoomId(roomId);
+        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
     }
 
     /**

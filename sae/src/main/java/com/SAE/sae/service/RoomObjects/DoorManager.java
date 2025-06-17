@@ -54,8 +54,8 @@ public class DoorManager {
     /**
      * Récupérer les Doors par ID de salle
      */
-    public List<Door> findByIdRoom(Number roomId) {
-        return DoorRepository.findByIdRoom(roomId);
+    public List<Door> findByRoomId(Integer  roomId) {
+        return DoorRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class DoorManager {
      * Supprimer toutes les Doors d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        DoorRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        DoorRepository.deleteByRoomId(roomId);
     }
 
     /**

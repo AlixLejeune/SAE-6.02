@@ -54,8 +54,8 @@ public class HeaterManager {
     /**
      * Récupérer les Heaters par ID de salle
      */
-    public List<Heater> findByIdRoom(Number roomId) {
-        return HeaterRepository.findByIdRoom(roomId);
+    public List<Heater> findByRoomId(Integer  roomId) {
+        return HeaterRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class HeaterManager {
      * Supprimer toutes les Heaters d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        HeaterRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        HeaterRepository.deleteByRoomId(roomId);
     }
 
     /**

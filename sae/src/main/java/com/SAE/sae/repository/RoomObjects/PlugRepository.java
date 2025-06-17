@@ -17,7 +17,7 @@ public interface PlugRepository extends JpaRepository<Plug, Integer> {
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<Plug> findByIdRoom(Number roomId);
+    List<Plug> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface PlugRepository extends JpaRepository<Plug, Integer> {
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

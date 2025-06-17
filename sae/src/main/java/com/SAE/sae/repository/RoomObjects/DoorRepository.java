@@ -17,7 +17,7 @@ public interface DoorRepository extends JpaRepository<Door, Integer> {
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<Door> findByIdRoom(Number roomId);
+    List<Door> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface DoorRepository extends JpaRepository<Door, Integer> {
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

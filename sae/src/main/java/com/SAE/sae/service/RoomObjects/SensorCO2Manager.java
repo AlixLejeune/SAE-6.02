@@ -54,7 +54,7 @@ public class SensorCO2Manager {
     /**
      * Récupérer les SensorCO2s par ID de salle
      */
-    public List<SensorCO2> findByIdRoom(Number roomId) {
+    public List<SensorCO2> findByIdRoom(Integer  roomId) {
         return SensorCO2Repository.findByIdRoom(roomId);
     }
 
@@ -99,8 +99,8 @@ public class SensorCO2Manager {
      * Supprimer toutes les SensorCO2s d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        SensorCO2Repository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        SensorCO2Repository.deleteByRoomId(roomId);
     }
 
     /**

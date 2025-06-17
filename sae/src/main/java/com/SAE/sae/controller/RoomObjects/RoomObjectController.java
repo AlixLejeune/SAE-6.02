@@ -100,11 +100,11 @@ public class RoomObjectController {
      * @param roomId L'ID de la salle.
      * @return Message de confirmation.
      */
-    @DeleteMapping("/by-room/{roomId}")
+      @DeleteMapping("/by-room/{roomId}")
     @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Number roomId) {
-        roomObjectRepository.deleteByIdRoom(roomId);
-        return ResponseEntity.ok("Objets de la salle supprimés");
+    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
+        roomObjectRepository.deleteByRoomId(roomId);
+        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
     }
 
     /**

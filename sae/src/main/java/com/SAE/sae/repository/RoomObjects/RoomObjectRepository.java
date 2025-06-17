@@ -17,7 +17,7 @@ public interface RoomObjectRepository extends JpaRepository<RoomObject, Integer>
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<RoomObject> findByIdRoom(Number roomId);
+    List<RoomObject> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface RoomObjectRepository extends JpaRepository<RoomObject, Integer>
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

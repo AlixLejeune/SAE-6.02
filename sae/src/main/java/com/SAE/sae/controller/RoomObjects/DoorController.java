@@ -100,11 +100,11 @@ public class DoorController {
      * @param roomId ID de la salle.
      * @return Message de confirmation.
      */
-    @DeleteMapping("/by-room/{roomId}")
+      @DeleteMapping("/by-room/{roomId}")
     @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Number roomId) {
-        DoorRepository.deleteByIdRoom(roomId);
-        return ResponseEntity.ok("Toutes les Doors de la salle ont été supprimées");
+    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
+        DoorRepository.deleteByRoomId(roomId);
+        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
     }
 
     /**

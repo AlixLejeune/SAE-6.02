@@ -17,7 +17,7 @@ public interface SirenRepository extends JpaRepository<Siren, Integer> {
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<Siren> findByIdRoom(Number roomId);
+    List<Siren> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface SirenRepository extends JpaRepository<Siren, Integer> {
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

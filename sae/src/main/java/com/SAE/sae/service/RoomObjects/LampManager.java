@@ -54,8 +54,8 @@ public class LampManager {
     /**
      * Récupérer les Lamps par ID de salle
      */
-    public List<Lamp> findByIdRoom(Number roomId) {
-        return LampRepository.findByIdRoom(roomId);
+    public List<Lamp> findByRoomId(Integer  roomId) {
+        return LampRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class LampManager {
      * Supprimer toutes les Lamps d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        LampRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        LampRepository.deleteByRoomId(roomId);
     }
 
     /**

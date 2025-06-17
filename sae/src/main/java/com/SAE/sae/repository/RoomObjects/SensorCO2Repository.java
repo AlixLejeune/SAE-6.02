@@ -17,7 +17,7 @@ public interface SensorCO2Repository extends JpaRepository<SensorCO2, Integer> {
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<SensorCO2> findByIdRoom(Number roomId);
+    List<SensorCO2> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface SensorCO2Repository extends JpaRepository<SensorCO2, Integer> {
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

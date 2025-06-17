@@ -54,8 +54,8 @@ public class SirenManager {
     /**
      * Récupérer les Sirens par ID de salle
      */
-    public List<Siren> findByIdRoom(Number roomId) {
-        return SirenRepository.findByIdRoom(roomId);
+    public List<Siren> findByRoomId(Integer  roomId) {
+        return SirenRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class SirenManager {
      * Supprimer toutes les Sirens d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        SirenRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        SirenRepository.deleteByRoomId(roomId);
     }
 
     /**

@@ -100,11 +100,11 @@ public class PlugController {
      * @param roomId ID de la salle.
      * @return Message de confirmation.
      */
-    @DeleteMapping("/by-room/{roomId}")
+     @DeleteMapping("/by-room/{roomId}")
     @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Number roomId) {
-        PlugRepository.deleteByIdRoom(roomId);
-        return ResponseEntity.ok("Toutes les Plugs de la salle ont été supprimées");
+    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
+        PlugRepository.deleteByRoomId(roomId);
+        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
     }
 
     /**

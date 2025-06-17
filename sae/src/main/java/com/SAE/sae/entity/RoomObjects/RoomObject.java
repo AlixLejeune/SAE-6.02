@@ -13,7 +13,8 @@ public abstract class RoomObject {
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
     protected int id;
 
-    protected String CustomName;
+    @Column(name = "rob_name")
+    protected String customName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_room")

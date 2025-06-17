@@ -102,9 +102,9 @@ public class HeaterController {
      */
     @DeleteMapping("/by-room/{roomId}")
     @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Number roomId) {
-        HeaterRepository.deleteByIdRoom(roomId);
-        return ResponseEntity.ok("Toutes les Heaters de la salle ont été supprimées");
+    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
+        HeaterRepository.deleteByRoomId(roomId);
+        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
     }
 
     /**

@@ -54,8 +54,8 @@ public class DataTableManager {
     /**
      * Récupérer les DataTables par ID de salle
      */
-    public List<DataTable> findByIdRoom(Number roomId) {
-        return dataTableRepository.findByIdRoom(roomId);
+    public List<DataTable> findByRoomId(Integer  roomId) {
+        return dataTableRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class DataTableManager {
      * Supprimer toutes les DataTables d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        dataTableRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        dataTableRepository.deleteByRoomId(roomId);
     }
 
     /**

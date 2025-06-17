@@ -54,8 +54,8 @@ public class Sensor6in1Manager {
     /**
      * Récupérer les Sensor6in1s par ID de salle
      */
-    public List<Sensor6in1> findByIdRoom(Number roomId) {
-        return Sensor6in1Repository.findByIdRoom(roomId);
+    public List<Sensor6in1> findByRoomId(Integer  roomId) {
+        return Sensor6in1Repository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class Sensor6in1Manager {
      * Supprimer toutes les Sensor6in1s d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        Sensor6in1Repository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        Sensor6in1Repository.deleteByRoomId(roomId);
     }
 
     /**

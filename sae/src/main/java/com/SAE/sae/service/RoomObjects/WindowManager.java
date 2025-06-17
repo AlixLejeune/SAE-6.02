@@ -54,8 +54,8 @@ public class WindowManager {
     /**
      * Récupérer les Windows par ID de salle
      */
-    public List<Window> findByIdRoom(Number roomId) {
-        return WindowRepository.findByIdRoom(roomId);
+    public List<Window> findByRoomId(Integer  roomId) {
+        return WindowRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class WindowManager {
      * Supprimer toutes les Windows d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        WindowRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        WindowRepository.deleteByRoomId(roomId);
     }
 
     /**

@@ -54,8 +54,8 @@ public class RoomObjectManager {
     /**
      * Récupérer les RoomObjects par ID de salle
      */
-    public List<RoomObject> findByIdRoom(Number roomId) {
-        return RoomObjectRepository.findByIdRoom(roomId);
+    public List<RoomObject> findByRoomId(Integer  roomId) {
+        return RoomObjectRepository.findByRoomId(roomId);
     }
 
     /**
@@ -99,8 +99,8 @@ public class RoomObjectManager {
      * Supprimer toutes les RoomObjects d'une salle
      */
     @Transactional
-    public void deleteByIdRoom(Number roomId) {
-        RoomObjectRepository.deleteByIdRoom(roomId);
+    public void deleteByRoomId(Integer roomId) {
+        RoomObjectRepository.deleteByRoomId(roomId);
     }
 
     /**

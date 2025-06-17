@@ -18,6 +18,6 @@ public class Siren  extends RoomObject implements IPosition, ISize{
     @Column(name = "sir_posy")
     private Double posY;
 
-    @Column(name = "sir_posy")
+    @Column(name = "sir_posz")
     private Double posZ;
 }

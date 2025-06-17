@@ -17,7 +17,7 @@ public interface Sensor9in1Repository extends JpaRepository<Sensor9in1, Integer>
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<Sensor9in1> findByIdRoom(Number roomId);
+    List<Sensor9in1> findByRoomId(Integer  roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -87,7 +87,7 @@ public interface Sensor9in1Repository extends JpaRepository<Sensor9in1, Integer>
      */
     @Modifying
     @Transactional
-    void deleteByIdRoom(Number roomId);
+    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les portes par nom personnalisé

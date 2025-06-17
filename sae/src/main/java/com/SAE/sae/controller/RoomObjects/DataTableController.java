@@ -102,8 +102,8 @@ public class DataTableController {
      */
     @DeleteMapping("/by-room/{roomId}")
     @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Number roomId) {
-        dataTableRepository.deleteByIdRoom(roomId);
+    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
+        dataTableRepository.deleteByRoomId(roomId);
         return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
     }
 

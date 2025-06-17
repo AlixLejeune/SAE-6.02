@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "room")
+@Table(name = "t_e_room_roo")
 public class Room {
     @Id
     private int id;
@@ -24,6 +24,6 @@ public class Room {
 
     @JoinColumn(name="fk_building_id")
     private int fkBuildingId;
-    @JoinColumn(name="fk_room_id")
-    private int fkRoomId;
+    @JoinColumn(name="fk_room_type_id")
+    private int fkRoomTypeId;
 }

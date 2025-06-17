@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "room_type")
+@Table(name = "t_e_room_type_rty")
 public class RoomType {
     @Id
     private int id;

@@ -1,13 +1,14 @@
 package com.SAE.sae.repository;
 
-import com.SAE.sae.entity.Building;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import com.SAE.sae.entity.Building;
 
 @Repository
 public interface BuildingRepository extends JpaRepository<Building, Integer> {
@@ -17,7 +18,7 @@ public interface BuildingRepository extends JpaRepository<Building, Integer> {
     /**
      * Trouver par nom personnalisé exact
      */
-    List<Building> findByCustomName(String customName);
+    List<Building> findByName(String customName);
 
     /**
      * Trouver un objet par son ID (read standard)
@@ -78,5 +79,5 @@ public interface BuildingRepository extends JpaRepository<Building, Integer> {
      */
     @Modifying
     @Transactional
-    void deleteByCustomName(String customName);
+    void deleteByName(String name);
 }

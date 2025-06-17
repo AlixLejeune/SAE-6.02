@@ -3,8 +3,9 @@ package com.SAE.sae.entity.RoomObjects;
 import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;
 import jakarta.persistence.*;
-import lombok.*;
-import jakarta.persistence.Column;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "t_e_sensorco2_co2")

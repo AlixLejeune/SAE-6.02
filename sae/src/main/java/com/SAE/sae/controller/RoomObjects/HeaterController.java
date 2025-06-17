@@ -1,20 +1,30 @@
 package com.SAE.sae.controller.RoomObjects;
 
-import com.SAE.sae.entity.RoomObjects.Heater;
-import com.SAE.sae.repository.RoomObjects.HeaterRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.SAE.sae.entity.RoomObjects.Heater;
+import com.SAE.sae.repository.RoomObjects.HeaterRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Contrôleur REST pour la gestion des entités Heater.
  * Fournit les opérations CRUD et des recherches spécifiques.
  */
 @RestController
-@RequestMapping("/api/v1/haters")
+@RequestMapping("/api/v1/heaters")
 @RequiredArgsConstructor
 public class HeaterController {
 

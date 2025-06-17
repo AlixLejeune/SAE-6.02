@@ -89,13 +89,13 @@ public class BuildingController {
 
     /**
      * Supprime toutes les Buildings avec un nom personnalisé spécifique.
-     * @param customName Nom personnalisé.
+     * @param name Nom personnalisé.
      * @return Message de confirmation.
      */
     @DeleteMapping("/by-custom-name")
     @Transactional
-    public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
-        BuildingRepository.deleteByCustomName(customName);
+    public ResponseEntity<String> deleteByCustomName(@RequestParam String name) {
+        BuildingRepository.deleteByCustomName(name);
         return ResponseEntity.ok("Tous les Buildings avec ce nom ont été supprimées");
     }
 }

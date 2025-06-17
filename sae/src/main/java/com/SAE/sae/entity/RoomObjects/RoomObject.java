@@ -1,6 +1,7 @@
 package com.SAE.sae.entity.RoomObjects;
 
 import com.SAE.sae.entity.Room;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,5 +28,6 @@ public abstract class RoomObject {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_room")
+    @JsonIgnore
     private Room room;
 }

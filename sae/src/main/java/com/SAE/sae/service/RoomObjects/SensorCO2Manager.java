@@ -54,8 +54,8 @@ public class SensorCO2Manager {
     /**
      * Récupérer les SensorCO2s par ID de salle
      */
-    public List<SensorCO2> findByIdRoom(Integer  roomId) {
-        return SensorCO2Repository.findByIdRoom(roomId);
+    public List<SensorCO2> findByRoomId(Integer  roomId) {
+ return SensorCO2Repository.findByRoomId(roomId);
     }
 
     /**

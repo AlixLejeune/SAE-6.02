@@ -14,7 +14,7 @@ import java.util.List;
  * Fournit les opérations CRUD et des recherches spécifiques.
  */
 @RestController
-@RequestMapping("/api/v1/data-tables")
+@RequestMapping("/api/v1/windows")
 @RequiredArgsConstructor
 public class WindowController {
 

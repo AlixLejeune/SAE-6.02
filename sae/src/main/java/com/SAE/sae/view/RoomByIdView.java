@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.Room;
-import com.SAE.sae.repository.RoomRepository;
+import com.SAE.sae.service.RoomManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Label;
@@ -13,11 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = "rooms/:id", layout = MainLayout.class)
 public class RoomByIdView extends VerticalLayout implements HasUrlParameter<Integer> {
 
-    private final RoomRepository roomRepository;
+    private final RoomManager roomManager;
 
     @Autowired
-    public RoomByIdView(RoomRepository roomRepository) {
-        this.roomRepository = roomRepository;
+    public RoomByIdView(RoomManager roomManager) {
+        this.roomManager = roomManager;
     }
 
     @Override
@@ -27,8 +27,8 @@ public class RoomByIdView extends VerticalLayout implements HasUrlParameter<Inte
             return;
         }
 
-        Room room = roomRepository.findById(id).orElse(null);
-
+        Room room = roomManager.getRoomById(id);
+//.orElse(null)
         if (room == null) {
             add(new Label("❌ Salle introuvable pour l'ID " + id));
         } else {

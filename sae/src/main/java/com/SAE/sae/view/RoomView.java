@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.Room;
-import com.SAE.sae.repository.RoomRepository;
+import com.SAE.sae.service.RoomManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,12 +15,12 @@ import java.util.List;
 @Route(value = "rooms", layout = MainLayout.class)
 public class RoomView extends VerticalLayout {
 
-    private final RoomRepository roomRepository;
+    private final RoomManager roomManager;
     private final Grid<Room> grid = new Grid<>(Room.class);
 
     @Autowired
-    public RoomView(RoomRepository roomRepository) {
-        this.roomRepository = roomRepository;
+    public RoomView(RoomManager roomManager) {
+        this.roomManager = roomManager;
 
         // Titre
         add("📋 Liste des Rooms");
@@ -41,7 +41,7 @@ public class RoomView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Room> rooms = roomRepository.findAll();
+            List<Room> rooms = roomManager.getAllRooms();
             grid.setItems(rooms);
             Notification.show("✅ " + rooms.size() + " Rooms chargées");
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Lamp;
-import com.SAE.sae.repository.RoomObjects.LampRepository;
+import com.SAE.sae.service.RoomObjects.LampManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,12 +15,12 @@ import java.util.List;
 @Route(value = "lamps", layout = MainLayout.class)
 public class LampView extends VerticalLayout {
 
-    private final LampRepository lampRepository;
+    private final LampManager lampManager;
     private final Grid<Lamp> grid = new Grid<>(Lamp.class);
 
     @Autowired
-    public LampView(LampRepository lampRepository) {
-        this.lampRepository = lampRepository;
+    public LampView(LampManager lampManager) {
+        this.lampManager = lampManager;
 
         // Titre
         add("📋 Liste des Lamps");
@@ -41,7 +41,7 @@ public class LampView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Lamp> lamps = lampRepository.findAll();
+            List<Lamp> lamps = lampManager.findAll();
             grid.setItems(lamps);
             Notification.show("✅ " + lamps.size() + " Lamps chargées");
         } catch (Exception e) {

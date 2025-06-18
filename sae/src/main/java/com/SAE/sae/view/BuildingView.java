@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.Building;
-import com.SAE.sae.repository.BuildingRepository;
+import com.SAE.sae.service.BuildingManager;
 import com.SAE.sae.view.layouts.MainLayout;
 
 import com.vaadin.flow.component.grid.Grid;
@@ -16,12 +16,12 @@ import java.util.List;
 @Route(value = "buildings", layout = MainLayout.class)
 public class BuildingView extends VerticalLayout {
 
-    private final BuildingRepository buildingRepository;
+    private final BuildingManager buildingManager;
     private final Grid<Building> grid = new Grid<>(Building.class);
 
     @Autowired
-    public BuildingView(BuildingRepository buildingRepository) {
-        this.buildingRepository = buildingRepository;
+    public BuildingView(BuildingManager buildingManager) {
+        this.buildingManager = buildingManager;
 
         // Titre
         add("📋 Liste des Buildings");
@@ -42,7 +42,7 @@ public class BuildingView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Building> buildings = buildingRepository.findAll();
+            List<Building> buildings = buildingManager.getAllBuildings();
             grid.setItems(buildings);
             Notification.show("✅ " + buildings.size() + " Buildings chargées");
         } catch (Exception e) {

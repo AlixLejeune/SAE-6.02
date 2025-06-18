@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Siren;
-import com.SAE.sae.repository.RoomObjects.SirenRepository;
+import com.SAE.sae.service.RoomObjects.SirenManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,12 +16,12 @@ import java.util.List;
 @Route(value = "sirens", layout = MainLayout.class)
 public class SirenView extends VerticalLayout {
 
-    private final SirenRepository sirenRepository;
+    private final SirenManager sirenManager;
     private final Grid<Siren> grid = new Grid<>(Siren.class);
 
     @Autowired
-    public SirenView(SirenRepository sirenRepository) {
-        this.sirenRepository = sirenRepository;
+    public SirenView(SirenManager sirenManager) {
+        this.sirenManager = sirenManager;
 
         // Titre
         add("📋 Liste des Sirens");
@@ -42,7 +42,7 @@ public class SirenView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Siren> sirens = sirenRepository.findAll();
+            List<Siren> sirens = sirenManager.findAll();
             grid.setItems(sirens);
             Notification.show("✅ " + sirens.size() + " Sirens chargées");
         } catch (Exception e) {

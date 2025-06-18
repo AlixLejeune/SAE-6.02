@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Plug;
-import com.SAE.sae.repository.RoomObjects.PlugRepository;
+import com.SAE.sae.service.RoomObjects.PlugManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,12 +15,12 @@ import java.util.List;
 @Route(value = "plugs", layout = MainLayout.class)
 public class PlugView extends VerticalLayout {
 
-    private final PlugRepository plugRepository;
+    private final PlugManager plugManager;
     private final Grid<Plug> grid = new Grid<>(Plug.class);
 
     @Autowired
-    public PlugView(PlugRepository plugRepository) {
-        this.plugRepository = plugRepository;
+    public PlugView(PlugManager plugManager) {
+        this.plugManager = plugManager;
 
         // Titre
         add("📋 Liste des Plugs");
@@ -41,7 +41,7 @@ public class PlugView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Plug> plugs = plugRepository.findAll();
+            List<Plug> plugs = plugManager.findAll();
             grid.setItems(plugs);
             Notification.show("✅ " + plugs.size() + " Plugs chargées");
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.SensorCO2;
-import com.SAE.sae.repository.RoomObjects.SensorCO2Repository;
+import com.SAE.sae.service.RoomObjects.SensorCO2Manager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,12 +15,12 @@ import java.util.List;
 @Route(value = "sensorco2", layout = MainLayout.class)
 public class SensorCO2View extends VerticalLayout {
 
-    private final SensorCO2Repository sensorCO2Repository;
+    private final SensorCO2Manager sensorCO2Manager;
     private final Grid<SensorCO2> grid = new Grid<>(SensorCO2.class);
 
     @Autowired
-    public SensorCO2View(SensorCO2Repository sensorCO2Repository) {
-        this.sensorCO2Repository = sensorCO2Repository;
+    public SensorCO2View(SensorCO2Manager sensorCO2Manager) {
+        this.sensorCO2Manager = sensorCO2Manager;
 
         // Titre
         add("📋 Liste des SensorCO2s");
@@ -41,7 +41,7 @@ public class SensorCO2View extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<SensorCO2> sensorCO2s = sensorCO2Repository.findAll();
+            List<SensorCO2> sensorCO2s = sensorCO2Manager.findAll();
             grid.setItems(sensorCO2s);
             Notification.show("✅ " + sensorCO2s.size() + " SensorCO2s chargées");
         } catch (Exception e) {

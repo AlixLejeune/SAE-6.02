@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Window;
-import com.SAE.sae.repository.RoomObjects.WindowRepository;
+import com.SAE.sae.service.RoomObjects.WindowManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,12 +16,12 @@ import java.util.List;
 @Route(value = "windows", layout = MainLayout.class)
 public class WindowView extends VerticalLayout {
 
-    private final WindowRepository windowRepository;
+    private final WindowManager windowManager;
     private final Grid<Window> grid = new Grid<>(Window.class);
 
     @Autowired
-    public WindowView(WindowRepository windowRepository) {
-        this.windowRepository = windowRepository;
+    public WindowView(WindowManager windowManager) {
+        this.windowManager = windowManager;
 
         // Titre
         add("📋 Liste des Windows");
@@ -42,7 +42,7 @@ public class WindowView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Window> windows = windowRepository.findAll();
+            List<Window> windows = windowManager.findAll();
             grid.setItems(windows);
             Notification.show("✅ " + windows.size() + " Windows chargées");
         } catch (Exception e) {

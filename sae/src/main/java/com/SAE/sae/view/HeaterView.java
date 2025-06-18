@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Heater;
-import com.SAE.sae.repository.RoomObjects.HeaterRepository;
+import com.SAE.sae.service.RoomObjects.HeaterManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,12 +16,12 @@ import java.util.List;
 @Route(value = "heaters", layout = MainLayout.class)
 public class HeaterView extends VerticalLayout {
 
-    private final HeaterRepository heaterRepository;
+    private final HeaterManager heaterManager;
     private final Grid<Heater> grid = new Grid<>(Heater.class);
 
     @Autowired
-    public HeaterView(HeaterRepository heaterRepository) {
-        this.heaterRepository = heaterRepository;
+    public HeaterView(HeaterManager heaterManager) {
+        this.heaterManager = heaterManager;
 
         // Titre
         add("📋 Liste des Heaters");
@@ -42,7 +42,7 @@ public class HeaterView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Heater> heaters = heaterRepository.findAll();
+            List<Heater> heaters = heaterManager.findAll();
             grid.setItems(heaters);
             Notification.show("✅ " + heaters.size() + " Heaters chargées");
         } catch (Exception e) {

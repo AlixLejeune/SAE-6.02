@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.DataTable;
-import com.SAE.sae.repository.RoomObjects.DataTableRepository;
+import com.SAE.sae.service.RoomObjects.DataTableManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,12 +15,12 @@ import java.util.List;
 @Route(value = "data-tables", layout = MainLayout.class)
 public class DataTableView extends VerticalLayout {
 
-    private final DataTableRepository dataTableRepository;
+    private final DataTableManager dataTableManager;
     private final Grid<DataTable> grid = new Grid<>(DataTable.class);
 
     @Autowired
-    public DataTableView(DataTableRepository dataTableRepository) {
-        this.dataTableRepository = dataTableRepository;
+    public DataTableView(DataTableManager dataTableManager) {
+        this.dataTableManager = dataTableManager;
 
         // Titre
         add("📋 Liste des DataTables");
@@ -41,7 +41,7 @@ public class DataTableView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<DataTable> dataTables = dataTableRepository.findAll();
+            List<DataTable> dataTables = dataTableManager.findAll();
             grid.setItems(dataTables);
             Notification.show("✅ " + dataTables.size() + " DataTables chargées");
         } catch (Exception e) {

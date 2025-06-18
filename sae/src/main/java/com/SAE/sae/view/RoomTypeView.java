@@ -1,7 +1,7 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomType;
-import com.SAE.sae.repository.RoomTypeRepository;
+import com.SAE.sae.service.RoomTypeManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,12 +15,12 @@ import java.util.List;
 @Route(value = "room_types", layout = MainLayout.class)
 public class RoomTypeView extends VerticalLayout {
 
-    private final RoomTypeRepository roomTypeRepository;
+    private final RoomTypeManager roomTypeManager;
     private final Grid<RoomType> grid = new Grid<>(RoomType.class);
 
     @Autowired
-    public RoomTypeView(RoomTypeRepository roomTypeRepository) {
-        this.roomTypeRepository = roomTypeRepository;
+    public RoomTypeView(RoomTypeManager roomTypeManager) {
+        this.roomTypeManager = roomTypeManager;
 
         // Titre
         add("📋 Liste des RoomTypes");
@@ -41,7 +41,7 @@ public class RoomTypeView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<RoomType> roomTypes = roomTypeRepository.findAll();
+            List<RoomType> roomTypes = roomTypeManager.getAllRoomTypes();
             grid.setItems(roomTypes);
             Notification.show("✅ " + roomTypes.size() + " RoomTypes chargées");
         } catch (Exception e) {

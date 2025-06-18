@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.SAE.sae.entity.Building;
-import com.SAE.sae.repository.BuildingRepository;
+import com.SAE.sae.service.BuildingManager;
 import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -21,7 +21,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-import com.SAE.sae.repository.BuildingRepository;
+
 
 
 

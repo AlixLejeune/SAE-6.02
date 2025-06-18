@@ -2,6 +2,7 @@ package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Lamp;
 import com.SAE.sae.repository.RoomObjects.LampRepository;
+import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route("lamps") 
+@Route(value = "lamps", layout = MainLayout.class)
 public class LampView extends VerticalLayout {
 
     private final LampRepository lampRepository;

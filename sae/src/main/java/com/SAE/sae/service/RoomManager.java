@@ -32,7 +32,7 @@ public class RoomManager {
 
     public Room saveRoom (Room room){
         Room savedroom = roomRepo.save(room);
-        log.info("room with id {} saved wucessfully.", room.getId());
+        log.info("room with id {} saved sucessfully.", room.getId());
         return savedroom;
     }
 

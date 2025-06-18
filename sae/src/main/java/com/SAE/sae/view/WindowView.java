@@ -1,0 +1,50 @@
+package com.SAE.sae.view;
+
+import com.SAE.sae.entity.RoomObjects.Window;
+import com.SAE.sae.repository.RoomObjects.WindowRepository;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.notification.Notification;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+@Route("windows") 
+public class WindowView extends VerticalLayout {
+
+    private final WindowRepository windowRepository;
+    private final Grid<Window> grid = new Grid<>(Window.class);
+
+    @Autowired
+    public WindowView(WindowRepository windowRepository) {
+        this.windowRepository = windowRepository;
+
+        // Titre
+        add("📋 Liste des Windows");
+
+        // Bouton de chargement
+        Button loadButton = new Button("🔄 Charger les Windows", e -> loadData());
+
+        // Configuration du grid
+        grid.setColumns("id", "customName", "posX", "posY", "posZ", "sizeX", "sizeY", "sizeZ");
+        grid.setWidthFull();
+
+        // Ajout des composants
+        add(loadButton, grid);
+
+        // Chargement initial
+        loadData();
+    }
+
+    private void loadData() {
+        try {
+            List<Window> windows = windowRepository.findAll();
+            grid.setItems(windows);
+            Notification.show("✅ " + windows.size() + " Windows chargées");
+        } catch (Exception e) {
+            Notification.show("❌ Erreur lors du chargement : " + e.getMessage(), 3000, Notification.Position.MIDDLE);
+        }
+    }
+}

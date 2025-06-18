@@ -14,21 +14,21 @@ import com.SAE.sae.entity.transform.ISize;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Window  extends RoomObject implements IPosition, ISize {
-    @Column(name = "doo_posx")
+    @Column(name = "win_posx")
     private Double posX;
     
-    @Column(name = "doo_posy")
+    @Column(name = "win_posy")
     private Double posY;
     
-    @Column(name = "doo_posz")
+    @Column(name = "win_posz")
     private Double posZ;
         
-    @Column(name = "doo_sizex")
+    @Column(name = "win_sizex")
     private Double sizeX;
     
-    @Column(name = "doo_sizey")
+    @Column(name = "win_sizey")
     private Double sizeY;
     
-    @Column(name = "doo_sizez")
+    @Column(name = "win_sizez")
     private Double sizeZ;
 }

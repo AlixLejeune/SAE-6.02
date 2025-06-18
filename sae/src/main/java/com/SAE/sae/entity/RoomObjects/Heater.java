@@ -14,21 +14,21 @@ import com.SAE.sae.entity.transform.ISize;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Heater extends RoomObject implements IPosition, ISize{
-    @Column(name = "doo_posx")
+    @Column(name = "hea_posx")
     private Double posX;
     
-    @Column(name = "doo_posy")
+    @Column(name = "hea_posy")
     private Double posY;
     
-    @Column(name = "doo_posz")
+    @Column(name = "hea_posz")
     private Double posZ;
         
-    @Column(name = "doo_sizex")
+    @Column(name = "hea_sizex")
     private Double sizeX;
     
-    @Column(name = "doo_sizey")
+    @Column(name = "hea_sizey")
     private Double sizeY;
     
-    @Column(name = "doo_sizez")
+    @Column(name = "hea_sizez")
     private Double sizeZ;
 }

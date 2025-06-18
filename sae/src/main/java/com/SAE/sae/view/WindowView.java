@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route(value = "buildings", layout = MainLayout.class)
+
+@Route(value = "windows", layout = MainLayout.class)
 public class WindowView extends VerticalLayout {
 
     private final WindowRepository windowRepository;

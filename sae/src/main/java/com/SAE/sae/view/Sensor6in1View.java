@@ -2,6 +2,7 @@ package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Sensor6in1;
 import com.SAE.sae.repository.RoomObjects.Sensor6in1Repository;
+import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route("sensor6in1") 
+@Route(value = "sensor6in1", layout = MainLayout.class)
 public class Sensor6in1View extends VerticalLayout {
 
     private final Sensor6in1Repository sensor6in1Repository;

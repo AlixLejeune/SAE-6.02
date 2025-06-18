@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route(value = "buildings", layout = MainLayout.class)
+@Route(value = "sensorco2", layout = MainLayout.class)
 public class SensorCO2View extends VerticalLayout {
 
     private final SensorCO2Repository sensorCO2Repository;

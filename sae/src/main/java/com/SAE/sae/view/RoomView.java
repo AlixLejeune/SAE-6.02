@@ -2,6 +2,7 @@ package com.SAE.sae.view;
 
 import com.SAE.sae.entity.Room;
 import com.SAE.sae.repository.RoomRepository;
+import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route("rooms") 
+@Route(value = "rooms", layout = MainLayout.class)
 public class RoomView extends VerticalLayout {
 
     private final RoomRepository roomRepository;

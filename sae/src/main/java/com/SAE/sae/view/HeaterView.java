@@ -2,6 +2,7 @@ package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Heater;
 import com.SAE.sae.repository.RoomObjects.HeaterRepository;
+import com.SAE.sae.view.layouts.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route("heaters") 
+
+@Route(value = "heaters", layout = MainLayout.class)
 public class HeaterView extends VerticalLayout {
 
     private final HeaterRepository heaterRepository;

@@ -2,6 +2,8 @@ package com.SAE.sae.view;
 
 import com.SAE.sae.entity.Building;
 import com.SAE.sae.repository.BuildingRepository;
+import com.SAE.sae.view.layouts.MainLayout;
+
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route("buildings") 
+@Route(value = "buildings", layout = MainLayout.class)
 public class BuildingView extends VerticalLayout {
 
     private final BuildingRepository buildingRepository;

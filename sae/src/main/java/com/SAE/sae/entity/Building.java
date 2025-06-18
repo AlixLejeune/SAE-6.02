@@ -1,7 +1,10 @@
 package com.SAE.sae.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,5 +20,7 @@ public class Building {
     private int id;
 
     private String name;
-    
+    @OneToMany(mappedBy = "building")
+    private List<Room> rooms;
+
 }

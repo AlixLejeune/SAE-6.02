@@ -3,6 +3,7 @@ package com.SAE.sae.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +23,9 @@ public class Room {
     private double length;
     private double height;
 
-    @JoinColumn(name="fk_building_id")
-    private int fkBuildingId;
+    @ManyToOne
+    @JoinColumn(name = "fk_building_id") 
+    private Building building;
     @JoinColumn(name="fk_room_type_id")
     private int fkRoomTypeId;
 }

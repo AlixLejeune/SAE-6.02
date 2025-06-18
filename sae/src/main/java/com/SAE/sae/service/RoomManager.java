@@ -49,4 +49,8 @@ public class RoomManager {
         roomRepo.deleteById(id);
         log.info("room with id {} has been deleted sucessfully.", id);
     }
+
+    public List<Room> getRoomsByBuildingId(int buildingId) {
+        return roomRepo.findByBuilding_Id(buildingId);
+    }
 }

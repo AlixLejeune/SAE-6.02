@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
  * Fournit les opérations CRUD et des recherches spécifiques.
  */
 @RestController
-@RequestMapping("/api/v1/building")
+@RequestMapping("/api/v1/buildings")
 @RequiredArgsConstructor
 public class BuildingController {
     

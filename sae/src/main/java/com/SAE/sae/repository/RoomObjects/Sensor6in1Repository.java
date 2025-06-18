@@ -7,90 +7,36 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface Sensor6in1Repository extends JpaRepository<Sensor6in1, Integer> {
 
-    // ========== REQUÊTES DE BASE ==========
+    // ========== REQUÊTES PERSONNALISÉES ==========
 
     /**
-     * Trouver toutes les portes d'une salle spécifique
+     * Trouver tous les capteurs d'une salle spécifique
      */
-    List<Sensor6in1> findByRoomId(Integer  roomId);
+    List<Sensor6in1> findByRoomId(Integer roomId);
 
     /**
-     * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
+     * Trouver tous les capteurs d'une salle (alternative avec l'objet Room)
      */
     List<Sensor6in1> findByRoom_Id(Long roomId);
 
     /**
-     * Trouver par nom personnalisé exact
+     * Trouver les capteurs par nom personnalisé exact
      */
     List<Sensor6in1> findByCustomName(String customName);
 
     /**
-     * Trouver un objet par son ID (read standard)
-     */
-    Optional<Sensor6in1> findById(Integer id);
-
-    /**
-     * Créer ou mettre à jour un objet (save standard)
-     */
-    @Override
-    <S extends Sensor6in1> S save(S entity);
-
-    /**
-     * Créer ou mettre à jour une liste d’objets
-     */
-    @Override
-    <S extends Sensor6in1> List<S> saveAll(Iterable<S> entities);
-
-    /**
-     * Supprimer un objet par son ID
-     */
-    @Override
-    void deleteById(Integer id);
-
-    /**
-     * Supprimer un objet donné
-     */
-    @Override
-    void delete(Sensor6in1 entity);
-
-    /**
-     * Supprimer tous les objets
-     */
-    @Override
-    void deleteAll();
-
-    /**
-     * Supprimer une liste d’objets
-     */
-    @Override
-    void deleteAll(Iterable<? extends Sensor6in1> entities);
-
-    /**
-     * Vérifier l’existence d’un objet par son ID
-     */
-    @Override
-    boolean existsById(Integer id);
-
-    /**
-     * Compter le nombre total d’objets
-     */
-    @Override
-    long count();
-
-    /**
-     * Supprimer toutes les portes d'une salle
+     * Supprimer tous les capteurs d'une salle
      */
     @Modifying
     @Transactional
     void deleteByRoomId(Integer id);
 
     /**
-     * Supprimer les portes par nom personnalisé
+     * Supprimer les capteurs par nom personnalisé
      */
     @Modifying
     @Transactional

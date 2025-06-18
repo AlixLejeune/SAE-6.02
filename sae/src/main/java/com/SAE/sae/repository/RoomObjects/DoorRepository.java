@@ -7,17 +7,16 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface DoorRepository extends JpaRepository<Door, Integer> {
 
-    // ========== REQUÊTES DE BASE ==========
+    // ========== REQUÊTES PERSONNALISÉES ==========
 
     /**
      * Trouver toutes les portes d'une salle spécifique
      */
-    List<Door> findByRoomId(Integer  roomId);
+    List<Door> findByRoomId(Integer roomId);
 
     /**
      * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
@@ -28,59 +27,6 @@ public interface DoorRepository extends JpaRepository<Door, Integer> {
      * Trouver par nom personnalisé exact
      */
     List<Door> findByCustomName(String customName);
-
-    /**
-     * Trouver un objet par son ID (read standard)
-     */
-    Optional<Door> findById(Integer id);
-
-    /**
-     * Créer ou mettre à jour un objet (save standard)
-     */
-    @Override
-    <S extends Door> S save(S entity);
-
-    /**
-     * Créer ou mettre à jour une liste d’objets
-     */
-    @Override
-    <S extends Door> List<S> saveAll(Iterable<S> entities);
-
-    /**
-     * Supprimer un objet par son ID
-     */
-    @Override
-    void deleteById(Integer id);
-
-    /**
-     * Supprimer un objet donné
-     */
-    @Override
-    void delete(Door entity);
-
-    /**
-     * Supprimer tous les objets
-     */
-    @Override
-    void deleteAll();
-
-    /**
-     * Supprimer une liste d’objets
-     */
-    @Override
-    void deleteAll(Iterable<? extends Door> entities);
-
-    /**
-     * Vérifier l’existence d’un objet par son ID
-     */
-    @Override
-    boolean existsById(Integer id);
-
-    /**
-     * Compter le nombre total d’objets
-     */
-    @Override
-    long count();
 
     /**
      * Supprimer toutes les portes d'une salle

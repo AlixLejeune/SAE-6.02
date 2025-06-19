@@ -1,3 +1,4 @@
+package com.SAE.sae.testMock.controller.roomObjects;
 // package com.SAE.sae.controller.RoomObjects;
 
 // import com.SAE.sae.entity.RoomObjects.RoomObject;

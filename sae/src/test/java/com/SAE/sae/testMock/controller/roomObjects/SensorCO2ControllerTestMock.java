@@ -1,4 +1,4 @@
-package com.SAE.sae.controller.roomObjects;
+package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.SensorCO2Controller;
 import com.SAE.sae.entity.RoomObjects.SensorCO2;

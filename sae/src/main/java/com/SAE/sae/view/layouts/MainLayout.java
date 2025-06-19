@@ -32,6 +32,12 @@ public class MainLayout extends AppLayout {
         this.buildingRepository = buildingRepository;
         this.roomRepository = roomRepository;
 
+        // Assurer que le layout prend toute la hauteur
+        getElement().getStyle()
+            .set("min-height", "100vh")
+            .set("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
+            .set("background-attachment", "fixed");
+
         // --- HEADER ---
         DrawerToggle toggle = new DrawerToggle();
         H1 title = new H1("Home Assistant 2.0");

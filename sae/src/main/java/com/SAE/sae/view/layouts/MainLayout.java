@@ -65,7 +65,7 @@ public class MainLayout extends AppLayout {
                 });
 
                 // Ajouter les salles
-                List<Room> rooms = roomRepository.findByBuilding_Id(building.getId());
+                List<Room> rooms = roomRepository.findByFkBuildingId(building.getId());
                 for (Room room : rooms) {
                     Button roomBtn = new Button("🚪 " + room.getName(), click -> {
                         UI.getCurrent().navigate("rooms/" + room.getId());

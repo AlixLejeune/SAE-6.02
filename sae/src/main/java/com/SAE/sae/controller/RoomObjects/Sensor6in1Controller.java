@@ -104,7 +104,7 @@ public class Sensor6in1Controller {
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
         Sensor6in1Repository.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
+        return ResponseEntity.ok("Toutes les Sensor6in1s de la salle ont été supprimées");
     }
 
     /**

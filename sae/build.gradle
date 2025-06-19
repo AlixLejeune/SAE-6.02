@@ -27,7 +27,6 @@ repositories {
 dependencies {
     // Vaadin (version fixée manuellement)
     implementation 'com.vaadin:vaadin-spring-boot-starter:24.7.6'
-
     // Spring Boot : web, JPA, actuator
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

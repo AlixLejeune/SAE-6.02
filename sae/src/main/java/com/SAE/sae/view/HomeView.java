@@ -1,41 +1,521 @@
 package com.SAE.sae.view;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.SAE.sae.entity.Building;
+import com.SAE.sae.entity.Room;
 import com.SAE.sae.service.BuildingManager;
+import com.SAE.sae.service.RoomManager;
+import com.SAE.sae.service.RoomObjects.*;
 import com.SAE.sae.view.layouts.MainLayout;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-
-
-
-
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 
 @Route(value = "", layout = MainLayout.class)
 public class HomeView extends VerticalLayout {
 
+    private final BuildingManager buildingManager;
+    private final RoomManager roomManager;
+    private final LampManager lampManager;
+    private final SensorCO2Manager sensorCO2Manager;
+    private final Sensor6in1Manager sensor6in1Manager;
+    private final HeaterManager heaterManager;
+    private final WindowManager windowManager;
+    private final DoorManager doorManager;
+
     @Autowired
-    public HomeView() {
-        // --- Contenu principal ---
-        add(new Label("Bienvenue sur la page d'accueil"));
-
-        Label portesOuvretes = new Label("La température moyennes dans les batiment :");
-
-        add(portesOuvretes);
+    public HomeView(BuildingManager buildingManager, RoomManager roomManager,
+                    LampManager lampManager, SensorCO2Manager sensorCO2Manager,
+                    Sensor6in1Manager sensor6in1Manager, HeaterManager heaterManager,
+                    WindowManager windowManager, DoorManager doorManager) {
+        this.buildingManager = buildingManager;
+        this.roomManager = roomManager;
+        this.lampManager = lampManager;
+        this.sensorCO2Manager = sensorCO2Manager;
+        this.sensor6in1Manager = sensor6in1Manager;
+        this.heaterManager = heaterManager;
+        this.windowManager = windowManager;
+        this.doorManager = doorManager;
+        
+        setSizeFull();
+        setPadding(true);
+        setSpacing(true);
+        
+        // Correction pour que le fond prenne toute la hauteur
+        getStyle()
+            .set("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
+            .set("min-height", "100vh") // Hauteur minimale de la viewport
+            .set("background-attachment", "fixed"); // Le fond reste fixe lors du scroll
+        
+        add(createHeader());
+        add(createKPISection());
+        add(createSystemOverview());
+        add(createQuickActions());
+        add(createActivityFeed());
     }
-
+    
+    private VerticalLayout createHeader() {
+        VerticalLayout header = new VerticalLayout();
+        header.setWidthFull();
+        header.setPadding(false);
+        header.setSpacing(false);
+        
+        H1 title = new H1("🏠 Home Assistant Dashboard");
+        title.getStyle()
+            .set("color", "white")
+            .set("text-align", "center")
+            .set("margin", "0")
+            .set("font-size", "2.5em")
+            .set("text-shadow", "2px 2px 4px rgba(0,0,0,0.3)");
+        
+        Span subtitle = new Span("Tableau de bord intelligent pour la gestion de votre domicile");
+        subtitle.getStyle()
+            .set("color", "rgba(255,255,255,0.8)")
+            .set("text-align", "center")
+            .set("font-size", "1.1em")
+            .set("margin-top", "10px");
+        
+        header.add(title, subtitle);
+        header.setAlignItems(FlexComponent.Alignment.CENTER);
+        
+        return header;
+    }
+    
+    private HorizontalLayout createKPISection() {
+        HorizontalLayout kpiLayout = new HorizontalLayout();
+        kpiLayout.setWidthFull();
+        kpiLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.EVENLY);
+        kpiLayout.setSpacing(true);
+        
+        try {
+            List<Building> buildings = buildingManager.getAllBuildings();
+            List<Room> rooms = roomManager.getAllRooms();
+            long totalDevices = getTotalDevices();
+            long activeDevices = getActiveDevices();
+            
+            kpiLayout.add(
+                createKPICard("🏢", "Bâtiments", buildings.size(), "Structures", "#3498db"),
+                createKPICard("🚪", "Salles", rooms.size(), "Espaces", "#2ecc71"),
+                createKPICard("📱", "Appareils", (int)totalDevices, "Connectés", "#e74c3c"),
+                createKPICard("⚡", "Actifs", (int)activeDevices, "En ligne", "#f39c12")
+            );
+            
+        } catch (Exception e) {
+            kpiLayout.add(createErrorCard("Erreur de chargement des données"));
+        }
+        
+        return kpiLayout;
+    }
+    
+    private VerticalLayout createKPICard(String icon, String title, int value, String subtitle, String color) {
+        VerticalLayout card = new VerticalLayout();
+        card.getStyle()
+            .set("background", "white")
+            .set("border-radius", "15px")
+            .set("padding", "25px")
+            .set("text-align", "center")
+            .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)")
+            .set("transition", "transform 0.3s ease")
+            .set("cursor", "pointer")
+            .set("min-width", "180px")
+            .set("position", "relative")
+            .set("overflow", "hidden");
+        
+        // Effet de hover
+        card.getElement().addEventListener("mouseenter", e -> {
+            card.getStyle().set("transform", "translateY(-5px)");
+        });
+        card.getElement().addEventListener("mouseleave", e -> {
+            card.getStyle().set("transform", "translateY(0)");
+        });
+        
+        // Barre colorée en haut
+        Div colorBar = new Div();
+        colorBar.getStyle()
+            .set("position", "absolute")
+            .set("top", "0")
+            .set("left", "0")
+            .set("right", "0")
+            .set("height", "4px")
+            .set("background", color);
+        
+        Span iconSpan = new Span(icon);
+        iconSpan.getStyle()
+            .set("font-size", "3em")
+            .set("margin-bottom", "10px")
+            .set("display", "block");
+        
+        H2 valueH2 = new H2(String.valueOf(value));
+        valueH2.getStyle()
+            .set("margin", "0")
+            .set("color", color)
+            .set("font-size", "2.5em")
+            .set("font-weight", "bold");
+        
+        H4 titleH4 = new H4(title);
+        titleH4.getStyle()
+            .set("margin", "5px 0")
+            .set("color", "#2c3e50")
+            .set("font-size", "1.2em");
+        
+        Span subtitleSpan = new Span(subtitle);
+        subtitleSpan.getStyle()
+            .set("color", "#7f8c8d")
+            .set("font-size", "0.9em");
+        
+        card.add(colorBar, iconSpan, valueH2, titleH4, subtitleSpan);
+        card.setAlignItems(FlexComponent.Alignment.CENTER);
+        
+        return card;
+    }
+    
+    private HorizontalLayout createSystemOverview() {
+        HorizontalLayout overview = new HorizontalLayout();
+        overview.setWidthFull();
+        overview.setSpacing(true);
+        
+        // Graphique de répartition des appareils
+        VerticalLayout deviceChart = createDeviceDistributionChart();
+        
+        // Statut des bâtiments
+        VerticalLayout buildingStatus = createBuildingStatusPanel();
+        
+        overview.add(deviceChart, buildingStatus);
+        overview.setFlexGrow(1, deviceChart);
+        overview.setFlexGrow(1, buildingStatus);
+        
+        return overview;
+    }
+    
+    private VerticalLayout createDeviceDistributionChart() {
+        VerticalLayout container = new VerticalLayout();
+        container.getStyle()
+            .set("background", "white")
+            .set("border-radius", "15px")
+            .set("padding", "25px")
+            .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)")
+            .set("height", "400px");
+        
+        // Réduire l'espacement du container
+        container.setSpacing(false);
+        container.setPadding(false);
+        container.getStyle().set("padding", "20px"); // Garder seulement le padding CSS
+        
+        H3 title = new H3("📊 Répartition des Appareils");
+        title.getStyle()
+            .set("margin-top", "0")
+            .set("margin-bottom", "15px") // Réduire la marge du titre
+            .set("color", "#2c3e50")
+            .set("text-align", "center");
+        
+        container.add(title);
+        
+        try {
+            // Création d'un graphique simple avec des barres CSS
+            container.add(createDeviceBar("💡 Lampes", (int)lampManager.count(), "#f1c40f"));
+            container.add(createDeviceBar("🌡️ Capteurs CO2", (int)sensorCO2Manager.count(), "#e74c3c"));
+            container.add(createDeviceBar("📡 Capteurs 6-in-1", (int)sensor6in1Manager.count(), "#3498db"));
+            container.add(createDeviceBar("🔥 Radiateurs", (int)heaterManager.count(), "#e67e22"));
+            container.add(createDeviceBar("🪟 Fenêtres", (int)windowManager.count(), "#9b59b6"));
+            container.add(createDeviceBar("🚪 Portes", (int)doorManager.count(), "#34495e"));
+            
+        } catch (Exception e) {
+            container.add(new Span("❌ Erreur lors du chargement des données"));
+        }
+        
+        return container;
+    }
+    
+    private HorizontalLayout createDeviceBar(String label, int count, String color) {
+        HorizontalLayout bar = new HorizontalLayout();
+        bar.setWidthFull();
+        bar.setAlignItems(FlexComponent.Alignment.CENTER);
+        bar.getStyle().set("margin", "5px 0"); // Réduire la marge de 10px à 5px
+        
+        Span labelSpan = new Span(label);
+        labelSpan.getStyle()
+            .set("min-width", "130px") // Réduire légèrement la largeur
+            .set("font-weight", "500")
+            .set("color", "#2c3e50")
+            .set("font-size", "0.9em"); // Réduire légèrement la taille de police
+        
+        Div progressContainer = new Div();
+        progressContainer.getStyle()
+            .set("flex", "1")
+            .set("background", "#ecf0f1")
+            .set("border-radius", "8px") // Réduire le border-radius
+            .set("height", "18px") // Réduire la hauteur de 20px à 18px
+            .set("margin", "0 12px") // Réduire la marge de 15px à 12px
+            .set("position", "relative")
+            .set("overflow", "hidden");
+        
+        Div progress = new Div();
+        // Calculer le pourcentage par rapport au maximum
+        int maxDevices = Math.max(1, getMaxDeviceCount());
+        double percentage = (double) count / maxDevices * 100;
+        
+        progress.getStyle()
+            .set("background", color)
+            .set("height", "100%")
+            .set("border-radius", "8px")
+            .set("width", Math.min(percentage, 100) + "%")
+            .set("transition", "width 1s ease");
+        
+        progressContainer.add(progress);
+        
+        Span countSpan = new Span(String.valueOf(count));
+        countSpan.getStyle()
+            .set("font-weight", "bold")
+            .set("color", color)
+            .set("min-width", "25px") // Réduire légèrement
+            .set("font-size", "0.9em"); // Réduire la taille de police
+        
+        bar.add(labelSpan, progressContainer, countSpan);
+        
+        return bar;
+    }
+    
+    private VerticalLayout createBuildingStatusPanel() {
+        VerticalLayout panel = new VerticalLayout();
+        panel.getStyle()
+            .set("background", "white")
+            .set("border-radius", "15px")
+            .set("padding", "25px")
+            .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)")
+            .set("height", "400px");
+        
+        H3 title = new H3("🏘️ Statut des Bâtiments");
+        title.getStyle()
+            .set("margin-top", "0")
+            .set("color", "#2c3e50")
+            .set("text-align", "center");
+        
+        panel.add(title);
+        
+        try {
+            List<Building> buildings = buildingManager.getAllBuildings();
+            
+            for (Building building : buildings) {
+                List<Room> buildingRooms = roomManager.getRoomsByBuildingId(building.getId());
+                
+                panel.add(createBuildingCard(building, buildingRooms.size()));
+            }
+            
+        } catch (Exception e) {
+            panel.add(new Span("❌ Erreur lors du chargement"));
+        }
+        
+        return panel;
+    }
+    
+    private HorizontalLayout createBuildingCard(Building building, int roomCount) {
+        HorizontalLayout card = new HorizontalLayout();
+        card.setWidthFull();
+        card.setAlignItems(FlexComponent.Alignment.CENTER);
+        card.getStyle()
+            .set("background", "#f8f9fa")
+            .set("border-radius", "10px")
+            .set("padding", "15px")
+            .set("margin", "8px 0")
+            .set("border-left", "4px solid #3498db");
+        
+        Icon buildingIcon = new Icon(VaadinIcon.BUILDING);
+        buildingIcon.getStyle()
+            .set("color", "#3498db")
+            .set("margin-right", "15px");
+        
+        VerticalLayout info = new VerticalLayout();
+        info.setPadding(false);
+        info.setSpacing(false);
+        
+        H4 name = new H4(building.getName());
+        name.getStyle()
+            .set("margin", "0")
+            .set("color", "#2c3e50");
+        
+        Span rooms = new Span(roomCount + " salle(s)");
+        rooms.getStyle()
+            .set("color", "#7f8c8d")
+            .set("font-size", "0.9em");
+        
+        info.add(name, rooms);
+        
+        Span status = new Span("🟢 Actif");
+        status.getStyle()
+            .set("font-size", "0.9em")
+            .set("color", "#27ae60");
+        
+        card.add(buildingIcon, info, status);
+        card.setFlexGrow(1, info);
+        
+        return card;
+    }
+    
+    private VerticalLayout createQuickActions() {
+        HorizontalLayout actions = new HorizontalLayout();
+        actions.setWidthFull();
+        actions.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        actions.setSpacing(true);
+        
+        H3 sectionTitle = new H3("🚀 Actions Rapides");
+        sectionTitle.getStyle()
+            .set("color", "white")
+            .set("text-align", "center")
+            .set("width", "100%")
+            .set("margin", "30px 0 20px 0");
+        
+        VerticalLayout wrapper = new VerticalLayout();
+        wrapper.setWidthFull();
+        wrapper.add(sectionTitle);
+        
+        HorizontalLayout buttonRow = new HorizontalLayout();
+        buttonRow.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        buttonRow.setSpacing(true);
+        
+        buttonRow.add(
+            createActionButton("📊 Voir les Bâtiments", VaadinIcon.BUILDING, "#3498db"),
+            createActionButton("🚪 Gérer les Salles", VaadinIcon.HOME, "#2ecc71"),
+            createActionButton("💡 Contrôler Éclairage", VaadinIcon.LIGHTBULB, "#f1c40f"),
+            createActionButton("🌡️ Capteurs", VaadinIcon.CHART, "#e74c3c")
+        );
+        
+        wrapper.add(buttonRow);
+        
+        return wrapper;
+    }
+    
+    private Button createActionButton(String text, VaadinIcon icon, String color) {
+        Button button = new Button(text, new Icon(icon));
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.getStyle()
+            .set("background", color)
+            .set("border", "none")
+            .set("padding", "15px 25px")
+            .set("border-radius", "25px")
+            .set("font-weight", "bold")
+            .set("transition", "all 0.3s ease")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.2)");
+        
+        button.getElement().addEventListener("mouseenter", e -> {
+            button.getStyle().set("transform", "translateY(-2px)");
+        });
+        button.getElement().addEventListener("mouseleave", e -> {
+            button.getStyle().set("transform", "translateY(0)");
+        });
+        
+        return button;
+    }
+    
+    private VerticalLayout createActivityFeed() {
+        VerticalLayout feed = new VerticalLayout();
+        feed.getStyle()
+            .set("background", "white")
+            .set("border-radius", "15px")
+            .set("padding", "25px")
+            .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)")
+            .set("margin-top", "20px");
+        
+        H3 title = new H3("📈 Activité Récente");
+        title.getStyle()
+            .set("margin-top", "0")
+            .set("color", "#2c3e50")
+            .set("text-align", "center");
+        
+        feed.add(title);
+        
+        // Activités simulées
+        feed.add(createActivityItem("🏢", "Nouveau bâtiment ajouté", "Il y a 2 heures", "#3498db"));
+        feed.add(createActivityItem("🚪", "5 nouvelles salles configurées", "Il y a 4 heures", "#2ecc71"));
+        feed.add(createActivityItem("💡", "Éclairage optimisé dans le bâtiment A", "Il y a 6 heures", "#f1c40f"));
+        feed.add(createActivityItem("🌡️", "Capteurs CO2 mis à jour", "Il y a 8 heures", "#e74c3c"));
+        
+        return feed;
+    }
+    
+    private HorizontalLayout createActivityItem(String icon, String activity, String time, String color) {
+        HorizontalLayout item = new HorizontalLayout();
+        item.setWidthFull();
+        item.setAlignItems(FlexComponent.Alignment.CENTER);
+        item.getStyle()
+            .set("padding", "10px")
+            .set("border-bottom", "1px solid #ecf0f1");
+        
+        Span iconSpan = new Span(icon);
+        iconSpan.getStyle()
+            .set("font-size", "1.5em")
+            .set("margin-right", "15px");
+        
+        VerticalLayout content = new VerticalLayout();
+        content.setPadding(false);
+        content.setSpacing(false);
+        
+        Span activitySpan = new Span(activity);
+        activitySpan.getStyle()
+            .set("font-weight", "500")
+            .set("color", "#2c3e50");
+        
+        Span timeSpan = new Span(time);
+        timeSpan.getStyle()
+            .set("font-size", "0.8em")
+            .set("color", "#7f8c8d");
+        
+        content.add(activitySpan, timeSpan);
+        
+        item.add(iconSpan, content);
+        item.setFlexGrow(1, content);
+        
+        return item;
+    }
+    
+    // Méthodes utilitaires
+    private long getTotalDevices() {
+        try {
+            return lampManager.count() + sensorCO2Manager.count() + 
+                   sensor6in1Manager.count() + heaterManager.count() + 
+                   windowManager.count() + doorManager.count();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+    
+    private long getActiveDevices() {
+        // Simulation - en réalité, vous pourriez avoir un statut "actif" dans vos entités
+        return (long) (getTotalDevices() * 0.85); // 85% des appareils actifs
+    }
+    
+    private int getMaxDeviceCount() {
+        try {
+            return (int) Math.max(lampManager.count(), 
+                   Math.max(sensorCO2Manager.count(),
+                   Math.max(sensor6in1Manager.count(),
+                   Math.max(heaterManager.count(),
+                   Math.max(windowManager.count(), doorManager.count())))));
+        } catch (Exception e) {
+            return 1;
+        }
+    }
+    
+    private VerticalLayout createErrorCard(String message) {
+        VerticalLayout card = new VerticalLayout();
+        card.getStyle()
+            .set("background", "white")
+            .set("border-radius", "15px")
+            .set("padding", "25px")
+            .set("text-align", "center")
+            .set("border-left", "4px solid #e74c3c");
+        
+        card.add(new Span("❌ " + message));
+        return card;
+    }
 }

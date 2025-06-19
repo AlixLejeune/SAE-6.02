@@ -14,7 +14,7 @@ import java.util.List;
  * Fournit les opérations CRUD et des recherches spécifiques.
  */
 @RestController
-@RequestMapping("/api/v1/sensor9in1ss")
+@RequestMapping("/api/v1/sensor9in1s")
 @RequiredArgsConstructor
 public class Sensor9in1Controller {
 
@@ -104,7 +104,7 @@ public class Sensor9in1Controller {
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
         Sensor9in1Repository.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
+        return ResponseEntity.ok("Toutes les Sensor9in1s de la salle ont été supprimées");
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.SAE.sae.RoomObjects;
+package com.SAE.sae.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.DataTableController;
 import com.SAE.sae.entity.RoomObjects.DataTable;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class DataTableControllerTest {
+public class DataTableControllerTestMock {
 
     @Mock
     private DataTableRepository dataTableRepository;

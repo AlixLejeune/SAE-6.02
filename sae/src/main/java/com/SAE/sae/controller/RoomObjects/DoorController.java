@@ -104,7 +104,7 @@ public class DoorController {
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
         DoorRepository.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
+        return ResponseEntity.ok("Toutes les Doors de la salle ont été supprimées");
     }
 
     /**

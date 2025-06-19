@@ -104,7 +104,7 @@ public class WindowController {
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
         WindowRepository.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
+        return ResponseEntity.ok("Toutes les Windows de la salle ont été supprimées");
     }
 
     /**

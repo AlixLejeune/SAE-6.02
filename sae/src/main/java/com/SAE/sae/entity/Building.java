@@ -25,7 +25,11 @@ public class Building {
 
     private String name;
 
-    @OneToMany(targetEntity = Room.class, mappedBy = "fkBuildingId")
+    @OneToMany(targetEntity = Room.class, mappedBy = "building")
     private List<Room> rooms = new ArrayList<>();
 
+
+    public Building(String name){
+        this.name = name;
+    }
 }

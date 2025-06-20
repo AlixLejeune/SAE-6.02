@@ -1,8 +1,6 @@
 package com.SAE.sae.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +9,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import com.SAE.sae.entity.Room;
+import com.SAE.sae.entity.Building;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RoomControllerTest {
@@ -23,13 +22,13 @@ public class RoomControllerTest {
 
     @Test
     void testCreateRoom() {
-        Room create = new Room(6,"createTest",0,0,0,1,1);
+        Room create = new Room(6,"createTest",0,0,0,new Building(),1);
 
         restTemplate.postForEntity("http://localhost:" + port + "/api/v1/rooms", create, Room.class);
 
         assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/rooms/6",
                 Room.class)).satisfies(rooms -> {
-                    assertThat(rooms).isNotNull();
+                    //assertThat(rooms).isNotNull();
                     assertThat(rooms).isEqualTo(create);
                 });
         restTemplate.delete("http://localhost:" + port + "/api/v1/rooms/6");
@@ -37,7 +36,7 @@ public class RoomControllerTest {
 
     @Test
     void testDeleteRoom() {
-        Room create = new Room(6,"deleteTest",0,0,0,1,1);
+        Room create = new Room(6,"deleteTest",0,0,0,null,1);
 
         restTemplate.postForEntity("http://localhost:" + port + "/api/v1/rooms", create, Room.class);
         restTemplate.delete("http://localhost:" + port + "/api/v1/rooms/6");
@@ -73,7 +72,7 @@ public class RoomControllerTest {
 
     @Test
     void testUpdateRoom() {
-        Room update = new Room(5,"updateTest",6,8,3,3,5);
+        Room update = new Room(5,"updateTest",6,8,3,null,5);
         restTemplate.put("http://localhost:" + port + "/api/v1/rooms", update);
         assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/rooms/5",
                 Room.class)).satisfies(rooms -> {

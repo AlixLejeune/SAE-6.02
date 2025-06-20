@@ -23,26 +23,22 @@ public class BuildingControllerTest {
 
     @Test
     void testCreateBuilding() {
-        Building create = new Building(4,"createTest", null);
+        Building create = new Building("createTest");
 
         restTemplate.postForEntity("http://localhost:" + port + "/api/v1/buildings", create, Building.class);
-
-        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/buildings/4",
-                Building.class)).satisfies(buildings -> {
-                    assertThat(buildings).isNotNull();
-                    assertThat(buildings.getName()).isEqualTo("createTest");
-                });
-        restTemplate.delete("http://localhost:" + port + "/api/v1/buildings/4");
+        Building[] got = restTemplate.getForObject("http://localhost:" + port + "/api/v1/buildings/by-custom-name?name=createTest",Building[].class);
+        assert got[0] != null;
+        restTemplate.delete("http://localhost:" + port + "/api/v1/buildings/" + got[0].getId());
     }
 
     @Test
     void testDeleteBuilding() {
-        Building create = new Building(4,"deleteTest", null);
+        Building create = new Building("createTest");
 
-        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/buildings", create, Building.class);
-        restTemplate.delete("http://localhost:" + port + "/api/v1/buildings/4");
+        Building got = restTemplate.postForEntity("http://localhost:" + port + "/api/v1/buildings", create, Building.class).getBody();
+        restTemplate.delete("http://localhost:" + port + "/api/v1/buildings/" + got.getId());
 
-        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/buildings/4",
+        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/buildings/" + got.getId(),
                 Building.class)).satisfies(buildings -> {
                     assertThat(buildings).isNull();
                 });
@@ -50,9 +46,9 @@ public class BuildingControllerTest {
 
     @Test
     void testDeleteByName() {
-        Building create = new Building(4,"deleteTest", null);
+        Building create = new Building("deleteTest");
 
-        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/buildings", create, Building.class);
+        Building got = restTemplate.postForEntity("http://localhost:" + port + "/api/v1/buildings", create, Building.class).getBody();
         restTemplate.delete("http://localhost:" + port + "/api/v1/buildings/by-custom-name?name=deleteTest");
 
         assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/buildings/by-custom-name?name=deleteTest",

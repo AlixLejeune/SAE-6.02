@@ -3,19 +3,19 @@
 
 -- Table des bâtiments
 CREATE TABLE t_e_building_bui (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
 -- Table des types de pièces
 CREATE TABLE t_e_room_type_rty (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
 -- Table des pièces
 CREATE TABLE t_e_room_roo (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     width decimal NOT NULL,
     length decimal NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE t_e_room_roo (
 
 -- Table des tables
 CREATE TABLE t_e_table_tab (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     tab_posx decimal,
@@ -42,7 +42,7 @@ CREATE TABLE t_e_table_tab (
 
 -- Table des portes
 CREATE TABLE t_e_door_doo (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     doo_posx decimal,
@@ -56,7 +56,7 @@ CREATE TABLE t_e_door_doo (
 
 -- Table des radiateurs
 CREATE TABLE t_e_heater_hea (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     hea_posx decimal,
@@ -70,7 +70,7 @@ CREATE TABLE t_e_heater_hea (
 
 -- Table des lampes
 CREATE TABLE t_e_lamp_lam (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     lam_posx decimal,
@@ -81,7 +81,7 @@ CREATE TABLE t_e_lamp_lam (
 
 -- Table des prises
 CREATE TABLE t_e_plug_plu (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     plu_posx decimal,
@@ -92,7 +92,7 @@ CREATE TABLE t_e_plug_plu (
 
 -- Table des capteurs 6 en 1
 CREATE TABLE t_e_sensor6in1_sio (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     sio_posx decimal,
@@ -103,7 +103,7 @@ CREATE TABLE t_e_sensor6in1_sio (
 
 -- Table des capteurs 9 en 1
 CREATE TABLE t_e_sensor9in1_nio (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     nio_posx decimal,
@@ -114,7 +114,7 @@ CREATE TABLE t_e_sensor9in1_nio (
 
 -- Table des capteurs CO2
 CREATE TABLE t_e_sensorco2_co2 (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     co2_posx decimal,
@@ -125,7 +125,7 @@ CREATE TABLE t_e_sensorco2_co2 (
 
 -- Table des sirènes
 CREATE TABLE t_e_siren_sir (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     sir_posx decimal,
@@ -136,7 +136,7 @@ CREATE TABLE t_e_siren_sir (
 
 -- Table des fenêtres
 CREATE TABLE t_e_window_win (
-    id INTEGER PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
     rob_name VARCHAR(255),
     id_room INTEGER,
     win_posx decimal,

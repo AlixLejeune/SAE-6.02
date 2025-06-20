@@ -162,10 +162,11 @@ CREATE INDEX idx_sensorco2_room ON t_e_sensorco2_co2(id_room);
 CREATE INDEX idx_siren_room ON t_e_siren_sir(id_room);
 CREATE INDEX idx_window_room ON t_e_window_win(id_room);
 
-
 ALTER TABLE t_e_room_roo
 DROP CONSTRAINT fk_room_building,
 ADD CONSTRAINT fk_room_building
 FOREIGN KEY (fk_building_id) 
 REFERENCES t_e_building_bui(id) 
 ON DELETE CASCADE;
+
+CREATE SEQUENCE room_object_seq START WITH 7 INCREMENT BY 1;

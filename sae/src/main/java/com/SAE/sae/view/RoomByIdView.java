@@ -10,7 +10,7 @@ import com.vaadin.flow.router.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Route(value = "rooms/:id", layout = MainLayout.class)
+@Route(value = "room", layout = MainLayout.class)
 public class RoomByIdView extends VerticalLayout implements HasUrlParameter<Integer> {
 
     private final RoomManager roomManager;

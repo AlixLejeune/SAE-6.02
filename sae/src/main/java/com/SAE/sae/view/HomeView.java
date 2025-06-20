@@ -205,30 +205,54 @@ public class HomeView extends VerticalLayout {
             .set("border-radius", "15px")
             .set("padding", "25px")
             .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)")
-            .set("height", "400px");
+            .set("min-height", "400px") // Hauteur minimale
+            .set("max-height", "600px") // Hauteur maximale
+            .set("overflow-y", "auto"); // Scroll si nécessaire
         
         // Réduire l'espacement du container
         container.setSpacing(false);
         container.setPadding(false);
-        container.getStyle().set("padding", "20px"); // Garder seulement le padding CSS
+        container.getStyle().set("padding", "20px");
         
         H3 title = new H3("📊 Répartition des Appareils");
         title.getStyle()
             .set("margin-top", "0")
-            .set("margin-bottom", "15px") // Réduire la marge du titre
+            .set("margin-bottom", "15px")
             .set("color", "#2c3e50")
             .set("text-align", "center");
         
         container.add(title);
         
         try {
+            // Container pour les barres avec espacement approprié
+            VerticalLayout barsContainer = new VerticalLayout();
+            barsContainer.setPadding(false);
+            barsContainer.setSpacing(false);
+            barsContainer.getStyle().set("gap", "5px");
+            
             // Création d'un graphique simple avec des barres CSS
-            container.add(createDeviceBar("💡 Lampes", (int)lampManager.count(), "#f1c40f"));
-            container.add(createDeviceBar("🌡️ Capteurs CO2", (int)sensorCO2Manager.count(), "#e74c3c"));
-            container.add(createDeviceBar("📡 Capteurs 6-in-1", (int)sensor6in1Manager.count(), "#3498db"));
-            container.add(createDeviceBar("🔥 Radiateurs", (int)heaterManager.count(), "#e67e22"));
-            container.add(createDeviceBar("🪟 Fenêtres", (int)windowManager.count(), "#9b59b6"));
-            container.add(createDeviceBar("🚪 Portes", (int)doorManager.count(), "#34495e"));
+            barsContainer.add(createDeviceBar("💡 Lampes", (int)lampManager.count(), "#f1c40f"));
+            barsContainer.add(createDeviceBar("🌡️ Capteurs CO2", (int)sensorCO2Manager.count(), "#e74c3c"));
+            barsContainer.add(createDeviceBar("📡 Capteurs 6-in-1", (int)sensor6in1Manager.count(), "#3498db"));
+            barsContainer.add(createDeviceBar("🔥 Radiateurs", (int)heaterManager.count(), "#e67e22"));
+            barsContainer.add(createDeviceBar("🪟 Fenêtres", (int)windowManager.count(), "#9b59b6"));
+            barsContainer.add(createDeviceBar("🚪 Portes", (int)doorManager.count(), "#34495e"));
+            
+            container.add(barsContainer);
+            
+            // Résumé total
+            long totalDevices = getTotalDevices();
+            if (totalDevices > 0) {
+                Span totalSummary = new Span("Total : " + totalDevices + " appareils");
+                totalSummary.getStyle()
+                    .set("font-size", "0.9em")
+                    .set("color", "#6c757d")
+                    .set("text-align", "center")
+                    .set("margin-top", "15px")
+                    .set("padding-top", "15px")
+                    .set("border-top", "1px solid #ecf0f1");
+                container.add(totalSummary);
+            }
             
         } catch (Exception e) {
             container.add(new Span("❌ Erreur lors du chargement des données"));
@@ -293,11 +317,19 @@ public class HomeView extends VerticalLayout {
             .set("border-radius", "15px")
             .set("padding", "25px")
             .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)")
-            .set("height", "400px");
+            .set("min-height", "400px") // Hauteur minimale au lieu de hauteur fixe
+            .set("max-height", "600px") // Hauteur maximale pour éviter un cadre trop grand
+            .set("overflow-y", "auto"); // Scroll vertical si nécessaire
+        
+        // Ajuster l'espacement et le padding du panel
+        panel.setSpacing(true);
+        panel.setPadding(false);
+        panel.getStyle().set("padding", "25px"); // Garder le padding CSS
         
         H3 title = new H3("🏘️ Statut des Bâtiments");
         title.getStyle()
             .set("margin-top", "0")
+            .set("margin-bottom", "20px") // Espacement cohérent
             .set("color", "#2c3e50")
             .set("text-align", "center");
         
@@ -306,14 +338,65 @@ public class HomeView extends VerticalLayout {
         try {
             List<Building> buildings = buildingManager.getAllBuildings();
             
-            for (Building building : buildings) {
-                List<Room> buildingRooms = roomManager.getRoomsByBuildingId(building.getId());
+            if (buildings.isEmpty()) {
+                // Message quand aucun bâtiment n'est présent
+                Div emptyState = new Div();
+                emptyState.getStyle()
+                    .set("text-align", "center")
+                    .set("padding", "40px 20px")
+                    .set("color", "#6c757d");
                 
-                panel.add(createBuildingCard(building, buildingRooms.size()));
+                Span emptyIcon = new Span("🏗️");
+                emptyIcon.getStyle().set("font-size", "3em").set("display", "block");
+                
+                Span emptyText = new Span("Aucun bâtiment configuré");
+                emptyText.getStyle()
+                    .set("font-size", "1.1em")
+                    .set("margin-top", "10px")
+                    .set("display", "block");
+                
+                emptyState.add(emptyIcon, emptyText);
+                panel.add(emptyState);
+            } else {
+                // Container pour les cartes de bâtiments avec espacement approprié
+                VerticalLayout buildingsContainer = new VerticalLayout();
+                buildingsContainer.setPadding(false);
+                buildingsContainer.setSpacing(true);
+                buildingsContainer.getStyle().set("gap", "8px"); // Espacement entre les cartes
+                
+                for (Building building : buildings) {
+                    List<Room> buildingRooms = roomManager.getRoomsByBuildingId(building.getId());
+                    buildingsContainer.add(createBuildingCard(building, buildingRooms.size()));
+                }
+                
+                panel.add(buildingsContainer);
+                
+                // Indicateur du nombre total de bâtiments
+                if (buildings.size() > 3) { // Afficher seulement s'il y a beaucoup de bâtiments
+                    Span totalIndicator = new Span("Total : " + buildings.size() + " bâtiments");
+                    totalIndicator.getStyle()
+                        .set("font-size", "0.9em")
+                        .set("color", "#6c757d")
+                        .set("text-align", "center")
+                        .set("margin-top", "15px")
+                        .set("padding-top", "15px")
+                        .set("border-top", "1px solid #ecf0f1");
+                    panel.add(totalIndicator);
+                }
             }
             
         } catch (Exception e) {
-            panel.add(new Span("❌ Erreur lors du chargement"));
+            Div errorDiv = new Div();
+            errorDiv.getStyle()
+                .set("text-align", "center")
+                .set("padding", "40px 20px")
+                .set("background", "#f8d7da")
+                .set("color", "#721c24")
+                .set("border-radius", "8px")
+                .set("margin", "10px 0");
+            
+            errorDiv.add(new Span("❌ Erreur lors du chargement: " + e.getMessage()));
+            panel.add(errorDiv);
         }
         
         return panel;

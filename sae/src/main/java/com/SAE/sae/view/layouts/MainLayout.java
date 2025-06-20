@@ -257,7 +257,7 @@ public class MainLayout extends AppLayout {
             .set("color", "#2c3e50");
         
         // Compter les salles
-        List<Room> rooms = roomRepository.findByFkBuildingId(building.getId());
+        List<Room> rooms = roomRepository.findByBuilding_Id(building.getId());
         Span roomCount = new Span("(" + rooms.size() + ")");
         roomCount.getStyle()
             .set("color", "#6c757d")

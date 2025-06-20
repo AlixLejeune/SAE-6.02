@@ -1,12 +1,8 @@
 package com.SAE.sae.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,16 +15,18 @@ import lombok.NoArgsConstructor;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     private String name;
     private double width;
     private double length;
     private double height;
 
-    @JoinColumn(name = "fk_building_id")
-    private int fkBuildingId;
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "fk_building_id") 
+    private Building building;
+    
 
-    @JoinColumn(name = "fk_room_type_id")
     private int fkRoomTypeId;
 }

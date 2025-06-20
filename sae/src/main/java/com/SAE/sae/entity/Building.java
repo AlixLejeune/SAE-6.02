@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.SAE.sae.entity.Room;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,12 +19,11 @@ import com.SAE.sae.entity.Room;
 @Table(name = "t_e_building_bui")
 public class Building {
     @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     private String name;
 
-    @OneToMany(targetEntity = Room.class, mappedBy = "fkBuildingId")
+    @OneToMany(mappedBy = "building")
     private List<Room> rooms;
-
 }

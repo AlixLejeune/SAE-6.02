@@ -9,5 +9,5 @@ import com.SAE.sae.entity.Room;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Integer> {
-    List<Room> findByFkBuildingId(int buildingId);
+    List<Room> findByBuilding_Id(int buildingId);
 }

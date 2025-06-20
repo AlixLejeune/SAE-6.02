@@ -1,6 +1,8 @@
 package com.SAE.sae.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "t_e_room_roo")
 public class Room {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
@@ -23,9 +26,9 @@ public class Room {
     private double length;
     private double height;
 
-    @JoinColumn(name = "fk_building_id") 
+    @JoinColumn(name = "fk_building_id")
     private int fkBuildingId;
 
-    @JoinColumn(name="fk_room_type_id")
+    @JoinColumn(name = "fk_room_type_id")
     private int fkRoomTypeId;
 }

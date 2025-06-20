@@ -1,7 +1,9 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.RoomObjects.Door;
+import com.SAE.sae.entity.Room;
 import com.SAE.sae.service.RoomObjects.DoorManager;
+import com.SAE.sae.service.RoomManager;
 import com.SAE.sae.view.layouts.MainLayout;
 
 import com.vaadin.flow.component.grid.Grid;
@@ -9,6 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -29,6 +32,7 @@ import java.util.List;
 public class DoorView extends VerticalLayout {
 
     private final DoorManager doorManager;
+    private final RoomManager roomManager;
     private final Grid<Door> grid = new Grid<>(Door.class);
     private Door selectedDoor = null;
 
@@ -39,8 +43,9 @@ public class DoorView extends VerticalLayout {
     private Button deleteButton;
 
     @Autowired
-    public DoorView(DoorManager doorManager) {
+    public DoorView(DoorManager doorManager, RoomManager roomManager) {
         this.doorManager = doorManager;
+        this.roomManager = roomManager;
         
         // Configuration générale de la vue
         setSizeFull();
@@ -271,6 +276,13 @@ public class DoorView extends VerticalLayout {
         nameField.setPlaceholder("Entrez le nom de la porte...");
         nameField.setWidthFull();
 
+        // ComboBox pour la room
+        ComboBox<Room> roomComboBox = new ComboBox<>("Salle");
+        roomComboBox.setPlaceholder("Sélectionnez une salle...");
+        roomComboBox.setWidthFull();
+        roomComboBox.setItemLabelGenerator(Room::getName);
+        roomComboBox.setItems(roomManager.getAllRooms());
+
         // Position
         HorizontalLayout positionLayout = new HorizontalLayout();
         NumberField posXField = new NumberField("Position X");
@@ -293,6 +305,7 @@ public class DoorView extends VerticalLayout {
 
         if (door != null) {
             nameField.setValue(door.getCustomName() != null ? door.getCustomName() : "");
+            roomComboBox.setValue(door.getRoom());
             posXField.setValue(door.getPosX());
             posYField.setValue(door.getPosY());
             posZField.setValue(door.getPosZ());
@@ -301,7 +314,7 @@ public class DoorView extends VerticalLayout {
             sizeZField.setValue(door.getSizeZ());
         }
 
-        VerticalLayout content = new VerticalLayout(nameField, positionLayout, sizeLayout);
+        VerticalLayout content = new VerticalLayout(nameField, roomComboBox, positionLayout, sizeLayout);
         content.setPadding(false);
         content.setSpacing(true);
         dialog.add(content);
@@ -315,15 +328,17 @@ public class DoorView extends VerticalLayout {
         cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         saveButton.addClickListener(e -> {
-            if (validateFields(nameField, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField)) {
+            Room selectedRoom = roomComboBox.getValue();
+            System.out.println("Room sélectionnée: " + selectedRoom.getName() + " (ID: " + selectedRoom.getId() + ")");
+            if (validateFields(nameField, roomComboBox, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField)) {
                 try {
                     if (door == null) {
                         Door newDoor = new Door();
-                        setDoorFields(newDoor, nameField, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField);
+                        setDoorFields(newDoor, nameField, roomComboBox, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField);
                         doorManager.save(newDoor);
                         showSuccessNotification("Porte créée avec succès !");
                     } else {
-                        setDoorFields(door, nameField, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField);
+                        setDoorFields(door, nameField, roomComboBox, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField);
                         doorManager.save(door);
                         showSuccessNotification("Porte modifiée avec succès !");
                     }
@@ -351,10 +366,16 @@ public class DoorView extends VerticalLayout {
         return dialog;
     }
 
-    private boolean validateFields(TextField nameField, NumberField... numberFields) {
+    private boolean validateFields(TextField nameField, ComboBox<Room> roomComboBox, NumberField... numberFields) {
         if (nameField.getValue() == null || nameField.getValue().trim().isEmpty()) {
             showWarningNotification("Le nom ne peut pas être vide");
             nameField.focus();
+            return false;
+        }
+
+        if (roomComboBox.getValue() == null) {
+            showWarningNotification("Veuillez sélectionner une salle");
+            roomComboBox.focus();
             return false;
         }
 
@@ -368,10 +389,11 @@ public class DoorView extends VerticalLayout {
         return true;
     }
 
-    private void setDoorFields(Door door, TextField nameField, 
+    private void setDoorFields(Door door, TextField nameField, ComboBox<Room> roomComboBox,
                               NumberField posXField, NumberField posYField, NumberField posZField,
                               NumberField sizeXField, NumberField sizeYField, NumberField sizeZField) {
         door.setCustomName(nameField.getValue().trim());
+        door.setRoom(roomComboBox.getValue());
         door.setPosX(posXField.getValue());
         door.setPosY(posYField.getValue());
         door.setPosZ(posZField.getValue());

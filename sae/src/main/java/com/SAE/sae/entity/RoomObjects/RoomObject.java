@@ -28,7 +28,7 @@ public abstract class RoomObject {
     @Column(name = "rob_name")
     protected String customName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_room")
     @JsonIgnore
     private Room room;

@@ -224,9 +224,14 @@ public class DoorView extends VerticalLayout {
     }
 
     private void updateButtonStates() {
-        boolean hasSelection = selectedDoor != null;
+        // CORRECTION : Récupérer la sélection actuelle à chaque fois
+        Door currentSelection = grid.asSingleSelect().getValue();
+        boolean hasSelection = currentSelection != null;
         editButton.setEnabled(hasSelection);
         deleteButton.setEnabled(hasSelection);
+        
+        // Mettre à jour selectedDoor avec la sélection actuelle
+        selectedDoor = currentSelection;
     }
 
     private void loadData() {
@@ -241,6 +246,7 @@ public class DoorView extends VerticalLayout {
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             
+            // CORRECTION : Clear la sélection comme dans BuildingView
             grid.asSingleSelect().clear();
             
         } catch (Exception e) {
@@ -254,9 +260,13 @@ public class DoorView extends VerticalLayout {
     }
 
     private void openEditDialog() {
-        if (selectedDoor != null) {
-            Dialog dialog = createDoorDialog("Modifier la Porte", selectedDoor);
+        // CORRECTION : Récupérer la sélection actuelle au moment de l'action
+        Door currentSelection = grid.asSingleSelect().getValue();
+        if (currentSelection != null) {
+            Dialog dialog = createDoorDialog("Modifier la Porte", currentSelection);
             dialog.open();
+        } else {
+            showWarningNotification("Veuillez sélectionner une porte à modifier");
         }
     }
 
@@ -403,11 +413,13 @@ public class DoorView extends VerticalLayout {
     }
 
     private void confirmDelete() {
-        if (selectedDoor != null) {
+        // CORRECTION : Récupérer la sélection actuelle au moment de l'action
+        Door currentSelection = grid.asSingleSelect().getValue();
+        if (currentSelection != null) {
             ConfirmDialog confirmDialog = new ConfirmDialog();
             confirmDialog.setHeader("Confirmer la suppression");
             confirmDialog.setText("Êtes-vous sûr de vouloir supprimer la porte \"" + 
-                                 selectedDoor.getCustomName() + "\" ? Cette action est irréversible.");
+                                 currentSelection.getCustomName() + "\" ? Cette action est irréversible.");
 
             confirmDialog.setCancelable(true);
             confirmDialog.setCancelText("❌ Annuler");
@@ -416,7 +428,7 @@ public class DoorView extends VerticalLayout {
 
             confirmDialog.addConfirmListener(e -> {
                 try {
-                    doorManager.deleteById(selectedDoor.getId());
+                    doorManager.deleteById(currentSelection.getId());
                     showSuccessNotification("Porte supprimée avec succès !");
                     loadData();
                 } catch (Exception ex) {
@@ -425,6 +437,8 @@ public class DoorView extends VerticalLayout {
             });
 
             confirmDialog.open();
+        } else {
+            showWarningNotification("Veuillez sélectionner une porte à supprimer");
         }
     }
 

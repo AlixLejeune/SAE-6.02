@@ -23,9 +23,9 @@ public class Room {
     private double length;
     private double height;
 
-    @ManyToOne
     @JoinColumn(name = "fk_building_id") 
-    private Building building;
+    private int fkBuildingId;
+
     @JoinColumn(name="fk_room_type_id")
     private int fkRoomTypeId;
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.SAE.sae.entity.Room;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +21,8 @@ public class Building {
     private int id;
 
     private String name;
-    @OneToMany(mappedBy = "building")
+
+    @OneToMany(targetEntity = Room.class, mappedBy = "fkBuildingId")
     private List<Room> rooms;
 
 }

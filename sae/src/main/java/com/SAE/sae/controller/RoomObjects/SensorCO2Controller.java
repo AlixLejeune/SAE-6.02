@@ -104,7 +104,7 @@ public class SensorCO2Controller {
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
         SensorCO2Repository.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
+        return ResponseEntity.ok("Toutes les SensorCO2s de la salle ont été supprimées");
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.SAE.sae.controller.roomObjects;
+package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.DataTableController;
 import com.SAE.sae.entity.RoomObjects.DataTable;

@@ -51,6 +51,6 @@ public class RoomManager {
     }
 
     public List<Room> getRoomsByBuildingId(int buildingId) {
-        return roomRepo.findByBuilding_Id(buildingId);
+        return roomRepo.findByFkBuildingId(buildingId);
     }
 }

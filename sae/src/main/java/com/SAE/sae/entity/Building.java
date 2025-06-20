@@ -1,5 +1,6 @@
 package com.SAE.sae.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -23,6 +24,6 @@ public class Building {
     private String name;
 
     @OneToMany(targetEntity = Room.class, mappedBy = "fkBuildingId")
-    private List<Room> rooms;
+    private List<Room> rooms = new ArrayList<>();
 
 }

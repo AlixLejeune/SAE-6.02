@@ -75,7 +75,7 @@ public interface BuildingRepository extends JpaRepository<Building, Integer> {
 
 
     /**
-     * Supprimer les portes par nom personnalisé
+     * Supprimer les buildings par nom personnalisé
      */
     @Modifying
     @Transactional

@@ -42,11 +42,12 @@ public class BuildingView extends VerticalLayout {
     public BuildingView(BuildingManager buildingManager) {
         this.buildingManager = buildingManager;
         
-        // Configuration générale de la vue
+        // Configuration générale de la vue - CORRECTION : utiliser le même style que MainLayout
         setSizeFull();
         setPadding(true);
         setSpacing(true);
-        getStyle().set("background", "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)");
+        // Retirer le fond car il est déjà géré par MainLayout
+        // getStyle().set("background", "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)");
 
         createHeader();
         createToolbar();
@@ -60,11 +61,11 @@ public class BuildingView extends VerticalLayout {
     private void createHeader() {
         H2 title = new H2("🏢 Gestion des Bâtiments");
         title.getStyle()
-            .set("color", "#2c3e50")
+            .set("color", "white") // CORRECTION : texte blanc comme dans HomeView
             .set("margin", "0 0 20px 0")
             .set("text-align", "center")
             .set("font-weight", "300")
-            .set("text-shadow", "1px 1px 2px rgba(0,0,0,0.1)");
+            .set("text-shadow", "2px 2px 4px rgba(0,0,0,0.3)"); // Ombre plus prononcée pour le contraste
         
         add(title);
     }
@@ -196,13 +197,15 @@ public class BuildingView extends VerticalLayout {
     private void createSelectionInfo() {
         Div infoContainer = new Div();
         infoContainer.getStyle()
-            .set("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
+            .set("background", "rgba(255,255,255,0.1)") // CORRECTION : utiliser la transparence comme dans MainLayout
             .set("color", "white")
             .set("padding", "15px")
             .set("border-radius", "12px")
             .set("margin-top", "20px")
             .set("text-align", "center")
-            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)");
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
+            .set("backdrop-filter", "blur(10px)") // Effet de flou comme dans MainLayout
+            .set("border", "1px solid rgba(255,255,255,0.2)"); // Bordure subtile
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {

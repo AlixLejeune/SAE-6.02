@@ -3,50 +3,446 @@ package com.SAE.sae.view;
 import com.SAE.sae.entity.RoomObjects.Window;
 import com.SAE.sae.service.RoomObjects.WindowManager;
 import com.SAE.sae.view.layouts.MainLayout;
+
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-
 
 @Route(value = "windows", layout = MainLayout.class)
 public class WindowView extends VerticalLayout {
 
     private final WindowManager windowManager;
     private final Grid<Window> grid = new Grid<>(Window.class);
+    private Window selectedWindow = null;
+
+    // Boutons d'action
+    private Button refreshButton;
+    private Button addButton;
+    private Button editButton;
+    private Button deleteButton;
 
     @Autowired
     public WindowView(WindowManager windowManager) {
         this.windowManager = windowManager;
+        
+        // Configuration générale de la vue
+        setSizeFull();
+        setPadding(true);
+        setSpacing(true);
 
-        // Titre
-        add("📋 Liste des Windows");
-
-        // Bouton de chargement
-        Button loadButton = new Button("🔄 Charger les Windows", e -> loadData());
-
-        // Configuration du grid
-        grid.setColumns("id", "customName", "posX", "posY", "posZ", "sizeX", "sizeY", "sizeZ");
-        grid.setWidthFull();
-
-        // Ajout des composants
-        add(loadButton, grid);
-
+        createHeader();
+        createToolbar();
+        createGrid();
+        createLayout();
+        
         // Chargement initial
         loadData();
+    }
+
+    private void createHeader() {
+        H2 title = new H2("🪟 Gestion des Fenêtres");
+        title.getStyle()
+            .set("color", "white")
+            .set("margin", "0 0 20px 0")
+            .set("text-align", "center")
+            .set("font-weight", "300")
+            .set("text-shadow", "2px 2px 4px rgba(0,0,0,0.3)");
+        
+        add(title);
+    }
+
+    private void createToolbar() {
+        // Container pour la barre d'outils
+        HorizontalLayout toolbar = new HorizontalLayout();
+        toolbar.setWidthFull();
+        toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
+        toolbar.getStyle()
+            .set("background", "white")
+            .set("padding", "15px 20px")
+            .set("border-radius", "12px")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
+            .set("margin-bottom", "20px");
+
+        // Groupe de boutons principaux (gauche)
+        HorizontalLayout actionButtons = new HorizontalLayout();
+        actionButtons.setSpacing(true);
+
+        // Bouton Actualiser
+        refreshButton = createStyledButton("🔄 Actualiser", VaadinIcon.REFRESH, "#3498db", ButtonVariant.LUMO_PRIMARY);
+        refreshButton.addClickListener(e -> loadData());
+
+        // Bouton Ajouter
+        addButton = createStyledButton("➕ Ajouter", VaadinIcon.PLUS, "#27ae60", ButtonVariant.LUMO_SUCCESS);
+        addButton.addClickListener(e -> openAddDialog());
+
+        actionButtons.add(refreshButton, addButton);
+
+        // Groupe de boutons d'action sur sélection (droite)
+        HorizontalLayout selectionButtons = new HorizontalLayout();
+        selectionButtons.setSpacing(true);
+
+        // Bouton Modifier
+        editButton = createStyledButton("✏️ Modifier", VaadinIcon.EDIT, "#f39c12", ButtonVariant.LUMO_CONTRAST);
+        editButton.addClickListener(e -> openEditDialog());
+        editButton.setEnabled(false);
+
+        // Bouton Supprimer
+        deleteButton = createStyledButton("🗑️ Supprimer", VaadinIcon.TRASH, "#e74c3c", ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(e -> confirmDelete());
+        deleteButton.setEnabled(false);
+
+        selectionButtons.add(editButton, deleteButton);
+
+        toolbar.add(actionButtons, selectionButtons);
+        add(toolbar);
+    }
+
+    private Button createStyledButton(String text, VaadinIcon icon, String color, ButtonVariant variant) {
+        Button button = new Button(text, new Icon(icon));
+        button.addThemeVariants(variant);
+        button.getStyle()
+            .set("border-radius", "8px")
+            .set("font-weight", "500")
+            .set("padding", "10px 16px")
+            .set("transition", "all 0.3s ease")
+            .set("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
+
+        // Effet hover personnalisé
+        button.getElement().addEventListener("mouseenter", e -> {
+            button.getStyle().set("transform", "translateY(-2px)");
+        });
+        button.getElement().addEventListener("mouseleave", e -> {
+            button.getStyle().set("transform", "translateY(0)");
+        });
+
+        return button;
+    }
+
+    private void createGrid() {
+        // Configuration du grid avec style moderne
+        grid.removeAllColumns();
+        
+        // Colonnes personnalisées
+        grid.addColumn(Window::getId)
+            .setHeader("ID")
+            .setWidth("80px")
+            .setFlexGrow(0);
+            
+        grid.addColumn(Window::getCustomName)
+            .setHeader("Nom")
+            .setFlexGrow(1);
+
+        grid.addColumn(window -> window.getRoom() != null ? window.getRoom().getName() : "Non assignée")
+            .setHeader("Salle")
+            .setFlexGrow(1);
+
+        grid.addColumn(window -> String.format("%.1f, %.1f, %.1f", 
+            window.getPosX(), window.getPosY(), window.getPosZ()))
+            .setHeader("Position (X, Y, Z)")
+            .setFlexGrow(1);
+
+        grid.addColumn(window -> String.format("%.1f × %.1f × %.1f", 
+            window.getSizeX(), window.getSizeY(), window.getSizeZ()))
+            .setHeader("Taille (L × l × H)")
+            .setFlexGrow(1);
+
+        // Style du grid
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.getStyle()
+            .set("border-radius", "12px")
+            .set("overflow", "hidden")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)");
+
+        // Gestion de la sélection
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            selectedWindow = event.getValue();
+            updateButtonStates();
+        });
+
+        // Style des lignes
+        grid.setClassNameGenerator(window -> "custom-grid-row");
+        
+        // CSS personnalisé pour le grid
+        grid.getElement().executeJs(
+            "this.shadowRoot.querySelector('style').textContent += " +
+            "'.custom-grid-row { transition: background-color 0.2s ease; }' + " +
+            "'.custom-grid-row:hover { background-color: #f8f9fa !important; }'"
+        );
+    }
+
+    private void createLayout() {
+        // Container principal pour le contenu
+        Div contentContainer = new Div();
+        contentContainer.setSizeFull();
+        contentContainer.getStyle()
+            .set("background", "white")
+            .set("border-radius", "12px")
+            .set("padding", "20px")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
+            .set("overflow", "hidden");
+
+        contentContainer.add(grid);
+        add(contentContainer);
+
+        // Informations sur la sélection
+        createSelectionInfo();
+    }
+
+    private void createSelectionInfo() {
+        Div infoContainer = new Div();
+        infoContainer.getStyle()
+            .set("background", "rgba(255,255,255,0.1)")
+            .set("color", "white")
+            .set("padding", "15px")
+            .set("border-radius", "12px")
+            .set("margin-top", "20px")
+            .set("text-align", "center")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
+            .set("backdrop-filter", "blur(10px)")
+            .set("border", "1px solid rgba(255,255,255,0.2)");
+
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                infoContainer.setText("🪟 Fenêtre sélectionnée : " + event.getValue().getCustomName());
+                infoContainer.setVisible(true);
+            } else {
+                infoContainer.setVisible(false);
+            }
+        });
+
+        infoContainer.setVisible(false);
+        add(infoContainer);
+    }
+
+    private void updateButtonStates() {
+        boolean hasSelection = selectedWindow != null;
+        editButton.setEnabled(hasSelection);
+        deleteButton.setEnabled(hasSelection);
     }
 
     private void loadData() {
         try {
             List<Window> windows = windowManager.findAll();
             grid.setItems(windows);
-            Notification.show("✅ " + windows.size() + " Windows chargées");
+            
+            // Notification de succès
+            Notification notification = Notification.show(
+                "✅ " + windows.size() + " fenêtre(s) chargée(s)", 
+                3000, 
+                Notification.Position.TOP_END
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            
+            // Reset de la sélection
+            grid.asSingleSelect().clear();
+            
         } catch (Exception e) {
-            Notification.show("❌ Erreur lors du chargement : " + e.getMessage(), 3000, Notification.Position.MIDDLE);
+            showErrorNotification("Erreur lors du chargement", e.getMessage());
         }
+    }
+
+    private void openAddDialog() {
+        Dialog dialog = createWindowDialog("Nouvelle Fenêtre", null);
+        dialog.open();
+    }
+
+    private void openEditDialog() {
+        if (selectedWindow != null) {
+            Dialog dialog = createWindowDialog("Modifier la Fenêtre", selectedWindow);
+            dialog.open();
+        }
+    }
+
+    private Dialog createWindowDialog(String title, Window window) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle(title);
+        dialog.setModal(true);
+        dialog.setCloseOnEsc(true);
+        dialog.setCloseOnOutsideClick(false);
+
+        // Style du dialog
+        dialog.getElement().getStyle()
+            .set("border-radius", "12px")
+            .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)");
+
+        // Champs de saisie
+        TextField nameField = new TextField("Nom de la fenêtre");
+        nameField.setPlaceholder("Entrez le nom de la fenêtre...");
+        nameField.setWidthFull();
+
+        // Position
+        HorizontalLayout positionLayout = new HorizontalLayout();
+        NumberField posXField = new NumberField("Position X");
+        NumberField posYField = new NumberField("Position Y");
+        NumberField posZField = new NumberField("Position Z");
+        posXField.setStep(0.1);
+        posYField.setStep(0.1);
+        posZField.setStep(0.1);
+        positionLayout.add(posXField, posYField, posZField);
+
+        // Taille
+        HorizontalLayout sizeLayout = new HorizontalLayout();
+        NumberField sizeXField = new NumberField("Largeur");
+        NumberField sizeYField = new NumberField("Profondeur");
+        NumberField sizeZField = new NumberField("Hauteur");
+        sizeXField.setStep(0.1);
+        sizeYField.setStep(0.1);
+        sizeZField.setStep(0.1);
+        sizeLayout.add(sizeXField, sizeYField, sizeZField);
+
+        if (window != null) {
+            nameField.setValue(window.getCustomName() != null ? window.getCustomName() : "");
+            posXField.setValue(window.getPosX());
+            posYField.setValue(window.getPosY());
+            posZField.setValue(window.getPosZ());
+            sizeXField.setValue(window.getSizeX());
+            sizeYField.setValue(window.getSizeY());
+            sizeZField.setValue(window.getSizeZ());
+        }
+
+        // Layout du contenu
+        VerticalLayout content = new VerticalLayout(nameField, positionLayout, sizeLayout);
+        content.setPadding(false);
+        content.setSpacing(true);
+        dialog.add(content);
+
+        // Boutons
+        Button saveButton = new Button(window == null ? "✅ Créer" : "💾 Sauvegarder", 
+            new Icon(window == null ? VaadinIcon.CHECK : VaadinIcon.DOWNLOAD));
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.getStyle().set("margin-right", "10px");
+
+        Button cancelButton = new Button("❌ Annuler", new Icon(VaadinIcon.CLOSE));
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        // Actions des boutons
+        saveButton.addClickListener(e -> {
+            if (validateFields(nameField, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField)) {
+                try {
+                    if (window == null) {
+                        // Nouvelle fenêtre
+                        Window newWindow = new Window();
+                        setWindowFields(newWindow, nameField, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField);
+                        windowManager.save(newWindow);
+                        showSuccessNotification("Fenêtre créée avec succès !");
+                    } else {
+                        // Modification
+                        setWindowFields(window, nameField, posXField, posYField, posZField, sizeXField, sizeYField, sizeZField);
+                        windowManager.save(window);
+                        showSuccessNotification("Fenêtre modifiée avec succès !");
+                    }
+                    
+                    loadData();
+                    dialog.close();
+                    
+                } catch (Exception ex) {
+                    showErrorNotification("Erreur lors de la sauvegarde", ex.getMessage());
+                }
+            }
+        });
+
+        cancelButton.addClickListener(e -> dialog.close());
+
+        // Layout des boutons
+        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
+        dialog.getFooter().add(buttonLayout);
+
+        // Focus automatique
+        dialog.addOpenedChangeListener(e -> {
+            if (e.isOpened()) {
+                nameField.focus();
+            }
+        });
+
+        return dialog;
+    }
+
+    private boolean validateFields(TextField nameField, NumberField... numberFields) {
+        if (nameField.getValue() == null || nameField.getValue().trim().isEmpty()) {
+            showWarningNotification("Le nom ne peut pas être vide");
+            nameField.focus();
+            return false;
+        }
+
+        for (NumberField field : numberFields) {
+            if (field.getValue() == null) {
+                showWarningNotification("Tous les champs numériques doivent être remplis");
+                field.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void setWindowFields(Window window, TextField nameField, 
+                                NumberField posXField, NumberField posYField, NumberField posZField,
+                                NumberField sizeXField, NumberField sizeYField, NumberField sizeZField) {
+        window.setCustomName(nameField.getValue().trim());
+        window.setPosX(posXField.getValue());
+        window.setPosY(posYField.getValue());
+        window.setPosZ(posZField.getValue());
+        window.setSizeX(sizeXField.getValue());
+        window.setSizeY(sizeYField.getValue());
+        window.setSizeZ(sizeZField.getValue());
+    }
+
+    private void confirmDelete() {
+        if (selectedWindow != null) {
+            ConfirmDialog confirmDialog = new ConfirmDialog();
+            confirmDialog.setHeader("Confirmer la suppression");
+            confirmDialog.setText("Êtes-vous sûr de vouloir supprimer la fenêtre \"" + 
+                                 selectedWindow.getCustomName() + "\" ? Cette action est irréversible.");
+
+            confirmDialog.setCancelable(true);
+            confirmDialog.setCancelText("❌ Annuler");
+            confirmDialog.setConfirmText("🗑️ Supprimer");
+            confirmDialog.setConfirmButtonTheme("error primary");
+
+            confirmDialog.addConfirmListener(e -> {
+                try {
+                    windowManager.deleteById(selectedWindow.getId());
+                    showSuccessNotification("Fenêtre supprimée avec succès !");
+                    loadData();
+                } catch (Exception ex) {
+                    showErrorNotification("Erreur lors de la suppression", ex.getMessage());
+                }
+            });
+
+            confirmDialog.open();
+        }
+    }
+
+    // Méthodes utilitaires pour les notifications
+    private void showSuccessNotification(String message) {
+        Notification notification = Notification.show("✅ " + message, 3000, Notification.Position.TOP_END);
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+
+    private void showWarningNotification(String message) {
+        Notification notification = Notification.show("⚠️ " + message, 3000, Notification.Position.TOP_END);
+        notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+    }
+
+    private void showErrorNotification(String title, String message) {
+        Notification notification = Notification.show("❌ " + title + ": " + message, 5000, Notification.Position.TOP_END);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
     }
 }

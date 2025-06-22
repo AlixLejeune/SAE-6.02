@@ -7,16 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LampManager {
 
-    private final LampRepository LampRepository;
+    private final LampRepository lampRepository;
 
     @Autowired
-    public LampManager(LampRepository LampRepository) {
-        this.LampRepository = LampRepository;
+    public LampManager(LampRepository lampRepository) {
+        this.lampRepository = lampRepository;
     }
 
     // ========= CREATE / UPDATE =========
@@ -24,15 +23,15 @@ public class LampManager {
     /**
      * Créer ou mettre à jour une Lamp
      */
-    public Lamp save(Lamp Lamp) {
-        return LampRepository.save(Lamp);
+    public Lamp save(Lamp lamp) {
+        return lampRepository.save(lamp);
     }
 
     /**
      * Créer ou mettre à jour une liste de Lamps
      */
-    public List<Lamp> saveAll(List<Lamp> Lamps) {
-        return LampRepository.saveAll(Lamps);
+    public List<Lamp> saveAll(List<Lamp> lamps) {
+        return lampRepository.saveAll(lamps);
     }
 
     // ========= READ =========
@@ -40,36 +39,37 @@ public class LampManager {
     /**
      * Récupérer une Lamp par ID
      */
-    public Optional<Lamp> findById(Integer id) {
-        return LampRepository.findById(id);
+    public Lamp findById(Integer id) {
+        return lampRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune lampe trouvée avec l'ID : " + id));
     }
 
     /**
      * Récupérer toutes les Lamps
      */
     public List<Lamp> findAll() {
-        return LampRepository.findAll();
+        return lampRepository.findAll();
     }
 
     /**
      * Récupérer les Lamps par ID de salle
      */
-    public List<Lamp> findByRoomId(Integer  roomId) {
-        return LampRepository.findByRoomId(roomId);
+    public List<Lamp> findByRoomId(Integer roomId) {
+        return lampRepository.findByRoomId(roomId);
     }
 
     /**
-     * Récupérer les Lamps via l'objet Room
+     * Récupérer les Lamps via l'objet Room (ID de Room)
      */
     public List<Lamp> findByRoomId(Long roomId) {
-        return LampRepository.findByRoom_Id(roomId);
+        return lampRepository.findByRoom_Id(roomId);
     }
 
     /**
      * Récupérer les Lamps par nom personnalisé
      */
     public List<Lamp> findByCustomName(String customName) {
-        return LampRepository.findByCustomName(customName);
+        return lampRepository.findByCustomName(customName);
     }
 
     // ========= DELETE =========
@@ -78,21 +78,21 @@ public class LampManager {
      * Supprimer une Lamp par ID
      */
     public void deleteById(Integer id) {
-        LampRepository.deleteById(id);
+        lampRepository.deleteById(id);
     }
 
     /**
      * Supprimer un objet Lamp
      */
-    public void delete(Lamp Lamp) {
-        LampRepository.delete(Lamp);
+    public void delete(Lamp lamp) {
+        lampRepository.delete(lamp);
     }
 
     /**
      * Supprimer toutes les Lamps
      */
     public void deleteAll() {
-        LampRepository.deleteAll();
+        lampRepository.deleteAll();
     }
 
     /**
@@ -100,7 +100,7 @@ public class LampManager {
      */
     @Transactional
     public void deleteByRoomId(Integer roomId) {
-        LampRepository.deleteByRoomId(roomId);
+        lampRepository.deleteByRoomId(roomId);
     }
 
     /**
@@ -108,7 +108,7 @@ public class LampManager {
      */
     @Transactional
     public void deleteByCustomName(String customName) {
-        LampRepository.deleteByCustomName(customName);
+        lampRepository.deleteByCustomName(customName);
     }
 
     // ========= AUTRES =========
@@ -117,13 +117,13 @@ public class LampManager {
      * Vérifier l'existence d'une Lamp par ID
      */
     public boolean existsById(Integer id) {
-        return LampRepository.existsById(id);
+        return lampRepository.existsById(id);
     }
 
     /**
      * Compter le nombre total de Lamps
      */
     public long count() {
-        return LampRepository.count();
+        return lampRepository.count();
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DataTableManager {
@@ -40,8 +39,9 @@ public class DataTableManager {
     /**
      * Récupérer une DataTable par ID
      */
-    public Optional<DataTable> findById(Integer id) {
-        return dataTableRepository.findById(id);
+    public DataTable findById(Integer id) {
+        return dataTableRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune DataTable trouvée avec l'ID : " + id));
     }
 
     /**
@@ -54,12 +54,12 @@ public class DataTableManager {
     /**
      * Récupérer les DataTables par ID de salle
      */
-    public List<DataTable> findByRoomId(Integer  roomId) {
+    public List<DataTable> findByRoomId(Integer roomId) {
         return dataTableRepository.findByRoomId(roomId);
     }
 
     /**
-     * Récupérer les DataTables via l'objet Room
+     * Récupérer les DataTables via l'objet Room (en utilisant l'ID de Room)
      */
     public List<DataTable> findByRoomId(Long roomId) {
         return dataTableRepository.findByRoom_Id(roomId);

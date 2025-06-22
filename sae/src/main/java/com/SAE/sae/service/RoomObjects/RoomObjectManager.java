@@ -7,100 +7,100 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RoomObjectManager {
 
-    private final RoomObjectRepository RoomObjectRepository;
+    private final RoomObjectRepository roomObjectRepository;
 
     @Autowired
-    public RoomObjectManager(RoomObjectRepository RoomObjectRepository) {
-        this.RoomObjectRepository = RoomObjectRepository;
+    public RoomObjectManager(RoomObjectRepository roomObjectRepository) {
+        this.roomObjectRepository = roomObjectRepository;
     }
 
     // ========= CREATE / UPDATE =========
 
     /**
-     * Créer ou mettre à jour une RoomObject
+     * Créer ou mettre à jour un RoomObject
      */
-    public RoomObject save(RoomObject RoomObject) {
-        return RoomObjectRepository.save(RoomObject);
+    public RoomObject save(RoomObject roomObject) {
+        return roomObjectRepository.save(roomObject);
     }
 
     /**
      * Créer ou mettre à jour une liste de RoomObjects
      */
-    public List<RoomObject> saveAll(List<RoomObject> RoomObjects) {
-        return RoomObjectRepository.saveAll(RoomObjects);
+    public List<RoomObject> saveAll(List<RoomObject> roomObjects) {
+        return roomObjectRepository.saveAll(roomObjects);
     }
 
     // ========= READ =========
 
     /**
-     * Récupérer une RoomObject par ID
+     * Récupérer un RoomObject par ID
      */
-    public Optional<RoomObject> findById(Integer id) {
-        return RoomObjectRepository.findById(id);
+    public RoomObject findById(Integer id) {
+        return roomObjectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucun objet de salle trouvé avec l'ID : " + id));
     }
 
     /**
-     * Récupérer toutes les RoomObjects
+     * Récupérer tous les RoomObjects
      */
     public List<RoomObject> findAll() {
-        return RoomObjectRepository.findAll();
+        return roomObjectRepository.findAll();
     }
 
     /**
      * Récupérer les RoomObjects par ID de salle
      */
-    public List<RoomObject> findByRoomId(Integer  roomId) {
-        return RoomObjectRepository.findByRoomId(roomId);
+    public List<RoomObject> findByRoomId(Integer roomId) {
+        return roomObjectRepository.findByRoomId(roomId);
     }
 
     /**
      * Récupérer les RoomObjects via l'objet Room
      */
     public List<RoomObject> findByRoomId(Long roomId) {
-        return RoomObjectRepository.findByRoom_Id(roomId);
+        return roomObjectRepository.findByRoom_Id(roomId);
     }
 
     /**
      * Récupérer les RoomObjects par nom personnalisé
      */
     public List<RoomObject> findByCustomName(String customName) {
-        return RoomObjectRepository.findByCustomName(customName);
+        return roomObjectRepository.findByCustomName(customName);
     }
 
     // ========= DELETE =========
 
     /**
-     * Supprimer une RoomObject par ID
+     * Supprimer un RoomObject par ID
      */
     public void deleteById(Integer id) {
-        RoomObjectRepository.deleteById(id);
+        roomObjectRepository.deleteById(id);
     }
 
     /**
      * Supprimer un objet RoomObject
      */
-    public void delete(RoomObject RoomObject) {
-        RoomObjectRepository.delete(RoomObject);
+    public void delete(RoomObject roomObject) {
+        roomObjectRepository.delete(roomObject);
     }
 
     /**
-     * Supprimer toutes les RoomObjects
+     * Supprimer tous les RoomObjects
      */
     public void deleteAll() {
-        RoomObjectRepository.deleteAll();
+        roomObjectRepository.deleteAll();
     }
 
     /**
-     * Supprimer toutes les RoomObjects d'une salle
+     * Supprimer tous les RoomObjects d'une salle
      */
     @Transactional
     public void deleteByRoomId(Integer roomId) {
-        RoomObjectRepository.deleteByRoomId(roomId);
+        roomObjectRepository.deleteByRoomId(roomId);
     }
 
     /**
@@ -108,22 +108,22 @@ public class RoomObjectManager {
      */
     @Transactional
     public void deleteByCustomName(String customName) {
-        RoomObjectRepository.deleteByCustomName(customName);
+        roomObjectRepository.deleteByCustomName(customName);
     }
 
     // ========= AUTRES =========
 
     /**
-     * Vérifier l'existence d'une RoomObject par ID
+     * Vérifier l'existence d'un RoomObject par ID
      */
     public boolean existsById(Integer id) {
-        return RoomObjectRepository.existsById(id);
+        return roomObjectRepository.existsById(id);
     }
 
     /**
      * Compter le nombre total de RoomObjects
      */
     public long count() {
-        return RoomObjectRepository.count();
+        return roomObjectRepository.count();
     }
 }

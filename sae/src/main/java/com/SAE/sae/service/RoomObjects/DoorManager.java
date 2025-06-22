@@ -7,16 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DoorManager {
 
-    private final DoorRepository DoorRepository;
+    private final DoorRepository doorRepository;
 
     @Autowired
-    public DoorManager(DoorRepository DoorRepository) {
-        this.DoorRepository = DoorRepository;
+    public DoorManager(DoorRepository doorRepository) {
+        this.doorRepository = doorRepository;
     }
 
     // ========= CREATE / UPDATE =========
@@ -24,15 +23,15 @@ public class DoorManager {
     /**
      * Créer ou mettre à jour une Door
      */
-    public Door save(Door Door) {
-        return DoorRepository.save(Door);
+    public Door save(Door door) {
+        return doorRepository.save(door);
     }
 
     /**
      * Créer ou mettre à jour une liste de Doors
      */
-    public List<Door> saveAll(List<Door> Doors) {
-        return DoorRepository.saveAll(Doors);
+    public List<Door> saveAll(List<Door> doors) {
+        return doorRepository.saveAll(doors);
     }
 
     // ========= READ =========
@@ -40,36 +39,37 @@ public class DoorManager {
     /**
      * Récupérer une Door par ID
      */
-    public Optional<Door> findById(Integer id) {
-        return DoorRepository.findById(id);
+    public Door findById(Integer id) {
+        return doorRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune porte trouvée avec l'ID : " + id));
     }
 
     /**
      * Récupérer toutes les Doors
      */
     public List<Door> findAll() {
-        return DoorRepository.findAll();
+        return doorRepository.findAll();
     }
 
     /**
      * Récupérer les Doors par ID de salle
      */
-    public List<Door> findByRoomId(Integer  roomId) {
-        return DoorRepository.findByRoomId(roomId);
+    public List<Door> findByRoomId(Integer roomId) {
+        return doorRepository.findByRoomId(roomId);
     }
 
     /**
-     * Récupérer les Doors via l'objet Room
+     * Récupérer les Doors via l'objet Room (ID de Room)
      */
     public List<Door> findByRoomId(Long roomId) {
-        return DoorRepository.findByRoom_Id(roomId);
+        return doorRepository.findByRoom_Id(roomId);
     }
 
     /**
      * Récupérer les Doors par nom personnalisé
      */
     public List<Door> findByCustomName(String customName) {
-        return DoorRepository.findByCustomName(customName);
+        return doorRepository.findByCustomName(customName);
     }
 
     // ========= DELETE =========
@@ -78,21 +78,21 @@ public class DoorManager {
      * Supprimer une Door par ID
      */
     public void deleteById(Integer id) {
-        DoorRepository.deleteById(id);
+        doorRepository.deleteById(id);
     }
 
     /**
      * Supprimer un objet Door
      */
-    public void delete(Door Door) {
-        DoorRepository.delete(Door);
+    public void delete(Door door) {
+        doorRepository.delete(door);
     }
 
     /**
      * Supprimer toutes les Doors
      */
     public void deleteAll() {
-        DoorRepository.deleteAll();
+        doorRepository.deleteAll();
     }
 
     /**
@@ -100,7 +100,7 @@ public class DoorManager {
      */
     @Transactional
     public void deleteByRoomId(Integer roomId) {
-        DoorRepository.deleteByRoomId(roomId);
+        doorRepository.deleteByRoomId(roomId);
     }
 
     /**
@@ -108,7 +108,7 @@ public class DoorManager {
      */
     @Transactional
     public void deleteByCustomName(String customName) {
-        DoorRepository.deleteByCustomName(customName);
+        doorRepository.deleteByCustomName(customName);
     }
 
     // ========= AUTRES =========
@@ -117,13 +117,13 @@ public class DoorManager {
      * Vérifier l'existence d'une Door par ID
      */
     public boolean existsById(Integer id) {
-        return DoorRepository.existsById(id);
+        return doorRepository.existsById(id);
     }
 
     /**
      * Compter le nombre total de Doors
      */
     public long count() {
-        return DoorRepository.count();
+        return doorRepository.count();
     }
 }

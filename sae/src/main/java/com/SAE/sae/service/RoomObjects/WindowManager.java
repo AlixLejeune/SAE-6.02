@@ -7,16 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class WindowManager {
 
-    private final WindowRepository WindowRepository;
+    private final WindowRepository windowRepository;
 
     @Autowired
-    public WindowManager(WindowRepository WindowRepository) {
-        this.WindowRepository = WindowRepository;
+    public WindowManager(WindowRepository windowRepository) {
+        this.windowRepository = windowRepository;
     }
 
     // ========= CREATE / UPDATE =========
@@ -24,15 +23,15 @@ public class WindowManager {
     /**
      * Créer ou mettre à jour une Window
      */
-    public Window save(Window Window) {
-        return WindowRepository.save(Window);
+    public Window save(Window window) {
+        return windowRepository.save(window);
     }
 
     /**
      * Créer ou mettre à jour une liste de Windows
      */
-    public List<Window> saveAll(List<Window> Windows) {
-        return WindowRepository.saveAll(Windows);
+    public List<Window> saveAll(List<Window> windows) {
+        return windowRepository.saveAll(windows);
     }
 
     // ========= READ =========
@@ -40,36 +39,37 @@ public class WindowManager {
     /**
      * Récupérer une Window par ID
      */
-    public Optional<Window> findById(Integer id) {
-        return WindowRepository.findById(id);
+    public Window findById(Integer id) {
+        return windowRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune fenêtre trouvée avec l'ID : " + id));
     }
 
     /**
      * Récupérer toutes les Windows
      */
     public List<Window> findAll() {
-        return WindowRepository.findAll();
+        return windowRepository.findAll();
     }
 
     /**
      * Récupérer les Windows par ID de salle
      */
-    public List<Window> findByRoomId(Integer  roomId) {
-        return WindowRepository.findByRoomId(roomId);
+    public List<Window> findByRoomId(Integer roomId) {
+        return windowRepository.findByRoomId(roomId);
     }
 
     /**
      * Récupérer les Windows via l'objet Room
      */
     public List<Window> findByRoomId(Long roomId) {
-        return WindowRepository.findByRoom_Id(roomId);
+        return windowRepository.findByRoom_Id(roomId);
     }
 
     /**
      * Récupérer les Windows par nom personnalisé
      */
     public List<Window> findByCustomName(String customName) {
-        return WindowRepository.findByCustomName(customName);
+        return windowRepository.findByCustomName(customName);
     }
 
     // ========= DELETE =========
@@ -78,21 +78,21 @@ public class WindowManager {
      * Supprimer une Window par ID
      */
     public void deleteById(Integer id) {
-        WindowRepository.deleteById(id);
+        windowRepository.deleteById(id);
     }
 
     /**
      * Supprimer un objet Window
      */
-    public void delete(Window Window) {
-        WindowRepository.delete(Window);
+    public void delete(Window window) {
+        windowRepository.delete(window);
     }
 
     /**
      * Supprimer toutes les Windows
      */
     public void deleteAll() {
-        WindowRepository.deleteAll();
+        windowRepository.deleteAll();
     }
 
     /**
@@ -100,7 +100,7 @@ public class WindowManager {
      */
     @Transactional
     public void deleteByRoomId(Integer roomId) {
-        WindowRepository.deleteByRoomId(roomId);
+        windowRepository.deleteByRoomId(roomId);
     }
 
     /**
@@ -108,7 +108,7 @@ public class WindowManager {
      */
     @Transactional
     public void deleteByCustomName(String customName) {
-        WindowRepository.deleteByCustomName(customName);
+        windowRepository.deleteByCustomName(customName);
     }
 
     // ========= AUTRES =========
@@ -117,13 +117,13 @@ public class WindowManager {
      * Vérifier l'existence d'une Window par ID
      */
     public boolean existsById(Integer id) {
-        return WindowRepository.existsById(id);
+        return windowRepository.existsById(id);
     }
 
     /**
      * Compter le nombre total de Windows
      */
     public long count() {
-        return WindowRepository.count();
+        return windowRepository.count();
     }
 }

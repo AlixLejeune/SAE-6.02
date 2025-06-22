@@ -7,100 +7,100 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SensorCO2Manager {
 
-    private final SensorCO2Repository SensorCO2Repository;
+    private final SensorCO2Repository sensorCO2Repository;
 
     @Autowired
-    public SensorCO2Manager(SensorCO2Repository SensorCO2Repository) {
-        this.SensorCO2Repository = SensorCO2Repository;
+    public SensorCO2Manager(SensorCO2Repository sensorCO2Repository) {
+        this.sensorCO2Repository = sensorCO2Repository;
     }
 
     // ========= CREATE / UPDATE =========
 
     /**
-     * Créer ou mettre à jour une SensorCO2
+     * Créer ou mettre à jour un SensorCO2
      */
-    public SensorCO2 save(SensorCO2 SensorCO2) {
-        return SensorCO2Repository.save(SensorCO2);
+    public SensorCO2 save(SensorCO2 sensorCO2) {
+        return sensorCO2Repository.save(sensorCO2);
     }
 
     /**
      * Créer ou mettre à jour une liste de SensorCO2s
      */
-    public List<SensorCO2> saveAll(List<SensorCO2> SensorCO2s) {
-        return SensorCO2Repository.saveAll(SensorCO2s);
+    public List<SensorCO2> saveAll(List<SensorCO2> sensorCO2s) {
+        return sensorCO2Repository.saveAll(sensorCO2s);
     }
 
     // ========= READ =========
 
     /**
-     * Récupérer une SensorCO2 par ID
+     * Récupérer un SensorCO2 par ID
      */
-    public Optional<SensorCO2> findById(Integer id) {
-        return SensorCO2Repository.findById(id);
+    public SensorCO2 findById(Integer id) {
+        return sensorCO2Repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucun capteur CO2 trouvé avec l'ID : " + id));
     }
 
     /**
-     * Récupérer toutes les SensorCO2s
+     * Récupérer tous les SensorCO2s
      */
     public List<SensorCO2> findAll() {
-        return SensorCO2Repository.findAll();
+        return sensorCO2Repository.findAll();
     }
 
     /**
      * Récupérer les SensorCO2s par ID de salle
      */
-    public List<SensorCO2> findByRoomId(Integer  roomId) {
- return SensorCO2Repository.findByRoomId(roomId);
+    public List<SensorCO2> findByRoomId(Integer roomId) {
+        return sensorCO2Repository.findByRoomId(roomId);
     }
 
     /**
      * Récupérer les SensorCO2s via l'objet Room
      */
     public List<SensorCO2> findByRoomId(Long roomId) {
-        return SensorCO2Repository.findByRoom_Id(roomId);
+        return sensorCO2Repository.findByRoom_Id(roomId);
     }
 
     /**
      * Récupérer les SensorCO2s par nom personnalisé
      */
     public List<SensorCO2> findByCustomName(String customName) {
-        return SensorCO2Repository.findByCustomName(customName);
+        return sensorCO2Repository.findByCustomName(customName);
     }
 
     // ========= DELETE =========
 
     /**
-     * Supprimer une SensorCO2 par ID
+     * Supprimer un SensorCO2 par ID
      */
     public void deleteById(Integer id) {
-        SensorCO2Repository.deleteById(id);
+        sensorCO2Repository.deleteById(id);
     }
 
     /**
      * Supprimer un objet SensorCO2
      */
-    public void delete(SensorCO2 SensorCO2) {
-        SensorCO2Repository.delete(SensorCO2);
+    public void delete(SensorCO2 sensorCO2) {
+        sensorCO2Repository.delete(sensorCO2);
     }
 
     /**
-     * Supprimer toutes les SensorCO2s
+     * Supprimer tous les SensorCO2s
      */
     public void deleteAll() {
-        SensorCO2Repository.deleteAll();
+        sensorCO2Repository.deleteAll();
     }
 
     /**
-     * Supprimer toutes les SensorCO2s d'une salle
+     * Supprimer tous les SensorCO2s d'une salle
      */
     @Transactional
     public void deleteByRoomId(Integer roomId) {
-        SensorCO2Repository.deleteByRoomId(roomId);
+        sensorCO2Repository.deleteByRoomId(roomId);
     }
 
     /**
@@ -108,22 +108,22 @@ public class SensorCO2Manager {
      */
     @Transactional
     public void deleteByCustomName(String customName) {
-        SensorCO2Repository.deleteByCustomName(customName);
+        sensorCO2Repository.deleteByCustomName(customName);
     }
 
     // ========= AUTRES =========
 
     /**
-     * Vérifier l'existence d'une SensorCO2 par ID
+     * Vérifier l'existence d'un SensorCO2 par ID
      */
     public boolean existsById(Integer id) {
-        return SensorCO2Repository.existsById(id);
+        return sensorCO2Repository.existsById(id);
     }
 
     /**
      * Compter le nombre total de SensorCO2s
      */
     public long count() {
-        return SensorCO2Repository.count();
+        return sensorCO2Repository.count();
     }
 }

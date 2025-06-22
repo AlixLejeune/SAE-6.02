@@ -7,16 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PlugManager {
 
-    private final PlugRepository PlugRepository;
+    private final PlugRepository plugRepository;
 
     @Autowired
-    public PlugManager(PlugRepository PlugRepository) {
-        this.PlugRepository = PlugRepository;
+    public PlugManager(PlugRepository plugRepository) {
+        this.plugRepository = plugRepository;
     }
 
     // ========= CREATE / UPDATE =========
@@ -24,15 +23,15 @@ public class PlugManager {
     /**
      * Créer ou mettre à jour une Plug
      */
-    public Plug save(Plug Plug) {
-        return PlugRepository.save(Plug);
+    public Plug save(Plug plug) {
+        return plugRepository.save(plug);
     }
 
     /**
      * Créer ou mettre à jour une liste de Plugs
      */
-    public List<Plug> saveAll(List<Plug> Plugs) {
-        return PlugRepository.saveAll(Plugs);
+    public List<Plug> saveAll(List<Plug> plugs) {
+        return plugRepository.saveAll(plugs);
     }
 
     // ========= READ =========
@@ -40,36 +39,37 @@ public class PlugManager {
     /**
      * Récupérer une Plug par ID
      */
-    public Optional<Plug> findById(Integer id) {
-        return PlugRepository.findById(id);
+    public Plug findById(Integer id) {
+        return plugRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune prise trouvée avec l'ID : " + id));
     }
 
     /**
      * Récupérer toutes les Plugs
      */
     public List<Plug> findAll() {
-        return PlugRepository.findAll();
+        return plugRepository.findAll();
     }
 
     /**
      * Récupérer les Plugs par ID de salle
      */
-    public List<Plug> findByRoomId(Integer  roomId) {
-        return PlugRepository.findByRoomId(roomId);
+    public List<Plug> findByRoomId(Integer roomId) {
+        return plugRepository.findByRoomId(roomId);
     }
 
     /**
-     * Récupérer les Plugs via l'objet Room
+     * Récupérer les Plugs via l'objet Room (ID de Room)
      */
     public List<Plug> findByRoomId(Long roomId) {
-        return PlugRepository.findByRoom_Id(roomId);
+        return plugRepository.findByRoom_Id(roomId);
     }
 
     /**
      * Récupérer les Plugs par nom personnalisé
      */
     public List<Plug> findByCustomName(String customName) {
-        return PlugRepository.findByCustomName(customName);
+        return plugRepository.findByCustomName(customName);
     }
 
     // ========= DELETE =========
@@ -78,21 +78,21 @@ public class PlugManager {
      * Supprimer une Plug par ID
      */
     public void deleteById(Integer id) {
-        PlugRepository.deleteById(id);
+        plugRepository.deleteById(id);
     }
 
     /**
      * Supprimer un objet Plug
      */
-    public void delete(Plug Plug) {
-        PlugRepository.delete(Plug);
+    public void delete(Plug plug) {
+        plugRepository.delete(plug);
     }
 
     /**
      * Supprimer toutes les Plugs
      */
     public void deleteAll() {
-        PlugRepository.deleteAll();
+        plugRepository.deleteAll();
     }
 
     /**
@@ -100,7 +100,7 @@ public class PlugManager {
      */
     @Transactional
     public void deleteByRoomId(Integer roomId) {
-        PlugRepository.deleteByRoomId(roomId);
+        plugRepository.deleteByRoomId(roomId);
     }
 
     /**
@@ -108,7 +108,7 @@ public class PlugManager {
      */
     @Transactional
     public void deleteByCustomName(String customName) {
-        PlugRepository.deleteByCustomName(customName);
+        plugRepository.deleteByCustomName(customName);
     }
 
     // ========= AUTRES =========
@@ -117,13 +117,13 @@ public class PlugManager {
      * Vérifier l'existence d'une Plug par ID
      */
     public boolean existsById(Integer id) {
-        return PlugRepository.existsById(id);
+        return plugRepository.existsById(id);
     }
 
     /**
      * Compter le nombre total de Plugs
      */
     public long count() {
-        return PlugRepository.count();
+        return plugRepository.count();
     }
 }

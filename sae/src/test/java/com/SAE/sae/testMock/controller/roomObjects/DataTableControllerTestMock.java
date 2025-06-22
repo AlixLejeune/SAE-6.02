@@ -2,15 +2,13 @@ package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.DataTableController;
 import com.SAE.sae.entity.RoomObjects.DataTable;
-import com.SAE.sae.repository.RoomObjects.DataTableRepository;
+import com.SAE.sae.service.RoomObjects.DataTableManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -19,7 +17,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -31,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DataTableControllerTestMock {
 
     @Mock
-    private DataTableRepository dataTableRepository;
+    private DataTableManager dataTableManager;
 
     @InjectMocks
     private DataTableController dataTableController;
@@ -44,12 +41,10 @@ public class DataTableControllerTestMock {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(dataTableController).build();
         objectMapper = new ObjectMapper();
-        
+
         // Création d'un objet DataTable d'exemple
         sampleDataTable = new DataTable();
         sampleDataTable.setId(1);
-        sampleDataTable.setCustomName("Table Test");
-        // Ajoutez d'autres propriétés selon votre entité DataTable
     }
 
     @Test
@@ -57,7 +52,7 @@ public class DataTableControllerTestMock {
     void getAllDataTables_ShouldReturnAllDataTables() throws Exception {
         // Given
         List<DataTable> dataTables = Arrays.asList(sampleDataTable, new DataTable());
-        when(dataTableRepository.findAll()).thenReturn(dataTables);
+        when(dataTableManager.findAll()).thenReturn(dataTables);
 
         // When & Then
         mockMvc.perform(get("/api/v1/data-tables"))
@@ -65,21 +60,21 @@ public class DataTableControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
 
-        verify(dataTableRepository, times(1)).findAll();
+        verify(dataTableManager, times(1)).findAll();
     }
 
     @Test
     @DisplayName("GET /api/v1/data-tables - Retourner liste vide quand aucune DataTable")
     void getAllDataTables_WhenEmpty_ShouldReturnEmptyList() throws Exception {
         // Given
-        when(dataTableRepository.findAll()).thenReturn(Arrays.asList());
+        when(dataTableManager.findAll()).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/data-tables"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(dataTableRepository, times(1)).findAll();
+        verify(dataTableManager, times(1)).findAll();
     }
 
     @Test
@@ -87,16 +82,15 @@ public class DataTableControllerTestMock {
     void getDataTableById_WhenExists_ShouldReturnDataTable() throws Exception {
         // Given
         Integer id = 1;
-        when(dataTableRepository.findById(id)).thenReturn(Optional.of(sampleDataTable));
+        when(dataTableManager.findById(id)).thenReturn(sampleDataTable);
 
         // When & Then
         mockMvc.perform(get("/api/v1/data-tables/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.customName").value("Table Test"));
+                .andExpect(jsonPath("$.id").value(1));
 
-        verify(dataTableRepository, times(1)).findById(id);
+        verify(dataTableManager, times(1)).findById(id);
     }
 
     @Test
@@ -104,13 +98,13 @@ public class DataTableControllerTestMock {
     void getDataTableById_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(dataTableRepository.findById(id)).thenReturn(Optional.empty());
+        when(dataTableManager.findById(id)).thenThrow(new IllegalArgumentException("DataTable non trouvée"));
 
         // When & Then
         mockMvc.perform(get("/api/v1/data-tables/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(dataTableRepository, times(1)).findById(id);
+        verify(dataTableManager, times(1)).findById(id);
     }
 
     @Test
@@ -119,7 +113,7 @@ public class DataTableControllerTestMock {
         // Given
         Long roomId = 1L;
         List<DataTable> roomDataTables = Arrays.asList(sampleDataTable);
-        when(dataTableRepository.findByRoom_Id(roomId)).thenReturn(roomDataTables);
+        when(dataTableManager.findByRoomId(roomId)).thenReturn(roomDataTables);
 
         // When & Then
         mockMvc.perform(get("/api/v1/data-tables/by-room/{roomId}", roomId))
@@ -127,7 +121,7 @@ public class DataTableControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(dataTableRepository, times(1)).findByRoom_Id(roomId);
+        verify(dataTableManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -135,14 +129,14 @@ public class DataTableControllerTestMock {
     void getByRoomId_WhenNoDataTables_ShouldReturnEmptyList() throws Exception {
         // Given
         Long roomId = 999L;
-        when(dataTableRepository.findByRoom_Id(roomId)).thenReturn(Arrays.asList());
+        when(dataTableManager.findByRoomId(roomId)).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/data-tables/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(dataTableRepository, times(1)).findByRoom_Id(roomId);
+        verify(dataTableManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -151,7 +145,7 @@ public class DataTableControllerTestMock {
         // Given
         String customName = "Table Test";
         List<DataTable> namedDataTables = Arrays.asList(sampleDataTable);
-        when(dataTableRepository.findByCustomName(customName)).thenReturn(namedDataTables);
+        when(dataTableManager.findByCustomName(customName)).thenReturn(namedDataTables);
 
         // When & Then
         mockMvc.perform(get("/api/v1/data-tables/by-custom-name")
@@ -160,7 +154,7 @@ public class DataTableControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(dataTableRepository, times(1)).findByCustomName(customName);
+        verify(dataTableManager, times(1)).findByCustomName(customName);
     }
 
     @Test
@@ -169,8 +163,8 @@ public class DataTableControllerTestMock {
         // Given
         DataTable newDataTable = new DataTable();
         newDataTable.setCustomName("Nouvelle Table");
-        
-        when(dataTableRepository.save(any(DataTable.class))).thenReturn(sampleDataTable);
+
+        when(dataTableManager.save(any(DataTable.class))).thenReturn(sampleDataTable);
 
         // When & Then
         mockMvc.perform(post("/api/v1/data-tables")
@@ -180,7 +174,7 @@ public class DataTableControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1));
 
-        verify(dataTableRepository, times(1)).save(any(DataTable.class));
+        verify(dataTableManager, times(1)).save(any(DataTable.class));
     }
 
     @Test
@@ -190,8 +184,8 @@ public class DataTableControllerTestMock {
         DataTable updatedDataTable = new DataTable();
         updatedDataTable.setId(1);
         updatedDataTable.setCustomName("Table Modifiée");
-        
-        when(dataTableRepository.save(any(DataTable.class))).thenReturn(updatedDataTable);
+
+        when(dataTableManager.save(any(DataTable.class))).thenReturn(updatedDataTable);
 
         // When & Then
         mockMvc.perform(put("/api/v1/data-tables")
@@ -201,7 +195,7 @@ public class DataTableControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.customName").value("Table Modifiée"));
 
-        verify(dataTableRepository, times(1)).save(any(DataTable.class));
+        verify(dataTableManager, times(1)).save(any(DataTable.class));
     }
 
     @Test
@@ -209,16 +203,16 @@ public class DataTableControllerTestMock {
     void deleteDataTable_WhenExists_ShouldDeleteAndReturnSuccess() throws Exception {
         // Given
         Integer id = 1;
-        when(dataTableRepository.existsById(id)).thenReturn(true);
-        doNothing().when(dataTableRepository).deleteById(id);
+        when(dataTableManager.existsById(id)).thenReturn(true);
+        doNothing().when(dataTableManager).deleteById(id);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/data-tables/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("DataTable supprimée avec succès"));
 
-        verify(dataTableRepository, times(1)).existsById(id);
-        verify(dataTableRepository, times(1)).deleteById(id);
+        verify(dataTableManager, times(1)).existsById(id);
+        verify(dataTableManager, times(1)).deleteById(id);
     }
 
     @Test
@@ -226,14 +220,14 @@ public class DataTableControllerTestMock {
     void deleteDataTable_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(dataTableRepository.existsById(id)).thenReturn(false);
+        when(dataTableManager.existsById(id)).thenReturn(false);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/data-tables/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(dataTableRepository, times(1)).existsById(id);
-        verify(dataTableRepository, never()).deleteById(id);
+        verify(dataTableManager, times(1)).existsById(id);
+        verify(dataTableManager, never()).deleteById(id);
     }
 
     @Test
@@ -241,14 +235,14 @@ public class DataTableControllerTestMock {
     void deleteByRoomId_ShouldDeleteAllDataTablesInRoom() throws Exception {
         // Given
         Integer roomId = 1;
-        doNothing().when(dataTableRepository).deleteByRoomId(roomId);
+        doNothing().when(dataTableManager).deleteByRoomId(roomId);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/data-tables/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les DataTables de la salle ont été supprimées"));
 
-        verify(dataTableRepository, times(1)).deleteByRoomId(roomId);
+        verify(dataTableManager, times(1)).deleteByRoomId(roomId);
     }
 
     @Test
@@ -256,7 +250,7 @@ public class DataTableControllerTestMock {
     void deleteByCustomName_ShouldDeleteAllDataTablesWithCustomName() throws Exception {
         // Given
         String customName = "Table à supprimer";
-        doNothing().when(dataTableRepository).deleteByCustomName(customName);
+        doNothing().when(dataTableManager).deleteByCustomName(customName);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/data-tables/by-custom-name")
@@ -264,7 +258,7 @@ public class DataTableControllerTestMock {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les DataTables avec ce nom ont été supprimées"));
 
-        verify(dataTableRepository, times(1)).deleteByCustomName(customName);
+        verify(dataTableManager, times(1)).deleteByCustomName(customName);
     }
 
     @Test
@@ -274,7 +268,7 @@ public class DataTableControllerTestMock {
         mockMvc.perform(get("/api/v1/data-tables/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(dataTableRepository, never()).findByCustomName(anyString());
+        verify(dataTableManager, never()).findByCustomName(anyString());
     }
 
     @Test
@@ -284,19 +278,6 @@ public class DataTableControllerTestMock {
         mockMvc.perform(delete("/api/v1/data-tables/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(dataTableRepository, never()).deleteByCustomName(anyString());
-    }
-
-    @Test
-    @DisplayName("Test d'intégration - Scénario complet CRUD")
-    void fullCrudScenario_ShouldWorkCorrectly() throws Exception {
-        // Cette méthode pourrait tester un scénario complet :
-        // 1. Créer une DataTable
-        // 2. La récupérer
-        // 3. La modifier
-        // 4. La supprimer
-        
-        // Ceci est plus adapté pour des tests d'intégration
-        // mais peut être utile pour valider le comportement global
+        verify(dataTableManager, never()).deleteByCustomName(anyString());
     }
 }

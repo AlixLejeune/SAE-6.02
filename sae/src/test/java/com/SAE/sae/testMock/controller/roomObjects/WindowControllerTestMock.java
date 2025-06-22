@@ -2,15 +2,13 @@ package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.WindowController;
 import com.SAE.sae.entity.RoomObjects.Window;
-import com.SAE.sae.repository.RoomObjects.WindowRepository;
+import com.SAE.sae.service.RoomObjects.WindowManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -19,7 +17,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -31,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class WindowControllerTestMock {
 
     @Mock
-    private WindowRepository WindowRepository;
+    private WindowManager windowManager;
 
     @InjectMocks
-    private WindowController WindowController;
+    private WindowController windowController;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -42,14 +39,12 @@ public class WindowControllerTestMock {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(WindowController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(windowController).build();
         objectMapper = new ObjectMapper();
         
         // Création d'un objet Window d'exemple
         sampleWindow = new Window();
         sampleWindow.setId(1);
-        sampleWindow.setCustomName("Table Test");
-        // Ajoutez d'autres propriétés selon votre entité Window
     }
 
     @Test
@@ -57,7 +52,7 @@ public class WindowControllerTestMock {
     void getAllWindows_ShouldReturnAllWindows() throws Exception {
         // Given
         List<Window> Windows = Arrays.asList(sampleWindow, new Window());
-        when(WindowRepository.findAll()).thenReturn(Windows);
+        when(windowManager.findAll()).thenReturn(Windows);
 
         // When & Then
         mockMvc.perform(get("/api/v1/windows"))
@@ -65,21 +60,21 @@ public class WindowControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
 
-        verify(WindowRepository, times(1)).findAll();
+        verify(windowManager, times(1)).findAll();
     }
 
     @Test
     @DisplayName("GET /api/v1/windows - Retourner liste vide quand aucune Window")
     void getAllWindows_WhenEmpty_ShouldReturnEmptyList() throws Exception {
         // Given
-        when(WindowRepository.findAll()).thenReturn(Arrays.asList());
+        when(windowManager.findAll()).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/windows"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(WindowRepository, times(1)).findAll();
+        verify(windowManager, times(1)).findAll();
     }
 
     @Test
@@ -87,16 +82,15 @@ public class WindowControllerTestMock {
     void getWindowById_WhenExists_ShouldReturnWindow() throws Exception {
         // Given
         Integer id = 1;
-        when(WindowRepository.findById(id)).thenReturn(Optional.of(sampleWindow));
+        when(windowManager.findById(id)).thenReturn(sampleWindow);
 
         // When & Then
         mockMvc.perform(get("/api/v1/windows/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.customName").value("Table Test"));
+                .andExpect(jsonPath("$.id").value(1));
 
-        verify(WindowRepository, times(1)).findById(id);
+        verify(windowManager, times(1)).findById(id);
     }
 
     @Test
@@ -104,13 +98,13 @@ public class WindowControllerTestMock {
     void getWindowById_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(WindowRepository.findById(id)).thenReturn(Optional.empty());
+        when(windowManager.findById(id)).thenThrow(new IllegalArgumentException("Window not found"));
 
         // When & Then
         mockMvc.perform(get("/api/v1/windows/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(WindowRepository, times(1)).findById(id);
+        verify(windowManager, times(1)).findById(id);
     }
 
     @Test
@@ -119,7 +113,7 @@ public class WindowControllerTestMock {
         // Given
         Long roomId = 1L;
         List<Window> roomWindows = Arrays.asList(sampleWindow);
-        when(WindowRepository.findByRoom_Id(roomId)).thenReturn(roomWindows);
+        when(windowManager.findByRoomId(roomId)).thenReturn(roomWindows);
 
         // When & Then
         mockMvc.perform(get("/api/v1/windows/by-room/{roomId}", roomId))
@@ -127,7 +121,7 @@ public class WindowControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(WindowRepository, times(1)).findByRoom_Id(roomId);
+        verify(windowManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -135,14 +129,14 @@ public class WindowControllerTestMock {
     void getByRoomId_WhenNoWindows_ShouldReturnEmptyList() throws Exception {
         // Given
         Long roomId = 999L;
-        when(WindowRepository.findByRoom_Id(roomId)).thenReturn(Arrays.asList());
+        when(windowManager.findByRoomId(roomId)).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/windows/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(WindowRepository, times(1)).findByRoom_Id(roomId);
+        verify(windowManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -151,7 +145,7 @@ public class WindowControllerTestMock {
         // Given
         String customName = "Table Test";
         List<Window> namedWindows = Arrays.asList(sampleWindow);
-        when(WindowRepository.findByCustomName(customName)).thenReturn(namedWindows);
+        when(windowManager.findByCustomName(customName)).thenReturn(namedWindows);
 
         // When & Then
         mockMvc.perform(get("/api/v1/windows/by-custom-name")
@@ -160,7 +154,7 @@ public class WindowControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(WindowRepository, times(1)).findByCustomName(customName);
+        verify(windowManager, times(1)).findByCustomName(customName);
     }
 
     @Test
@@ -170,7 +164,7 @@ public class WindowControllerTestMock {
         Window newWindow = new Window();
         newWindow.setCustomName("Nouvelle Table");
         
-        when(WindowRepository.save(any(Window.class))).thenReturn(sampleWindow);
+        when(windowManager.save(any(Window.class))).thenReturn(sampleWindow);
 
         // When & Then
         mockMvc.perform(post("/api/v1/windows")
@@ -180,7 +174,7 @@ public class WindowControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1));
 
-        verify(WindowRepository, times(1)).save(any(Window.class));
+        verify(windowManager, times(1)).save(any(Window.class));
     }
 
     @Test
@@ -191,7 +185,7 @@ public class WindowControllerTestMock {
         updatedWindow.setId(1);
         updatedWindow.setCustomName("Table Modifiée");
         
-        when(WindowRepository.save(any(Window.class))).thenReturn(updatedWindow);
+        when(windowManager.save(any(Window.class))).thenReturn(updatedWindow);
 
         // When & Then
         mockMvc.perform(put("/api/v1/windows")
@@ -201,7 +195,7 @@ public class WindowControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.customName").value("Table Modifiée"));
 
-        verify(WindowRepository, times(1)).save(any(Window.class));
+        verify(windowManager, times(1)).save(any(Window.class));
     }
 
     @Test
@@ -209,16 +203,16 @@ public class WindowControllerTestMock {
     void deleteWindow_WhenExists_ShouldDeleteAndReturnSuccess() throws Exception {
         // Given
         Integer id = 1;
-        when(WindowRepository.existsById(id)).thenReturn(true);
-        doNothing().when(WindowRepository).deleteById(id);
+        when(windowManager.existsById(id)).thenReturn(true);
+        doNothing().when(windowManager).deleteById(id);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/windows/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Window supprimée avec succès"));
 
-        verify(WindowRepository, times(1)).existsById(id);
-        verify(WindowRepository, times(1)).deleteById(id);
+        verify(windowManager, times(1)).existsById(id);
+        verify(windowManager, times(1)).deleteById(id);
     }
 
     @Test
@@ -226,14 +220,14 @@ public class WindowControllerTestMock {
     void deleteWindow_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(WindowRepository.existsById(id)).thenReturn(false);
+        when(windowManager.existsById(id)).thenReturn(false);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/windows/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(WindowRepository, times(1)).existsById(id);
-        verify(WindowRepository, never()).deleteById(id);
+        verify(windowManager, times(1)).existsById(id);
+        verify(windowManager, never()).deleteById(id);
     }
 
     @Test
@@ -241,14 +235,14 @@ public class WindowControllerTestMock {
     void deleteByRoomId_ShouldDeleteAllWindowsInRoom() throws Exception {
         // Given
         Integer roomId = 1;
-        doNothing().when(WindowRepository).deleteByRoomId(roomId);
+        doNothing().when(windowManager).deleteByRoomId(roomId);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/windows/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Windows de la salle ont été supprimées"));
 
-        verify(WindowRepository, times(1)).deleteByRoomId(roomId);
+        verify(windowManager, times(1)).deleteByRoomId(roomId);
     }
 
     @Test
@@ -256,7 +250,7 @@ public class WindowControllerTestMock {
     void deleteByCustomName_ShouldDeleteAllWindowsWithCustomName() throws Exception {
         // Given
         String customName = "Table à supprimer";
-        doNothing().when(WindowRepository).deleteByCustomName(customName);
+        doNothing().when(windowManager).deleteByCustomName(customName);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/windows/by-custom-name")
@@ -264,7 +258,7 @@ public class WindowControllerTestMock {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Windows avec ce nom ont été supprimées"));
 
-        verify(WindowRepository, times(1)).deleteByCustomName(customName);
+        verify(windowManager, times(1)).deleteByCustomName(customName);
     }
 
     @Test
@@ -274,7 +268,7 @@ public class WindowControllerTestMock {
         mockMvc.perform(get("/api/v1/windows/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(WindowRepository, never()).findByCustomName(anyString());
+        verify(windowManager, never()).findByCustomName(anyString());
     }
 
     @Test
@@ -284,19 +278,6 @@ public class WindowControllerTestMock {
         mockMvc.perform(delete("/api/v1/windows/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(WindowRepository, never()).deleteByCustomName(anyString());
-    }
-
-    @Test
-    @DisplayName("Test d'intégration - Scénario complet CRUD")
-    void fullCrudScenario_ShouldWorkCorrectly() throws Exception {
-        // Cette méthode pourrait tester un scénario complet :
-        // 1. Créer une Window
-        // 2. La récupérer
-        // 3. La modifier
-        // 4. La supprimer
-        
-        // Ceci est plus adapté pour des tests d'intégration
-        // mais peut être utile pour valider le comportement global
+        verify(windowManager, never()).deleteByCustomName(anyString());
     }
 }

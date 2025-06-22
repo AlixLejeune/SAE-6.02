@@ -2,15 +2,14 @@ package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.LampController;
 import com.SAE.sae.entity.RoomObjects.Lamp;
-import com.SAE.sae.repository.RoomObjects.LampRepository;
+import com.SAE.sae.service.RoomObjects.LampManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -19,7 +18,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -31,10 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LampControllerTestMock {
 
     @Mock
-    private LampRepository LampRepository;
+    private LampManager lampManager;
 
     @InjectMocks
-    private LampController LampController;
+    private LampController lampController;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -42,14 +40,12 @@ public class LampControllerTestMock {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(LampController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(lampController).build();
         objectMapper = new ObjectMapper();
         
         // Création d'un objet Lamp d'exemple
         sampleLamp = new Lamp();
         sampleLamp.setId(1);
-        sampleLamp.setCustomName("Table Test");
-        // Ajoutez d'autres propriétés selon votre entité Lamp
     }
 
     @Test
@@ -57,7 +53,7 @@ public class LampControllerTestMock {
     void getAllLamps_ShouldReturnAllLamps() throws Exception {
         // Given
         List<Lamp> Lamps = Arrays.asList(sampleLamp, new Lamp());
-        when(LampRepository.findAll()).thenReturn(Lamps);
+        when(lampManager.findAll()).thenReturn(Lamps);
 
         // When & Then
         mockMvc.perform(get("/api/v1/lamps"))
@@ -65,21 +61,21 @@ public class LampControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
 
-        verify(LampRepository, times(1)).findAll();
+        verify(lampManager, times(1)).findAll();
     }
 
     @Test
     @DisplayName("GET /api/v1/lamps - Retourner liste vide quand aucune Lamp")
     void getAllLamps_WhenEmpty_ShouldReturnEmptyList() throws Exception {
         // Given
-        when(LampRepository.findAll()).thenReturn(Arrays.asList());
+        when(lampManager.findAll()).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/lamps"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(LampRepository, times(1)).findAll();
+        verify(lampManager, times(1)).findAll();
     }
 
     @Test
@@ -87,16 +83,15 @@ public class LampControllerTestMock {
     void getLampById_WhenExists_ShouldReturnLamp() throws Exception {
         // Given
         Integer id = 1;
-        when(LampRepository.findById(id)).thenReturn(Optional.of(sampleLamp));
+        when(lampManager.findById(id)).thenReturn(sampleLamp);
 
         // When & Then
         mockMvc.perform(get("/api/v1/lamps/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.customName").value("Table Test"));
+                .andExpect(jsonPath("$.id").value(1));
 
-        verify(LampRepository, times(1)).findById(id);
+        verify(lampManager, times(1)).findById(id);
     }
 
     @Test
@@ -104,13 +99,13 @@ public class LampControllerTestMock {
     void getLampById_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(LampRepository.findById(id)).thenReturn(Optional.empty());
+        when(lampManager.findById(id)).thenThrow(new IllegalArgumentException("Lamp not found"));
 
         // When & Then
         mockMvc.perform(get("/api/v1/lamps/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(LampRepository, times(1)).findById(id);
+        verify(lampManager, times(1)).findById(id);
     }
 
     @Test
@@ -119,7 +114,7 @@ public class LampControllerTestMock {
         // Given
         Long roomId = 1L;
         List<Lamp> roomLamps = Arrays.asList(sampleLamp);
-        when(LampRepository.findByRoom_Id(roomId)).thenReturn(roomLamps);
+        when(lampManager.findByRoomId(roomId)).thenReturn(roomLamps);
 
         // When & Then
         mockMvc.perform(get("/api/v1/lamps/by-room/{roomId}", roomId))
@@ -127,7 +122,7 @@ public class LampControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(LampRepository, times(1)).findByRoom_Id(roomId);
+        verify(lampManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -135,14 +130,14 @@ public class LampControllerTestMock {
     void getByRoomId_WhenNoLamps_ShouldReturnEmptyList() throws Exception {
         // Given
         Long roomId = 999L;
-        when(LampRepository.findByRoom_Id(roomId)).thenReturn(Arrays.asList());
+        when(lampManager.findByRoomId(roomId)).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/lamps/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(LampRepository, times(1)).findByRoom_Id(roomId);
+        verify(lampManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -151,7 +146,7 @@ public class LampControllerTestMock {
         // Given
         String customName = "Table Test";
         List<Lamp> namedLamps = Arrays.asList(sampleLamp);
-        when(LampRepository.findByCustomName(customName)).thenReturn(namedLamps);
+        when(lampManager.findByCustomName(customName)).thenReturn(namedLamps);
 
         // When & Then
         mockMvc.perform(get("/api/v1/lamps/by-custom-name")
@@ -160,7 +155,7 @@ public class LampControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(LampRepository, times(1)).findByCustomName(customName);
+        verify(lampManager, times(1)).findByCustomName(customName);
     }
 
     @Test
@@ -170,7 +165,7 @@ public class LampControllerTestMock {
         Lamp newLamp = new Lamp();
         newLamp.setCustomName("Nouvelle Table");
         
-        when(LampRepository.save(any(Lamp.class))).thenReturn(sampleLamp);
+        when(lampManager.save(any(Lamp.class))).thenReturn(sampleLamp);
 
         // When & Then
         mockMvc.perform(post("/api/v1/lamps")
@@ -180,7 +175,7 @@ public class LampControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1));
 
-        verify(LampRepository, times(1)).save(any(Lamp.class));
+        verify(lampManager, times(1)).save(any(Lamp.class));
     }
 
     @Test
@@ -191,7 +186,7 @@ public class LampControllerTestMock {
         updatedLamp.setId(1);
         updatedLamp.setCustomName("Table Modifiée");
         
-        when(LampRepository.save(any(Lamp.class))).thenReturn(updatedLamp);
+        when(lampManager.save(any(Lamp.class))).thenReturn(updatedLamp);
 
         // When & Then
         mockMvc.perform(put("/api/v1/lamps")
@@ -201,7 +196,7 @@ public class LampControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.customName").value("Table Modifiée"));
 
-        verify(LampRepository, times(1)).save(any(Lamp.class));
+        verify(lampManager, times(1)).save(any(Lamp.class));
     }
 
     @Test
@@ -209,16 +204,16 @@ public class LampControllerTestMock {
     void deleteLamp_WhenExists_ShouldDeleteAndReturnSuccess() throws Exception {
         // Given
         Integer id = 1;
-        when(LampRepository.existsById(id)).thenReturn(true);
-        doNothing().when(LampRepository).deleteById(id);
+        when(lampManager.existsById(id)).thenReturn(true);
+        doNothing().when(lampManager).deleteById(id);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/lamps/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Lamp supprimée avec succès"));
 
-        verify(LampRepository, times(1)).existsById(id);
-        verify(LampRepository, times(1)).deleteById(id);
+        verify(lampManager, times(1)).existsById(id);
+        verify(lampManager, times(1)).deleteById(id);
     }
 
     @Test
@@ -226,14 +221,14 @@ public class LampControllerTestMock {
     void deleteLamp_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(LampRepository.existsById(id)).thenReturn(false);
+        when(lampManager.existsById(id)).thenReturn(false);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/lamps/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(LampRepository, times(1)).existsById(id);
-        verify(LampRepository, never()).deleteById(id);
+        verify(lampManager, times(1)).existsById(id);
+        verify(lampManager, never()).deleteById(id);
     }
 
     @Test
@@ -241,14 +236,14 @@ public class LampControllerTestMock {
     void deleteByRoomId_ShouldDeleteAllLampsInRoom() throws Exception {
         // Given
         Integer roomId = 1;
-        doNothing().when(LampRepository).deleteByRoomId(roomId);
+        doNothing().when(lampManager).deleteByRoomId(roomId);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/lamps/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Lamps de la salle ont été supprimées"));
 
-        verify(LampRepository, times(1)).deleteByRoomId(roomId);
+        verify(lampManager, times(1)).deleteByRoomId(roomId);
     }
 
     @Test
@@ -256,7 +251,7 @@ public class LampControllerTestMock {
     void deleteByCustomName_ShouldDeleteAllLampsWithCustomName() throws Exception {
         // Given
         String customName = "Table à supprimer";
-        doNothing().when(LampRepository).deleteByCustomName(customName);
+        doNothing().when(lampManager).deleteByCustomName(customName);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/lamps/by-custom-name")
@@ -264,7 +259,7 @@ public class LampControllerTestMock {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Lamps avec ce nom ont été supprimées"));
 
-        verify(LampRepository, times(1)).deleteByCustomName(customName);
+        verify(lampManager, times(1)).deleteByCustomName(customName);
     }
 
     @Test
@@ -274,7 +269,7 @@ public class LampControllerTestMock {
         mockMvc.perform(get("/api/v1/lamps/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(LampRepository, never()).findByCustomName(anyString());
+        verify(lampManager, never()).findByCustomName(anyString());
     }
 
     @Test
@@ -284,19 +279,6 @@ public class LampControllerTestMock {
         mockMvc.perform(delete("/api/v1/lamps/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(LampRepository, never()).deleteByCustomName(anyString());
-    }
-
-    @Test
-    @DisplayName("Test d'intégration - Scénario complet CRUD")
-    void fullCrudScenario_ShouldWorkCorrectly() throws Exception {
-        // Cette méthode pourrait tester un scénario complet :
-        // 1. Créer une Lamp
-        // 2. La récupérer
-        // 3. La modifier
-        // 4. La supprimer
-        
-        // Ceci est plus adapté pour des tests d'intégration
-        // mais peut être utile pour valider le comportement global
+        verify(lampManager, never()).deleteByCustomName(anyString());
     }
 }

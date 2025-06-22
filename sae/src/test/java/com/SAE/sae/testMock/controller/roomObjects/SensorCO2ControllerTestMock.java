@@ -2,15 +2,13 @@ package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.SensorCO2Controller;
 import com.SAE.sae.entity.RoomObjects.SensorCO2;
-import com.SAE.sae.repository.RoomObjects.SensorCO2Repository;
+import com.SAE.sae.service.RoomObjects.SensorCO2Manager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -19,7 +17,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -31,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SensorCO2ControllerTestMock {
 
     @Mock
-    private SensorCO2Repository SensorCO2Repository;
+    private SensorCO2Manager sensorCO2Manager;
 
     @InjectMocks
-    private SensorCO2Controller SensorCO2Controller;
+    private SensorCO2Controller sensorCO2Controller;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -42,7 +39,7 @@ public class SensorCO2ControllerTestMock {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(SensorCO2Controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(sensorCO2Controller).build();
         objectMapper = new ObjectMapper();
         
         // Création d'un objet SensorCO2 d'exemple
@@ -57,7 +54,7 @@ public class SensorCO2ControllerTestMock {
     void getAllSensorCO2s_ShouldReturnAllSensorCO2s() throws Exception {
         // Given
         List<SensorCO2> SensorCO2s = Arrays.asList(sampleSensorCO2, new SensorCO2());
-        when(SensorCO2Repository.findAll()).thenReturn(SensorCO2s);
+        when(sensorCO2Manager.findAll()).thenReturn(SensorCO2s);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensorco2s"))
@@ -65,21 +62,21 @@ public class SensorCO2ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
 
-        verify(SensorCO2Repository, times(1)).findAll();
+        verify(sensorCO2Manager, times(1)).findAll();
     }
 
     @Test
     @DisplayName("GET /api/v1/sensorco2s - Retourner liste vide quand aucune SensorCO2")
     void getAllSensorCO2s_WhenEmpty_ShouldReturnEmptyList() throws Exception {
         // Given
-        when(SensorCO2Repository.findAll()).thenReturn(Arrays.asList());
+        when(sensorCO2Manager.findAll()).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensorco2s"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(SensorCO2Repository, times(1)).findAll();
+        verify(sensorCO2Manager, times(1)).findAll();
     }
 
     @Test
@@ -87,7 +84,7 @@ public class SensorCO2ControllerTestMock {
     void getSensorCO2ById_WhenExists_ShouldReturnSensorCO2() throws Exception {
         // Given
         Integer id = 1;
-        when(SensorCO2Repository.findById(id)).thenReturn(Optional.of(sampleSensorCO2));
+        when(sensorCO2Manager.findById(id)).thenReturn(sampleSensorCO2);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensorco2s/{id}", id))
@@ -96,7 +93,7 @@ public class SensorCO2ControllerTestMock {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.customName").value("Table Test"));
 
-        verify(SensorCO2Repository, times(1)).findById(id);
+        verify(sensorCO2Manager, times(1)).findById(id);
     }
 
     @Test
@@ -104,13 +101,13 @@ public class SensorCO2ControllerTestMock {
     void getSensorCO2ById_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(SensorCO2Repository.findById(id)).thenReturn(Optional.empty());
+        when(sensorCO2Manager.findById(id)).thenThrow(new IllegalArgumentException("SensorCo2 not found"));
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensorco2s/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(SensorCO2Repository, times(1)).findById(id);
+        verify(sensorCO2Manager, times(1)).findById(id);
     }
 
     @Test
@@ -119,7 +116,7 @@ public class SensorCO2ControllerTestMock {
         // Given
         Long roomId = 1L;
         List<SensorCO2> roomSensorCO2s = Arrays.asList(sampleSensorCO2);
-        when(SensorCO2Repository.findByRoom_Id(roomId)).thenReturn(roomSensorCO2s);
+        when(sensorCO2Manager.findByRoomId(roomId)).thenReturn(roomSensorCO2s);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensorco2s/by-room/{roomId}", roomId))
@@ -127,7 +124,7 @@ public class SensorCO2ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(SensorCO2Repository, times(1)).findByRoom_Id(roomId);
+        verify(sensorCO2Manager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -135,14 +132,14 @@ public class SensorCO2ControllerTestMock {
     void getByRoomId_WhenNoSensorCO2s_ShouldReturnEmptyList() throws Exception {
         // Given
         Long roomId = 999L;
-        when(SensorCO2Repository.findByRoom_Id(roomId)).thenReturn(Arrays.asList());
+        when(sensorCO2Manager.findByRoomId(roomId)).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensorco2s/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(SensorCO2Repository, times(1)).findByRoom_Id(roomId);
+        verify(sensorCO2Manager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -151,7 +148,7 @@ public class SensorCO2ControllerTestMock {
         // Given
         String customName = "Table Test";
         List<SensorCO2> namedSensorCO2s = Arrays.asList(sampleSensorCO2);
-        when(SensorCO2Repository.findByCustomName(customName)).thenReturn(namedSensorCO2s);
+        when(sensorCO2Manager.findByCustomName(customName)).thenReturn(namedSensorCO2s);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensorco2s/by-custom-name")
@@ -160,7 +157,7 @@ public class SensorCO2ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(SensorCO2Repository, times(1)).findByCustomName(customName);
+        verify(sensorCO2Manager, times(1)).findByCustomName(customName);
     }
 
     @Test
@@ -170,7 +167,7 @@ public class SensorCO2ControllerTestMock {
         SensorCO2 newSensorCO2 = new SensorCO2();
         newSensorCO2.setCustomName("Nouvelle Table");
         
-        when(SensorCO2Repository.save(any(SensorCO2.class))).thenReturn(sampleSensorCO2);
+        when(sensorCO2Manager.save(any(SensorCO2.class))).thenReturn(sampleSensorCO2);
 
         // When & Then
         mockMvc.perform(post("/api/v1/sensorco2s")
@@ -180,7 +177,7 @@ public class SensorCO2ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1));
 
-        verify(SensorCO2Repository, times(1)).save(any(SensorCO2.class));
+        verify(sensorCO2Manager, times(1)).save(any(SensorCO2.class));
     }
 
     @Test
@@ -191,7 +188,7 @@ public class SensorCO2ControllerTestMock {
         updatedSensorCO2.setId(1);
         updatedSensorCO2.setCustomName("Table Modifiée");
         
-        when(SensorCO2Repository.save(any(SensorCO2.class))).thenReturn(updatedSensorCO2);
+        when(sensorCO2Manager.save(any(SensorCO2.class))).thenReturn(updatedSensorCO2);
 
         // When & Then
         mockMvc.perform(put("/api/v1/sensorco2s")
@@ -201,7 +198,7 @@ public class SensorCO2ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.customName").value("Table Modifiée"));
 
-        verify(SensorCO2Repository, times(1)).save(any(SensorCO2.class));
+        verify(sensorCO2Manager, times(1)).save(any(SensorCO2.class));
     }
 
     @Test
@@ -209,16 +206,16 @@ public class SensorCO2ControllerTestMock {
     void deleteSensorCO2_WhenExists_ShouldDeleteAndReturnSuccess() throws Exception {
         // Given
         Integer id = 1;
-        when(SensorCO2Repository.existsById(id)).thenReturn(true);
-        doNothing().when(SensorCO2Repository).deleteById(id);
+        when(sensorCO2Manager.existsById(id)).thenReturn(true);
+        doNothing().when(sensorCO2Manager).deleteById(id);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensorco2s/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("SensorCO2 supprimée avec succès"));
 
-        verify(SensorCO2Repository, times(1)).existsById(id);
-        verify(SensorCO2Repository, times(1)).deleteById(id);
+        verify(sensorCO2Manager, times(1)).existsById(id);
+        verify(sensorCO2Manager, times(1)).deleteById(id);
     }
 
     @Test
@@ -226,14 +223,14 @@ public class SensorCO2ControllerTestMock {
     void deleteSensorCO2_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(SensorCO2Repository.existsById(id)).thenReturn(false);
+        when(sensorCO2Manager.existsById(id)).thenReturn(false);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensorco2s/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(SensorCO2Repository, times(1)).existsById(id);
-        verify(SensorCO2Repository, never()).deleteById(id);
+        verify(sensorCO2Manager, times(1)).existsById(id);
+        verify(sensorCO2Manager, never()).deleteById(id);
     }
 
     @Test
@@ -241,14 +238,14 @@ public class SensorCO2ControllerTestMock {
     void deleteByRoomId_ShouldDeleteAllSensorCO2sInRoom() throws Exception {
         // Given
         Integer roomId = 1;
-        doNothing().when(SensorCO2Repository).deleteByRoomId(roomId);
+        doNothing().when(sensorCO2Manager).deleteByRoomId(roomId);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensorco2s/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les SensorCO2s de la salle ont été supprimées"));
 
-        verify(SensorCO2Repository, times(1)).deleteByRoomId(roomId);
+        verify(sensorCO2Manager, times(1)).deleteByRoomId(roomId);
     }
 
     @Test
@@ -256,7 +253,7 @@ public class SensorCO2ControllerTestMock {
     void deleteByCustomName_ShouldDeleteAllSensorCO2sWithCustomName() throws Exception {
         // Given
         String customName = "Table à supprimer";
-        doNothing().when(SensorCO2Repository).deleteByCustomName(customName);
+        doNothing().when(sensorCO2Manager).deleteByCustomName(customName);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensorco2s/by-custom-name")
@@ -264,7 +261,7 @@ public class SensorCO2ControllerTestMock {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les SensorCO2s avec ce nom ont été supprimées"));
 
-        verify(SensorCO2Repository, times(1)).deleteByCustomName(customName);
+        verify(sensorCO2Manager, times(1)).deleteByCustomName(customName);
     }
 
     @Test
@@ -274,7 +271,7 @@ public class SensorCO2ControllerTestMock {
         mockMvc.perform(get("/api/v1/sensorco2s/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(SensorCO2Repository, never()).findByCustomName(anyString());
+        verify(sensorCO2Manager, never()).findByCustomName(anyString());
     }
 
     @Test
@@ -284,19 +281,6 @@ public class SensorCO2ControllerTestMock {
         mockMvc.perform(delete("/api/v1/sensorco2s/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(SensorCO2Repository, never()).deleteByCustomName(anyString());
-    }
-
-    @Test
-    @DisplayName("Test d'intégration - Scénario complet CRUD")
-    void fullCrudScenario_ShouldWorkCorrectly() throws Exception {
-        // Cette méthode pourrait tester un scénario complet :
-        // 1. Créer une SensorCO2
-        // 2. La récupérer
-        // 3. La modifier
-        // 4. La supprimer
-        
-        // Ceci est plus adapté pour des tests d'intégration
-        // mais peut être utile pour valider le comportement global
+        verify(sensorCO2Manager, never()).deleteByCustomName(anyString());
     }
 }

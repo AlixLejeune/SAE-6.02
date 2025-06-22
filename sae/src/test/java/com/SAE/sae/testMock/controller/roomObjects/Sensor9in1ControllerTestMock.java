@@ -2,15 +2,13 @@ package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.Sensor9in1Controller;
 import com.SAE.sae.entity.RoomObjects.Sensor9in1;
-import com.SAE.sae.repository.RoomObjects.Sensor9in1Repository;
+import com.SAE.sae.service.RoomObjects.Sensor9in1Manager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -19,7 +17,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -31,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class Sensor9in1ControllerTestMock {
 
     @Mock
-    private Sensor9in1Repository Sensor9in1Repository;
+    private Sensor9in1Manager sensor9in1Manager;
 
     @InjectMocks
-    private Sensor9in1Controller Sensor9in1Controller;
+    private Sensor9in1Controller sensor9in1Controller;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -42,7 +39,7 @@ public class Sensor9in1ControllerTestMock {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(Sensor9in1Controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(sensor9in1Controller).build();
         objectMapper = new ObjectMapper();
         
         // Création d'un objet Sensor9in1 d'exemple
@@ -57,7 +54,7 @@ public class Sensor9in1ControllerTestMock {
     void getAllSensor9in1s_ShouldReturnAllSensor9in1s() throws Exception {
         // Given
         List<Sensor9in1> Sensor9in1s = Arrays.asList(sampleSensor9in1, new Sensor9in1());
-        when(Sensor9in1Repository.findAll()).thenReturn(Sensor9in1s);
+        when(sensor9in1Manager.findAll()).thenReturn(Sensor9in1s);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensor9in1s"))
@@ -65,21 +62,21 @@ public class Sensor9in1ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
 
-        verify(Sensor9in1Repository, times(1)).findAll();
+        verify(sensor9in1Manager, times(1)).findAll();
     }
 
     @Test
     @DisplayName("GET /api/v1/sensor9in1s - Retourner liste vide quand aucune Sensor9in1")
     void getAllSensor9in1s_WhenEmpty_ShouldReturnEmptyList() throws Exception {
         // Given
-        when(Sensor9in1Repository.findAll()).thenReturn(Arrays.asList());
+        when(sensor9in1Manager.findAll()).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensor9in1s"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(Sensor9in1Repository, times(1)).findAll();
+        verify(sensor9in1Manager, times(1)).findAll();
     }
 
     @Test
@@ -87,7 +84,7 @@ public class Sensor9in1ControllerTestMock {
     void getSensor9in1ById_WhenExists_ShouldReturnSensor9in1() throws Exception {
         // Given
         Integer id = 1;
-        when(Sensor9in1Repository.findById(id)).thenReturn(Optional.of(sampleSensor9in1));
+        when(sensor9in1Manager.findById(id)).thenReturn(sampleSensor9in1);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensor9in1s/{id}", id))
@@ -96,7 +93,7 @@ public class Sensor9in1ControllerTestMock {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.customName").value("Table Test"));
 
-        verify(Sensor9in1Repository, times(1)).findById(id);
+        verify(sensor9in1Manager, times(1)).findById(id);
     }
 
     @Test
@@ -104,13 +101,13 @@ public class Sensor9in1ControllerTestMock {
     void getSensor9in1ById_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(Sensor9in1Repository.findById(id)).thenReturn(Optional.empty());
+        when(sensor9in1Manager.findById(id)).thenThrow(new IllegalArgumentException("Sensor9in1 not found"));
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensor9in1s/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(Sensor9in1Repository, times(1)).findById(id);
+        verify(sensor9in1Manager, times(1)).findById(id);
     }
 
     @Test
@@ -119,7 +116,7 @@ public class Sensor9in1ControllerTestMock {
         // Given
         Long roomId = 1L;
         List<Sensor9in1> roomSensor9in1s = Arrays.asList(sampleSensor9in1);
-        when(Sensor9in1Repository.findByRoom_Id(roomId)).thenReturn(roomSensor9in1s);
+        when(sensor9in1Manager.findByRoomId(roomId)).thenReturn(roomSensor9in1s);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensor9in1s/by-room/{roomId}", roomId))
@@ -127,7 +124,7 @@ public class Sensor9in1ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(Sensor9in1Repository, times(1)).findByRoom_Id(roomId);
+        verify(sensor9in1Manager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -135,14 +132,14 @@ public class Sensor9in1ControllerTestMock {
     void getByRoomId_WhenNoSensor9in1s_ShouldReturnEmptyList() throws Exception {
         // Given
         Long roomId = 999L;
-        when(Sensor9in1Repository.findByRoom_Id(roomId)).thenReturn(Arrays.asList());
+        when(sensor9in1Manager.findByRoomId(roomId)).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensor9in1s/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(Sensor9in1Repository, times(1)).findByRoom_Id(roomId);
+        verify(sensor9in1Manager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -151,7 +148,7 @@ public class Sensor9in1ControllerTestMock {
         // Given
         String customName = "Table Test";
         List<Sensor9in1> namedSensor9in1s = Arrays.asList(sampleSensor9in1);
-        when(Sensor9in1Repository.findByCustomName(customName)).thenReturn(namedSensor9in1s);
+        when(sensor9in1Manager.findByCustomName(customName)).thenReturn(namedSensor9in1s);
 
         // When & Then
         mockMvc.perform(get("/api/v1/sensor9in1s/by-custom-name")
@@ -160,7 +157,7 @@ public class Sensor9in1ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(Sensor9in1Repository, times(1)).findByCustomName(customName);
+        verify(sensor9in1Manager, times(1)).findByCustomName(customName);
     }
 
     @Test
@@ -170,7 +167,7 @@ public class Sensor9in1ControllerTestMock {
         Sensor9in1 newSensor9in1 = new Sensor9in1();
         newSensor9in1.setCustomName("Nouvelle Table");
         
-        when(Sensor9in1Repository.save(any(Sensor9in1.class))).thenReturn(sampleSensor9in1);
+        when(sensor9in1Manager.save(any(Sensor9in1.class))).thenReturn(sampleSensor9in1);
 
         // When & Then
         mockMvc.perform(post("/api/v1/sensor9in1s")
@@ -180,7 +177,7 @@ public class Sensor9in1ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1));
 
-        verify(Sensor9in1Repository, times(1)).save(any(Sensor9in1.class));
+        verify(sensor9in1Manager, times(1)).save(any(Sensor9in1.class));
     }
 
     @Test
@@ -191,7 +188,7 @@ public class Sensor9in1ControllerTestMock {
         updatedSensor9in1.setId(1);
         updatedSensor9in1.setCustomName("Table Modifiée");
         
-        when(Sensor9in1Repository.save(any(Sensor9in1.class))).thenReturn(updatedSensor9in1);
+        when(sensor9in1Manager.save(any(Sensor9in1.class))).thenReturn(updatedSensor9in1);
 
         // When & Then
         mockMvc.perform(put("/api/v1/sensor9in1s")
@@ -201,7 +198,7 @@ public class Sensor9in1ControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.customName").value("Table Modifiée"));
 
-        verify(Sensor9in1Repository, times(1)).save(any(Sensor9in1.class));
+        verify(sensor9in1Manager, times(1)).save(any(Sensor9in1.class));
     }
 
     @Test
@@ -209,16 +206,16 @@ public class Sensor9in1ControllerTestMock {
     void deleteSensor9in1_WhenExists_ShouldDeleteAndReturnSuccess() throws Exception {
         // Given
         Integer id = 1;
-        when(Sensor9in1Repository.existsById(id)).thenReturn(true);
-        doNothing().when(Sensor9in1Repository).deleteById(id);
+        when(sensor9in1Manager.existsById(id)).thenReturn(true);
+        doNothing().when(sensor9in1Manager).deleteById(id);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensor9in1s/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Sensor9in1 supprimée avec succès"));
 
-        verify(Sensor9in1Repository, times(1)).existsById(id);
-        verify(Sensor9in1Repository, times(1)).deleteById(id);
+        verify(sensor9in1Manager, times(1)).existsById(id);
+        verify(sensor9in1Manager, times(1)).deleteById(id);
     }
 
     @Test
@@ -226,14 +223,14 @@ public class Sensor9in1ControllerTestMock {
     void deleteSensor9in1_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(Sensor9in1Repository.existsById(id)).thenReturn(false);
+        when(sensor9in1Manager.existsById(id)).thenReturn(false);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensor9in1s/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(Sensor9in1Repository, times(1)).existsById(id);
-        verify(Sensor9in1Repository, never()).deleteById(id);
+        verify(sensor9in1Manager, times(1)).existsById(id);
+        verify(sensor9in1Manager, never()).deleteById(id);
     }
 
     @Test
@@ -241,14 +238,14 @@ public class Sensor9in1ControllerTestMock {
     void deleteByRoomId_ShouldDeleteAllSensor9in1sInRoom() throws Exception {
         // Given
         Integer roomId = 1;
-        doNothing().when(Sensor9in1Repository).deleteByRoomId(roomId);
+        doNothing().when(sensor9in1Manager).deleteByRoomId(roomId);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensor9in1s/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Sensor9in1s de la salle ont été supprimées"));
 
-        verify(Sensor9in1Repository, times(1)).deleteByRoomId(roomId);
+        verify(sensor9in1Manager, times(1)).deleteByRoomId(roomId);
     }
 
     @Test
@@ -256,7 +253,7 @@ public class Sensor9in1ControllerTestMock {
     void deleteByCustomName_ShouldDeleteAllSensor9in1sWithCustomName() throws Exception {
         // Given
         String customName = "Table à supprimer";
-        doNothing().when(Sensor9in1Repository).deleteByCustomName(customName);
+        doNothing().when(sensor9in1Manager).deleteByCustomName(customName);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/sensor9in1s/by-custom-name")
@@ -264,7 +261,7 @@ public class Sensor9in1ControllerTestMock {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Sensor9in1s avec ce nom ont été supprimées"));
 
-        verify(Sensor9in1Repository, times(1)).deleteByCustomName(customName);
+        verify(sensor9in1Manager, times(1)).deleteByCustomName(customName);
     }
 
     @Test
@@ -274,7 +271,7 @@ public class Sensor9in1ControllerTestMock {
         mockMvc.perform(get("/api/v1/sensor9in1s/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(Sensor9in1Repository, never()).findByCustomName(anyString());
+        verify(sensor9in1Manager, never()).findByCustomName(anyString());
     }
 
     @Test
@@ -284,19 +281,6 @@ public class Sensor9in1ControllerTestMock {
         mockMvc.perform(delete("/api/v1/sensor9in1s/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(Sensor9in1Repository, never()).deleteByCustomName(anyString());
-    }
-
-    @Test
-    @DisplayName("Test d'intégration - Scénario complet CRUD")
-    void fullCrudScenario_ShouldWorkCorrectly() throws Exception {
-        // Cette méthode pourrait tester un scénario complet :
-        // 1. Créer une Sensor9in1
-        // 2. La récupérer
-        // 3. La modifier
-        // 4. La supprimer
-        
-        // Ceci est plus adapté pour des tests d'intégration
-        // mais peut être utile pour valider le comportement global
+        verify(sensor9in1Manager, never()).deleteByCustomName(anyString());
     }
 }

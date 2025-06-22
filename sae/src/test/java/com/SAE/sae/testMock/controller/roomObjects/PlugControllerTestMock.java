@@ -2,15 +2,13 @@ package com.SAE.sae.testMock.controller.roomObjects;
 
 import com.SAE.sae.controller.RoomObjects.PlugController;
 import com.SAE.sae.entity.RoomObjects.Plug;
-import com.SAE.sae.repository.RoomObjects.PlugRepository;
+import com.SAE.sae.service.RoomObjects.PlugManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -19,7 +17,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -31,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PlugControllerTestMock {
 
     @Mock
-    private PlugRepository PlugRepository;
+    private PlugManager plugManager;
 
     @InjectMocks
-    private PlugController PlugController;
+    private PlugController plugController;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -42,7 +39,7 @@ public class PlugControllerTestMock {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(PlugController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(plugController).build();
         objectMapper = new ObjectMapper();
         
         // Création d'un objet Plug d'exemple
@@ -57,7 +54,7 @@ public class PlugControllerTestMock {
     void getAllPlugs_ShouldReturnAllPlugs() throws Exception {
         // Given
         List<Plug> Plugs = Arrays.asList(samplePlug, new Plug());
-        when(PlugRepository.findAll()).thenReturn(Plugs);
+        when(plugManager.findAll()).thenReturn(Plugs);
 
         // When & Then
         mockMvc.perform(get("/api/v1/plugs"))
@@ -65,21 +62,21 @@ public class PlugControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
 
-        verify(PlugRepository, times(1)).findAll();
+        verify(plugManager, times(1)).findAll();
     }
 
     @Test
     @DisplayName("GET /api/v1/plugs - Retourner liste vide quand aucune Plug")
     void getAllPlugs_WhenEmpty_ShouldReturnEmptyList() throws Exception {
         // Given
-        when(PlugRepository.findAll()).thenReturn(Arrays.asList());
+        when(plugManager.findAll()).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/plugs"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(PlugRepository, times(1)).findAll();
+        verify(plugManager, times(1)).findAll();
     }
 
     @Test
@@ -87,7 +84,7 @@ public class PlugControllerTestMock {
     void getPlugById_WhenExists_ShouldReturnPlug() throws Exception {
         // Given
         Integer id = 1;
-        when(PlugRepository.findById(id)).thenReturn(Optional.of(samplePlug));
+        when(plugManager.findById(id)).thenReturn(samplePlug);
 
         // When & Then
         mockMvc.perform(get("/api/v1/plugs/{id}", id))
@@ -96,7 +93,7 @@ public class PlugControllerTestMock {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.customName").value("Table Test"));
 
-        verify(PlugRepository, times(1)).findById(id);
+        verify(plugManager, times(1)).findById(id);
     }
 
     @Test
@@ -104,13 +101,13 @@ public class PlugControllerTestMock {
     void getPlugById_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(PlugRepository.findById(id)).thenReturn(Optional.empty());
+        when(plugManager.findById(id)).thenThrow(new IllegalArgumentException("Plug not found"));
 
         // When & Then
         mockMvc.perform(get("/api/v1/plugs/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(PlugRepository, times(1)).findById(id);
+        verify(plugManager, times(1)).findById(id);
     }
 
     @Test
@@ -119,7 +116,7 @@ public class PlugControllerTestMock {
         // Given
         Long roomId = 1L;
         List<Plug> roomPlugs = Arrays.asList(samplePlug);
-        when(PlugRepository.findByRoom_Id(roomId)).thenReturn(roomPlugs);
+        when(plugManager.findByRoomId(roomId)).thenReturn(roomPlugs);
 
         // When & Then
         mockMvc.perform(get("/api/v1/plugs/by-room/{roomId}", roomId))
@@ -127,7 +124,7 @@ public class PlugControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(PlugRepository, times(1)).findByRoom_Id(roomId);
+        verify(plugManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -135,14 +132,14 @@ public class PlugControllerTestMock {
     void getByRoomId_WhenNoPlugs_ShouldReturnEmptyList() throws Exception {
         // Given
         Long roomId = 999L;
-        when(PlugRepository.findByRoom_Id(roomId)).thenReturn(Arrays.asList());
+        when(plugManager.findByRoomId(roomId)).thenReturn(Arrays.asList());
 
         // When & Then
         mockMvc.perform(get("/api/v1/plugs/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verify(PlugRepository, times(1)).findByRoom_Id(roomId);
+        verify(plugManager, times(1)).findByRoomId(roomId);
     }
 
     @Test
@@ -151,7 +148,7 @@ public class PlugControllerTestMock {
         // Given
         String customName = "Table Test";
         List<Plug> namedPlugs = Arrays.asList(samplePlug);
-        when(PlugRepository.findByCustomName(customName)).thenReturn(namedPlugs);
+        when(plugManager.findByCustomName(customName)).thenReturn(namedPlugs);
 
         // When & Then
         mockMvc.perform(get("/api/v1/plugs/by-custom-name")
@@ -160,7 +157,7 @@ public class PlugControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(PlugRepository, times(1)).findByCustomName(customName);
+        verify(plugManager, times(1)).findByCustomName(customName);
     }
 
     @Test
@@ -170,7 +167,7 @@ public class PlugControllerTestMock {
         Plug newPlug = new Plug();
         newPlug.setCustomName("Nouvelle Table");
         
-        when(PlugRepository.save(any(Plug.class))).thenReturn(samplePlug);
+        when(plugManager.save(any(Plug.class))).thenReturn(samplePlug);
 
         // When & Then
         mockMvc.perform(post("/api/v1/plugs")
@@ -180,7 +177,7 @@ public class PlugControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1));
 
-        verify(PlugRepository, times(1)).save(any(Plug.class));
+        verify(plugManager, times(1)).save(any(Plug.class));
     }
 
     @Test
@@ -191,7 +188,7 @@ public class PlugControllerTestMock {
         updatedPlug.setId(1);
         updatedPlug.setCustomName("Table Modifiée");
         
-        when(PlugRepository.save(any(Plug.class))).thenReturn(updatedPlug);
+        when(plugManager.save(any(Plug.class))).thenReturn(updatedPlug);
 
         // When & Then
         mockMvc.perform(put("/api/v1/plugs")
@@ -201,7 +198,7 @@ public class PlugControllerTestMock {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.customName").value("Table Modifiée"));
 
-        verify(PlugRepository, times(1)).save(any(Plug.class));
+        verify(plugManager, times(1)).save(any(Plug.class));
     }
 
     @Test
@@ -209,16 +206,16 @@ public class PlugControllerTestMock {
     void deletePlug_WhenExists_ShouldDeleteAndReturnSuccess() throws Exception {
         // Given
         Integer id = 1;
-        when(PlugRepository.existsById(id)).thenReturn(true);
-        doNothing().when(PlugRepository).deleteById(id);
+        when(plugManager.existsById(id)).thenReturn(true);
+        doNothing().when(plugManager).deleteById(id);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/plugs/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Plug supprimée avec succès"));
 
-        verify(PlugRepository, times(1)).existsById(id);
-        verify(PlugRepository, times(1)).deleteById(id);
+        verify(plugManager, times(1)).existsById(id);
+        verify(plugManager, times(1)).deleteById(id);
     }
 
     @Test
@@ -226,14 +223,14 @@ public class PlugControllerTestMock {
     void deletePlug_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
-        when(PlugRepository.existsById(id)).thenReturn(false);
+        when(plugManager.existsById(id)).thenReturn(false);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/plugs/{id}", id))
                 .andExpect(status().isNotFound());
 
-        verify(PlugRepository, times(1)).existsById(id);
-        verify(PlugRepository, never()).deleteById(id);
+        verify(plugManager, times(1)).existsById(id);
+        verify(plugManager, never()).deleteById(id);
     }
 
     @Test
@@ -241,14 +238,14 @@ public class PlugControllerTestMock {
     void deleteByRoomId_ShouldDeleteAllPlugsInRoom() throws Exception {
         // Given
         Integer roomId = 1;
-        doNothing().when(PlugRepository).deleteByRoomId(roomId);
+        doNothing().when(plugManager).deleteByRoomId(roomId);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/plugs/by-room/{roomId}", roomId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Plugs de la salle ont été supprimées"));
 
-        verify(PlugRepository, times(1)).deleteByRoomId(roomId);
+        verify(plugManager, times(1)).deleteByRoomId(roomId);
     }
 
     @Test
@@ -256,7 +253,7 @@ public class PlugControllerTestMock {
     void deleteByCustomName_ShouldDeleteAllPlugsWithCustomName() throws Exception {
         // Given
         String customName = "Table à supprimer";
-        doNothing().when(PlugRepository).deleteByCustomName(customName);
+        doNothing().when(plugManager).deleteByCustomName(customName);
 
         // When & Then
         mockMvc.perform(delete("/api/v1/plugs/by-custom-name")
@@ -264,7 +261,7 @@ public class PlugControllerTestMock {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Toutes les Plugs avec ce nom ont été supprimées"));
 
-        verify(PlugRepository, times(1)).deleteByCustomName(customName);
+        verify(plugManager, times(1)).deleteByCustomName(customName);
     }
 
     @Test
@@ -274,7 +271,7 @@ public class PlugControllerTestMock {
         mockMvc.perform(get("/api/v1/plugs/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(PlugRepository, never()).findByCustomName(anyString());
+        verify(plugManager, never()).findByCustomName(anyString());
     }
 
     @Test
@@ -284,19 +281,6 @@ public class PlugControllerTestMock {
         mockMvc.perform(delete("/api/v1/plugs/by-custom-name"))
                 .andExpect(status().isBadRequest());
 
-        verify(PlugRepository, never()).deleteByCustomName(anyString());
-    }
-
-    @Test
-    @DisplayName("Test d'intégration - Scénario complet CRUD")
-    void fullCrudScenario_ShouldWorkCorrectly() throws Exception {
-        // Cette méthode pourrait tester un scénario complet :
-        // 1. Créer une Plug
-        // 2. La récupérer
-        // 3. La modifier
-        // 4. La supprimer
-        
-        // Ceci est plus adapté pour des tests d'intégration
-        // mais peut être utile pour valider le comportement global
+        verify(plugManager, never()).deleteByCustomName(anyString());
     }
 }

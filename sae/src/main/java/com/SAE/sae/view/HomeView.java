@@ -61,8 +61,6 @@ public class HomeView extends VerticalLayout {
         add(createHeader());
         add(createKPISection());
         add(createSystemOverview());
-        add(createQuickActions());
-        add(createActivityFeed());
     }
     
     private VerticalLayout createHeader() {
@@ -444,123 +442,7 @@ public class HomeView extends VerticalLayout {
         
         return card;
     }
-    
-    private VerticalLayout createQuickActions() {
-        HorizontalLayout actions = new HorizontalLayout();
-        actions.setWidthFull();
-        actions.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        actions.setSpacing(true);
         
-        H3 sectionTitle = new H3("🚀 Actions Rapides");
-        sectionTitle.getStyle()
-            .set("color", "white")
-            .set("text-align", "center")
-            .set("width", "100%")
-            .set("margin", "30px 0 20px 0");
-        
-        VerticalLayout wrapper = new VerticalLayout();
-        wrapper.setWidthFull();
-        wrapper.add(sectionTitle);
-        
-        HorizontalLayout buttonRow = new HorizontalLayout();
-        buttonRow.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        buttonRow.setSpacing(true);
-        
-        buttonRow.add(
-            createActionButton("📊 Voir les Bâtiments", VaadinIcon.BUILDING, "#3498db"),
-            createActionButton("🚪 Gérer les Salles", VaadinIcon.HOME, "#2ecc71"),
-            createActionButton("💡 Contrôler Éclairage", VaadinIcon.LIGHTBULB, "#f1c40f"),
-            createActionButton("🌡️ Capteurs", VaadinIcon.CHART, "#e74c3c")
-        );
-        
-        wrapper.add(buttonRow);
-        
-        return wrapper;
-    }
-    
-    private Button createActionButton(String text, VaadinIcon icon, String color) {
-        Button button = new Button(text, new Icon(icon));
-        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        button.getStyle()
-            .set("background", color)
-            .set("border", "none")
-            .set("padding", "15px 25px")
-            .set("border-radius", "25px")
-            .set("font-weight", "bold")
-            .set("transition", "all 0.3s ease")
-            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.2)");
-        
-        button.getElement().addEventListener("mouseenter", e -> {
-            button.getStyle().set("transform", "translateY(-2px)");
-        });
-        button.getElement().addEventListener("mouseleave", e -> {
-            button.getStyle().set("transform", "translateY(0)");
-        });
-        
-        return button;
-    }
-    
-    private VerticalLayout createActivityFeed() {
-        VerticalLayout feed = new VerticalLayout();
-        feed.getStyle()
-            .set("background", "white")
-            .set("border-radius", "15px")
-            .set("padding", "25px")
-            .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)")
-            .set("margin-top", "20px");
-        
-        H3 title = new H3("📈 Activité Récente");
-        title.getStyle()
-            .set("margin-top", "0")
-            .set("color", "#2c3e50")
-            .set("text-align", "center");
-        
-        feed.add(title);
-        
-        // Activités simulées
-        feed.add(createActivityItem("🏢", "Nouveau bâtiment ajouté", "Il y a 2 heures", "#3498db"));
-        feed.add(createActivityItem("🚪", "5 nouvelles salles configurées", "Il y a 4 heures", "#2ecc71"));
-        feed.add(createActivityItem("💡", "Éclairage optimisé dans le bâtiment A", "Il y a 6 heures", "#f1c40f"));
-        feed.add(createActivityItem("🌡️", "Capteurs CO2 mis à jour", "Il y a 8 heures", "#e74c3c"));
-        
-        return feed;
-    }
-    
-    private HorizontalLayout createActivityItem(String icon, String activity, String time, String color) {
-        HorizontalLayout item = new HorizontalLayout();
-        item.setWidthFull();
-        item.setAlignItems(FlexComponent.Alignment.CENTER);
-        item.getStyle()
-            .set("padding", "10px")
-            .set("border-bottom", "1px solid #ecf0f1");
-        
-        Span iconSpan = new Span(icon);
-        iconSpan.getStyle()
-            .set("font-size", "1.5em")
-            .set("margin-right", "15px");
-        
-        VerticalLayout content = new VerticalLayout();
-        content.setPadding(false);
-        content.setSpacing(false);
-        
-        Span activitySpan = new Span(activity);
-        activitySpan.getStyle()
-            .set("font-weight", "500")
-            .set("color", "#2c3e50");
-        
-        Span timeSpan = new Span(time);
-        timeSpan.getStyle()
-            .set("font-size", "0.8em")
-            .set("color", "#7f8c8d");
-        
-        content.add(activitySpan, timeSpan);
-        
-        item.add(iconSpan, content);
-        item.setFlexGrow(1, content);
-        
-        return item;
-    }
-    
     // Méthodes utilitaires
     private long getTotalDevices() {
         try {

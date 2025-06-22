@@ -381,7 +381,7 @@ public class MainLayout extends AppLayout {
         });
         
         roomBtn.addClickListener(click -> {
-            UI.getCurrent().navigate("rooms/" + room.getId());
+            UI.getCurrent().navigate("room/" + room.getId());
         });
         
         return roomBtn;

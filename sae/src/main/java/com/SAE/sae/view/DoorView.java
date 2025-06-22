@@ -24,9 +24,11 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Route(value = "doors", layout = MainLayout.class)
 public class DoorView extends VerticalLayout {
@@ -35,6 +37,8 @@ public class DoorView extends VerticalLayout {
     private final RoomManager roomManager;
     private final Grid<Door> grid = new Grid<>(Door.class);
     private Door selectedDoor = null;
+    private List<Door> allDoors; // Liste complète pour la recherche
+    private TextField searchField; // Champ de recherche
 
     // Boutons d'action
     private Button refreshButton;
@@ -73,6 +77,21 @@ public class DoorView extends VerticalLayout {
         add(title);
     }
 
+    private void createSearchField() {
+        searchField = new TextField();
+        searchField.setPlaceholder("🔍 Rechercher une porte...");
+        searchField.setWidth("300px");
+        searchField.setClearButtonVisible(true);
+        searchField.setValueChangeMode(ValueChangeMode.LAZY);
+        searchField.setValueChangeTimeout(300);
+        
+        searchField.getStyle()
+            .set("border-radius", "8px")
+            .set("font-size", "14px");
+
+        searchField.addValueChangeListener(e -> filterDoors(e.getValue()));
+    }
+
     private void createToolbar() {
         HorizontalLayout toolbar = new HorizontalLayout();
         toolbar.setWidthFull();
@@ -86,8 +105,9 @@ public class DoorView extends VerticalLayout {
             .set("margin-bottom", "20px");
 
         // Groupe de boutons principaux (gauche)
-        HorizontalLayout actionButtons = new HorizontalLayout();
-        actionButtons.setSpacing(true);
+        HorizontalLayout leftGroup = new HorizontalLayout();
+        leftGroup.setSpacing(true);
+        leftGroup.setAlignItems(FlexComponent.Alignment.CENTER);
 
         refreshButton = createStyledButton("🔄 Actualiser", VaadinIcon.REFRESH, "#3498db", ButtonVariant.LUMO_PRIMARY);
         refreshButton.addClickListener(e -> loadData());
@@ -95,11 +115,21 @@ public class DoorView extends VerticalLayout {
         addButton = createStyledButton("➕ Ajouter", VaadinIcon.PLUS, "#27ae60", ButtonVariant.LUMO_SUCCESS);
         addButton.addClickListener(e -> openAddDialog());
 
-        actionButtons.add(refreshButton, addButton);
+        leftGroup.add(refreshButton, addButton);
+
+        // Groupe central avec la recherche
+        HorizontalLayout centerGroup = new HorizontalLayout();
+        centerGroup.setAlignItems(FlexComponent.Alignment.CENTER);
+        centerGroup.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        
+        // Créer le champ de recherche
+        createSearchField();
+        centerGroup.add(searchField);
 
         // Groupe de boutons d'action sur sélection (droite)
-        HorizontalLayout selectionButtons = new HorizontalLayout();
-        selectionButtons.setSpacing(true);
+        HorizontalLayout rightGroup = new HorizontalLayout();
+        rightGroup.setSpacing(true);
+        rightGroup.setAlignItems(FlexComponent.Alignment.CENTER);
 
         editButton = createStyledButton("✏️ Modifier", VaadinIcon.EDIT, "#f39c12", ButtonVariant.LUMO_CONTRAST);
         editButton.addClickListener(e -> openEditDialog());
@@ -109,9 +139,13 @@ public class DoorView extends VerticalLayout {
         deleteButton.addClickListener(e -> confirmDelete());
         deleteButton.setEnabled(false);
 
-        selectionButtons.add(editButton, deleteButton);
+        rightGroup.add(editButton, deleteButton);
 
-        toolbar.add(actionButtons, selectionButtons);
+        toolbar.add(leftGroup, centerGroup, rightGroup);
+        toolbar.setFlexGrow(0, leftGroup);
+        toolbar.setFlexGrow(1, centerGroup);
+        toolbar.setFlexGrow(0, rightGroup);
+        
         add(toolbar);
     }
 
@@ -146,6 +180,10 @@ public class DoorView extends VerticalLayout {
             
         grid.addColumn(Door::getCustomName)
             .setHeader("Nom")
+            .setFlexGrow(1);
+
+        grid.addColumn(door -> door.getRoom() != null ? door.getRoom().getName() : "Aucune")
+            .setHeader("Salle")
             .setFlexGrow(1);
 
         grid.addColumn(door -> String.format("%.1f, %.1f, %.1f", 
@@ -223,6 +261,73 @@ public class DoorView extends VerticalLayout {
         add(infoContainer);
     }
 
+    private void filterDoors(String searchTerm) {
+        if (allDoors == null) {
+            return;
+        }
+
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            grid.setItems(allDoors);
+            updateResultsInfo(allDoors.size(), allDoors.size());
+            return;
+        }
+
+        String lowerCaseFilter = searchTerm.toLowerCase().trim();
+        List<Door> filteredDoors = allDoors.stream()
+            .filter(door -> matchesSearch(door, lowerCaseFilter))
+            .collect(Collectors.toList());
+
+        grid.setItems(filteredDoors);
+        updateResultsInfo(filteredDoors.size(), allDoors.size());
+        
+        // Clear selection après filtrage
+        grid.asSingleSelect().clear();
+    }
+
+    private boolean matchesSearch(Door door, String searchTerm) {
+        // Recherche dans le nom
+        if (door.getCustomName() != null && 
+            door.getCustomName().toLowerCase().contains(searchTerm)) {
+            return true;
+        }
+
+        // Recherche dans le nom de la salle
+        if (door.getRoom() != null && door.getRoom().getName() != null &&
+            door.getRoom().getName().toLowerCase().contains(searchTerm)) {
+            return true;
+        }
+
+        // Recherche dans les coordonnées (position)
+        String position = String.format("%.1f %.1f %.1f", 
+            door.getPosX(), door.getPosY(), door.getPosZ());
+        if (position.contains(searchTerm)) {
+            return true;
+        }
+
+        // Recherche dans les dimensions (taille)
+        String size = String.format("%.1f %.1f %.1f", 
+            door.getSizeX(), door.getSizeY(), door.getSizeZ());
+        if (size.contains(searchTerm)) {
+            return true;
+        }
+
+        // Recherche dans l'ID (converti en string)
+        if (String.valueOf(door.getId()).contains(searchTerm)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updateResultsInfo(int filteredCount, int totalCount) {
+        if (filteredCount != totalCount) {
+            String message = String.format("🔍 %d résultat(s) sur %d porte(s)", 
+                filteredCount, totalCount);
+            Notification notification = Notification.show(message, 2000, Notification.Position.BOTTOM_END);
+            notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+        }
+    }
+
     private void updateButtonStates() {
         // CORRECTION : Récupérer la sélection actuelle à chaque fois
         Door currentSelection = grid.asSingleSelect().getValue();
@@ -236,18 +341,19 @@ public class DoorView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Door> doors = doorManager.findAll();
-            grid.setItems(doors);
+            allDoors = doorManager.findAll(); // Stocker la liste complète
+            grid.setItems(allDoors);
             
             Notification notification = Notification.show(
-                "✅ " + doors.size() + " porte(s) chargée(s)", 
+                "✅ " + allDoors.size() + " porte(s) chargée(s)", 
                 3000, 
                 Notification.Position.TOP_END
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             
-            // CORRECTION : Clear la sélection comme dans BuildingView
+            // Clear la sélection et la recherche
             grid.asSingleSelect().clear();
+            searchField.clear();
             
         } catch (Exception e) {
             showErrorNotification("Erreur lors du chargement", e.getMessage());

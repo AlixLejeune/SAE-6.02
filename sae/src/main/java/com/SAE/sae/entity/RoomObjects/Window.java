@@ -1,16 +1,19 @@
 package com.SAE.sae.entity.RoomObjects;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;
 
+@Data
 @Entity
 @Table(name = "t_e_window_win")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Window  extends RoomObject implements IPosition, ISize {

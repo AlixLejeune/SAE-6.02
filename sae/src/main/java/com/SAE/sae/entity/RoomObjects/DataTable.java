@@ -1,16 +1,19 @@
 package com.SAE.sae.entity.RoomObjects;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Data
 @Entity
 @Table(name = "t_e_table_tab")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DataTable extends RoomObject implements IPosition, ISize {

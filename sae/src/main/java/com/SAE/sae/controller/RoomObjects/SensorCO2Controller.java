@@ -1,7 +1,8 @@
 package com.SAE.sae.controller.RoomObjects;
 
+import com.SAE.sae.entity.RoomObjects.Sensor6in1;
 import com.SAE.sae.entity.RoomObjects.SensorCO2;
-import com.SAE.sae.repository.RoomObjects.SensorCO2Repository;
+import com.SAE.sae.service.RoomObjects.SensorCO2Manager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SensorCO2Controller {
 
-    private final SensorCO2Repository SensorCO2Repository;
+    private final SensorCO2Manager sensorCO2Manager;
 
     /**
      * Récupère toutes les entités SensorCO2.
@@ -26,7 +27,7 @@ public class SensorCO2Controller {
      */
     @GetMapping
     public ResponseEntity<List<SensorCO2>> getAllSensorCO2s() {
-        return ResponseEntity.ok(SensorCO2Repository.findAll());
+        return ResponseEntity.ok(sensorCO2Manager.findAll());
     }
 
     /**
@@ -35,10 +36,13 @@ public class SensorCO2Controller {
      * @return SensorCO2 si elle existe, sinon 404.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<SensorCO2> getSensorCO2ById(@PathVariable Integer id) {
-        return SensorCO2Repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<SensorCO2> getDataTableById(@PathVariable Integer id) {
+        try {
+            SensorCO2 sensorCO2 = sensorCO2Manager.findById(id);
+            return ResponseEntity.ok(sensorCO2);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
@@ -48,7 +52,7 @@ public class SensorCO2Controller {
      */
     @GetMapping("/by-room/{roomId}")
     public ResponseEntity<List<SensorCO2>> getByRoomId(@PathVariable Long roomId) {
-        return ResponseEntity.ok(SensorCO2Repository.findByRoom_Id(roomId));
+        return ResponseEntity.ok(sensorCO2Manager.findByRoomId(roomId));
     }
 
     /**
@@ -58,7 +62,7 @@ public class SensorCO2Controller {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<SensorCO2>> getByCustomName(@RequestParam String name) {
-        return ResponseEntity.ok(SensorCO2Repository.findByCustomName(name));
+        return ResponseEntity.ok(sensorCO2Manager.findByCustomName(name));
     }
 
     /**
@@ -68,7 +72,7 @@ public class SensorCO2Controller {
      */
     @PostMapping
     public ResponseEntity<SensorCO2> createSensorCO2(@RequestBody SensorCO2 SensorCO2) {
-        return ResponseEntity.ok(SensorCO2Repository.save(SensorCO2));
+        return ResponseEntity.ok(sensorCO2Manager.save(SensorCO2));
     }
 
     /**
@@ -78,7 +82,7 @@ public class SensorCO2Controller {
      */
     @PutMapping
     public ResponseEntity<SensorCO2> updateSensorCO2(@RequestBody SensorCO2 SensorCO2) {
-        return ResponseEntity.ok(SensorCO2Repository.save(SensorCO2));
+        return ResponseEntity.ok(sensorCO2Manager.save(SensorCO2));
     }
 
     /**
@@ -88,10 +92,10 @@ public class SensorCO2Controller {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSensorCO2(@PathVariable Integer id) {
-        if (!SensorCO2Repository.existsById(id)) {
+        if (!sensorCO2Manager.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        SensorCO2Repository.deleteById(id);
+        sensorCO2Manager.deleteById(id);
         return ResponseEntity.ok("SensorCO2 supprimée avec succès");
     }
 
@@ -103,7 +107,7 @@ public class SensorCO2Controller {
       @DeleteMapping("/by-room/{roomId}")
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        SensorCO2Repository.deleteByRoomId(roomId);
+        sensorCO2Manager.deleteByRoomId(roomId);
         return ResponseEntity.ok("Toutes les SensorCO2s de la salle ont été supprimées");
     }
 
@@ -115,7 +119,7 @@ public class SensorCO2Controller {
     @DeleteMapping("/by-custom-name")
     @Transactional
     public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
-        SensorCO2Repository.deleteByCustomName(customName);
+        sensorCO2Manager.deleteByCustomName(customName);
         return ResponseEntity.ok("Toutes les SensorCO2s avec ce nom ont été supprimées");
     }
 }

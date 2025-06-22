@@ -1,7 +1,8 @@
 package com.SAE.sae.controller.RoomObjects;
 
+import com.SAE.sae.entity.RoomObjects.Plug;
 import com.SAE.sae.entity.RoomObjects.Sensor6in1;
-import com.SAE.sae.repository.RoomObjects.Sensor6in1Repository;
+import com.SAE.sae.service.RoomObjects.Sensor6in1Manager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Sensor6in1Controller {
 
-    private final Sensor6in1Repository Sensor6in1Repository;
+    private final Sensor6in1Manager sensor6in1Manager;
 
     /**
      * Récupère toutes les entités Sensor6in1.
@@ -26,7 +27,7 @@ public class Sensor6in1Controller {
      */
     @GetMapping
     public ResponseEntity<List<Sensor6in1>> getAllSensor6in1s() {
-        return ResponseEntity.ok(Sensor6in1Repository.findAll());
+        return ResponseEntity.ok(sensor6in1Manager.findAll());
     }
 
     /**
@@ -35,10 +36,13 @@ public class Sensor6in1Controller {
      * @return Sensor6in1 si elle existe, sinon 404.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Sensor6in1> getSensor6in1ById(@PathVariable Integer id) {
-        return Sensor6in1Repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Sensor6in1> getDataTableById(@PathVariable Integer id) {
+        try {
+            Sensor6in1 sensor6in1 = sensor6in1Manager.findById(id);
+            return ResponseEntity.ok(sensor6in1);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
@@ -48,7 +52,7 @@ public class Sensor6in1Controller {
      */
     @GetMapping("/by-room/{roomId}")
     public ResponseEntity<List<Sensor6in1>> getByRoomId(@PathVariable Long roomId) {
-        return ResponseEntity.ok(Sensor6in1Repository.findByRoom_Id(roomId));
+        return ResponseEntity.ok(sensor6in1Manager.findByRoomId(roomId));
     }
 
     /**
@@ -58,7 +62,7 @@ public class Sensor6in1Controller {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<Sensor6in1>> getByCustomName(@RequestParam String name) {
-        return ResponseEntity.ok(Sensor6in1Repository.findByCustomName(name));
+        return ResponseEntity.ok(sensor6in1Manager.findByCustomName(name));
     }
 
     /**
@@ -68,7 +72,7 @@ public class Sensor6in1Controller {
      */
     @PostMapping
     public ResponseEntity<Sensor6in1> createSensor6in1(@RequestBody Sensor6in1 Sensor6in1) {
-        return ResponseEntity.ok(Sensor6in1Repository.save(Sensor6in1));
+        return ResponseEntity.ok(sensor6in1Manager.save(Sensor6in1));
     }
 
     /**
@@ -78,7 +82,7 @@ public class Sensor6in1Controller {
      */
     @PutMapping
     public ResponseEntity<Sensor6in1> updateSensor6in1(@RequestBody Sensor6in1 Sensor6in1) {
-        return ResponseEntity.ok(Sensor6in1Repository.save(Sensor6in1));
+        return ResponseEntity.ok(sensor6in1Manager.save(Sensor6in1));
     }
 
     /**
@@ -88,10 +92,10 @@ public class Sensor6in1Controller {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSensor6in1(@PathVariable Integer id) {
-        if (!Sensor6in1Repository.existsById(id)) {
+        if (!sensor6in1Manager.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        Sensor6in1Repository.deleteById(id);
+        sensor6in1Manager.deleteById(id);
         return ResponseEntity.ok("Sensor6in1 supprimée avec succès");
     }
 
@@ -103,7 +107,7 @@ public class Sensor6in1Controller {
     @DeleteMapping("/by-room/{roomId}")
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        Sensor6in1Repository.deleteByRoomId(roomId);
+        sensor6in1Manager.deleteByRoomId(roomId);
         return ResponseEntity.ok("Toutes les Sensor6in1s de la salle ont été supprimées");
     }
 
@@ -115,7 +119,7 @@ public class Sensor6in1Controller {
     @DeleteMapping("/by-custom-name")
     @Transactional
     public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
-        Sensor6in1Repository.deleteByCustomName(customName);
+        sensor6in1Manager.deleteByCustomName(customName);
         return ResponseEntity.ok("Toutes les Sensor6in1s avec ce nom ont été supprimées");
     }
 }

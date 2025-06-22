@@ -1,7 +1,8 @@
 package com.SAE.sae.controller.RoomObjects;
 
+import com.SAE.sae.entity.RoomObjects.SensorCO2;
 import com.SAE.sae.entity.RoomObjects.Window;
-import com.SAE.sae.repository.RoomObjects.WindowRepository;
+import com.SAE.sae.service.RoomObjects.WindowManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WindowController {
 
-    private final WindowRepository WindowRepository;
+    private final WindowManager windowManager;
 
     /**
      * Récupère toutes les entités Window.
@@ -26,7 +27,7 @@ public class WindowController {
      */
     @GetMapping
     public ResponseEntity<List<Window>> getAllWindows() {
-        return ResponseEntity.ok(WindowRepository.findAll());
+        return ResponseEntity.ok(windowManager.findAll());
     }
 
     /**
@@ -34,11 +35,14 @@ public class WindowController {
      * @param id Identifiant de la Window.
      * @return Window si elle existe, sinon 404.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<Window> getWindowById(@PathVariable Integer id) {
-        return WindowRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+      @GetMapping("/{id}")
+    public ResponseEntity<Window> getDataTableById(@PathVariable Integer id) {
+        try {
+            Window window = windowManager.findById(id);
+            return ResponseEntity.ok(window);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
@@ -48,7 +52,7 @@ public class WindowController {
      */
     @GetMapping("/by-room/{roomId}")
     public ResponseEntity<List<Window>> getByRoomId(@PathVariable Long roomId) {
-        return ResponseEntity.ok(WindowRepository.findByRoom_Id(roomId));
+        return ResponseEntity.ok(windowManager.findByRoomId(roomId));
     }
 
     /**
@@ -58,7 +62,7 @@ public class WindowController {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<Window>> getByCustomName(@RequestParam String name) {
-        return ResponseEntity.ok(WindowRepository.findByCustomName(name));
+        return ResponseEntity.ok(windowManager.findByCustomName(name));
     }
 
     /**
@@ -68,7 +72,7 @@ public class WindowController {
      */
     @PostMapping
     public ResponseEntity<Window> createWindow(@RequestBody Window Window) {
-        return ResponseEntity.ok(WindowRepository.save(Window));
+        return ResponseEntity.ok(windowManager.save(Window));
     }
 
     /**
@@ -78,7 +82,7 @@ public class WindowController {
      */
     @PutMapping
     public ResponseEntity<Window> updateWindow(@RequestBody Window Window) {
-        return ResponseEntity.ok(WindowRepository.save(Window));
+        return ResponseEntity.ok(windowManager.save(Window));
     }
 
     /**
@@ -88,10 +92,10 @@ public class WindowController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteWindow(@PathVariable Integer id) {
-        if (!WindowRepository.existsById(id)) {
+        if (!windowManager.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        WindowRepository.deleteById(id);
+        windowManager.deleteById(id);
         return ResponseEntity.ok("Window supprimée avec succès");
     }
 
@@ -103,7 +107,7 @@ public class WindowController {
      @DeleteMapping("/by-room/{roomId}")
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        WindowRepository.deleteByRoomId(roomId);
+        windowManager.deleteByRoomId(roomId);
         return ResponseEntity.ok("Toutes les Windows de la salle ont été supprimées");
     }
 
@@ -115,7 +119,7 @@ public class WindowController {
     @DeleteMapping("/by-custom-name")
     @Transactional
     public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
-        WindowRepository.deleteByCustomName(customName);
+        windowManager.deleteByCustomName(customName);
         return ResponseEntity.ok("Toutes les Windows avec ce nom ont été supprimées");
     }
 }

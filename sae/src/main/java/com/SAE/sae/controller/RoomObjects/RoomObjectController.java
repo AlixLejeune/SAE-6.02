@@ -1,7 +1,8 @@
 package com.SAE.sae.controller.RoomObjects;
 
+import com.SAE.sae.entity.RoomObjects.Plug;
 import com.SAE.sae.entity.RoomObjects.RoomObject;
-import com.SAE.sae.repository.RoomObjects.RoomObjectRepository;
+import com.SAE.sae.service.RoomObjects.RoomObjectManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoomObjectController {
 
-    private final RoomObjectRepository roomObjectRepository;
+    private final RoomObjectManager roomObjectManager;
 
     /**
      * Récupère tous les objets de type RoomObject.
@@ -26,7 +27,7 @@ public class RoomObjectController {
      */
     @GetMapping
     public ResponseEntity<List<RoomObject>> getAllRoomObjects() {
-        return ResponseEntity.ok(roomObjectRepository.findAll());
+        return ResponseEntity.ok(roomObjectManager.findAll());
     }
 
     /**
@@ -35,10 +36,13 @@ public class RoomObjectController {
      * @return L'objet correspondant ou une réponse 404 s'il n'existe pas.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<RoomObject> getRoomObjectById(@PathVariable Integer id) {
-        return roomObjectRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<RoomObject> getDataTableById(@PathVariable Integer id) {
+        try {
+            RoomObject roomObject = roomObjectManager.findById(id);
+            return ResponseEntity.ok(roomObject);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
@@ -48,7 +52,7 @@ public class RoomObjectController {
      */
     @GetMapping("/by-room/{roomId}")
     public ResponseEntity<List<RoomObject>> getObjectsByRoomId(@PathVariable Long roomId) {
-        return ResponseEntity.ok(roomObjectRepository.findByRoom_Id(roomId));
+        return ResponseEntity.ok(roomObjectManager.findByRoomId(roomId));
     }
 
     /**
@@ -58,7 +62,7 @@ public class RoomObjectController {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<RoomObject>> getObjectsByCustomName(@RequestParam String name) {
-        return ResponseEntity.ok(roomObjectRepository.findByCustomName(name));
+        return ResponseEntity.ok(roomObjectManager.findByCustomName(name));
     }
 
     /**
@@ -68,7 +72,7 @@ public class RoomObjectController {
      */
     @PostMapping
     public ResponseEntity<RoomObject> createRoomObject(@RequestBody RoomObject roomObject) {
-        return ResponseEntity.ok(roomObjectRepository.save(roomObject));
+        return ResponseEntity.ok(roomObjectManager.save(roomObject));
     }
 
     /**
@@ -78,7 +82,7 @@ public class RoomObjectController {
      */
     @PutMapping
     public ResponseEntity<RoomObject> updateRoomObject(@RequestBody RoomObject roomObject) {
-        return ResponseEntity.ok(roomObjectRepository.save(roomObject));
+        return ResponseEntity.ok(roomObjectManager.save(roomObject));
     }
 
     /**
@@ -88,10 +92,10 @@ public class RoomObjectController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoomObject(@PathVariable Integer id) {
-        if (!roomObjectRepository.existsById(id)) {
+        if (!roomObjectManager.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        roomObjectRepository.deleteById(id);
+        roomObjectManager.deleteById(id);
         return ResponseEntity.ok("Objet supprimé avec succès");
     }
 
@@ -103,7 +107,7 @@ public class RoomObjectController {
       @DeleteMapping("/by-room/{roomId}")
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        roomObjectRepository.deleteByRoomId(roomId);
+        roomObjectManager.deleteByRoomId(roomId);
         return ResponseEntity.ok("Toutes les RoomObjects de la salle ont été supprimées");
     }
 
@@ -115,7 +119,7 @@ public class RoomObjectController {
     @DeleteMapping("/by-custom-name")
     @Transactional
     public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
-        roomObjectRepository.deleteByCustomName(customName);
+        roomObjectManager.deleteByCustomName(customName);
         return ResponseEntity.ok("Objets avec ce nom supprimés");
     }
 }

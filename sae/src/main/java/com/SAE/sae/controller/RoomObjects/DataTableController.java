@@ -1,7 +1,7 @@
 package com.SAE.sae.controller.RoomObjects;
 
 import com.SAE.sae.entity.RoomObjects.DataTable;
-import com.SAE.sae.repository.RoomObjects.DataTableRepository;
+import com.SAE.sae.service.RoomObjects.DataTableManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataTableController {
 
-    private final DataTableRepository dataTableRepository;
+    private final DataTableManager dataTableManager;
 
     /**
      * Récupère toutes les entités DataTable.
@@ -26,7 +26,7 @@ public class DataTableController {
      */
     @GetMapping
     public ResponseEntity<List<DataTable>> getAllDataTables() {
-        return ResponseEntity.ok(dataTableRepository.findAll());
+        return ResponseEntity.ok(dataTableManager.findAll());
     }
 
     /**
@@ -35,11 +35,15 @@ public class DataTableController {
      * @return DataTable si elle existe, sinon 404.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<DataTable> getDataTableById(@PathVariable Integer id) {
-        return dataTableRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+public ResponseEntity<DataTable> getDataTableById(@PathVariable Integer id) {
+    try {
+        DataTable dataTable = dataTableManager.findById(id);
+        return ResponseEntity.ok(dataTable);
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.notFound().build();
     }
+}
+
 
     /**
      * Récupère toutes les DataTables associées à une salle (via l'ID de la salle).
@@ -48,7 +52,7 @@ public class DataTableController {
      */
     @GetMapping("/by-room/{roomId}")
     public ResponseEntity<List<DataTable>> getByRoomId(@PathVariable Long roomId) {
-        return ResponseEntity.ok(dataTableRepository.findByRoom_Id(roomId));
+        return ResponseEntity.ok(dataTableManager.findByRoomId(roomId));
     }
 
     /**
@@ -58,7 +62,7 @@ public class DataTableController {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<DataTable>> getByCustomName(@RequestParam String name) {
-        return ResponseEntity.ok(dataTableRepository.findByCustomName(name));
+        return ResponseEntity.ok(dataTableManager.findByCustomName(name));
     }
 
     /**
@@ -68,7 +72,7 @@ public class DataTableController {
      */
     @PostMapping
     public ResponseEntity<DataTable> createDataTable(@RequestBody DataTable dataTable) {
-        return ResponseEntity.ok(dataTableRepository.save(dataTable));
+        return ResponseEntity.ok(dataTableManager.save(dataTable));
     }
 
     /**
@@ -78,7 +82,7 @@ public class DataTableController {
      */
     @PutMapping
     public ResponseEntity<DataTable> updateDataTable(@RequestBody DataTable dataTable) {
-        return ResponseEntity.ok(dataTableRepository.save(dataTable));
+        return ResponseEntity.ok(dataTableManager.save(dataTable));
     }
 
     /**
@@ -88,10 +92,10 @@ public class DataTableController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDataTable(@PathVariable Integer id) {
-        if (!dataTableRepository.existsById(id)) {
+        if (!dataTableManager.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        dataTableRepository.deleteById(id);
+        dataTableManager.deleteById(id);
         return ResponseEntity.ok("DataTable supprimée avec succès");
     }
 
@@ -103,7 +107,7 @@ public class DataTableController {
     @DeleteMapping("/by-room/{roomId}")
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        dataTableRepository.deleteByRoomId(roomId);
+        dataTableManager.deleteByRoomId(roomId);
         return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
     }
 
@@ -115,7 +119,7 @@ public class DataTableController {
     @DeleteMapping("/by-custom-name")
     @Transactional
     public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
-        dataTableRepository.deleteByCustomName(customName);
+        dataTableManager.deleteByCustomName(customName);
         return ResponseEntity.ok("Toutes les DataTables avec ce nom ont été supprimées");
     }
 }

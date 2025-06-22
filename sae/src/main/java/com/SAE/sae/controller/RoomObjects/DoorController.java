@@ -1,7 +1,8 @@
 package com.SAE.sae.controller.RoomObjects;
 
+import com.SAE.sae.entity.RoomObjects.DataTable;
 import com.SAE.sae.entity.RoomObjects.Door;
-import com.SAE.sae.repository.RoomObjects.DoorRepository;
+import com.SAE.sae.service.RoomObjects.DoorManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DoorController {
 
-    private final DoorRepository DoorRepository;
+    private final DoorManager doorManager;
 
     /**
      * Récupère toutes les entités Door.
@@ -26,7 +27,7 @@ public class DoorController {
      */
     @GetMapping
     public ResponseEntity<List<Door>> getAllDoors() {
-        return ResponseEntity.ok(DoorRepository.findAll());
+        return ResponseEntity.ok(doorManager.findAll());
     }
 
     /**
@@ -34,11 +35,14 @@ public class DoorController {
      * @param id Identifiant de la Door.
      * @return Door si elle existe, sinon 404.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<Door> getDoorById(@PathVariable Integer id) {
-        return DoorRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+   @GetMapping("/{id}")
+    public ResponseEntity<Door> getDataTableById(@PathVariable Integer id) {
+        try {
+            Door door = doorManager.findById(id);
+            return ResponseEntity.ok(door);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
@@ -48,7 +52,7 @@ public class DoorController {
      */
     @GetMapping("/by-room/{roomId}")
     public ResponseEntity<List<Door>> getByRoomId(@PathVariable Long roomId) {
-        return ResponseEntity.ok(DoorRepository.findByRoom_Id(roomId));
+        return ResponseEntity.ok(doorManager.findByRoomId(roomId));
     }
 
     /**
@@ -58,7 +62,7 @@ public class DoorController {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<Door>> getByCustomName(@RequestParam String name) {
-        return ResponseEntity.ok(DoorRepository.findByCustomName(name));
+        return ResponseEntity.ok(doorManager.findByCustomName(name));
     }
 
     /**
@@ -68,7 +72,7 @@ public class DoorController {
      */
     @PostMapping
     public ResponseEntity<Door> createDoor(@RequestBody Door Door) {
-        return ResponseEntity.ok(DoorRepository.save(Door));
+        return ResponseEntity.ok(doorManager.save(Door));
     }
 
     /**
@@ -78,7 +82,7 @@ public class DoorController {
      */
     @PutMapping
     public ResponseEntity<Door> updateDoor(@RequestBody Door Door) {
-        return ResponseEntity.ok(DoorRepository.save(Door));
+        return ResponseEntity.ok(doorManager.save(Door));
     }
 
     /**
@@ -88,10 +92,10 @@ public class DoorController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDoor(@PathVariable Integer id) {
-        if (!DoorRepository.existsById(id)) {
+        if (!doorManager.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        DoorRepository.deleteById(id);
+        doorManager.deleteById(id);
         return ResponseEntity.ok("Door supprimée avec succès");
     }
 
@@ -103,7 +107,7 @@ public class DoorController {
       @DeleteMapping("/by-room/{roomId}")
     @Transactional
     public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        DoorRepository.deleteByRoomId(roomId);
+        doorManager.deleteByRoomId(roomId);
         return ResponseEntity.ok("Toutes les Doors de la salle ont été supprimées");
     }
 
@@ -115,7 +119,7 @@ public class DoorController {
     @DeleteMapping("/by-custom-name")
     @Transactional
     public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
-        DoorRepository.deleteByCustomName(customName);
+        doorManager.deleteByCustomName(customName);
         return ResponseEntity.ok("Toutes les Doors avec ce nom ont été supprimées");
     }
 }

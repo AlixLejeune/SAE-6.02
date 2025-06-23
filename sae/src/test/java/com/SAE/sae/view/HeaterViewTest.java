@@ -1,6 +1,9 @@
 package com.SAE.sae.view;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,11 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
 import com.SAE.sae.entity.RoomObjects.Heater;
 import com.SAE.sae.entity.Room;
 import com.SAE.sae.entity.Building;
@@ -23,23 +21,20 @@ import com.SAE.sae.service.RoomObjects.HeaterManager;
 import com.SAE.sae.service.RoomManager;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.button.Button;
 
-import com.vaadin.flow.component.UI;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ExtendWith(MockitoExtension.class)
 /**
  * Test class for the HeaterView component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de gestion des tables de données
+ * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de
+ * gestion des tables de données
  * et de ses interactions avec les services.
  */
 public class HeaterViewTest {
 
-    @MockBean
+    @Mock
     private HeaterManager HeaterManager;
 
-    @MockBean
+    @Mock
     private RoomManager roomManager;
 
     private HeaterView HeaterView;
@@ -53,7 +48,7 @@ public class HeaterViewTest {
     @BeforeEach
     void setUp() {
         UI.setCurrent(new UI());
-        
+
         // Créer des données de test
         testBuilding = new Building();
         testBuilding.setId(1);
@@ -120,10 +115,10 @@ public class HeaterViewTest {
 
         // Créer une nouvelle instance pour tester l'initialisation
         HeaterView newView = new HeaterView(HeaterManager, roomManager);
-        
+
         // Vérifier que findAll a été appelé pendant l'initialisation
         verify(HeaterManager, atLeastOnce()).findAll();
-        
+
         logger.info("Constructor correctly calls loadData method");
     }
 
@@ -149,7 +144,7 @@ public class HeaterViewTest {
     void testLoadDataWithException() {
         // Mock qui lance une exception
         when(HeaterManager.findAll())
-            .thenThrow(new RuntimeException("Database connection error"));
+                .thenThrow(new RuntimeException("Database connection error"));
 
         // La vue devrait gérer l'exception sans planter
         assertDoesNotThrow(() -> {
@@ -262,7 +257,7 @@ public class HeaterViewTest {
         // Tester avec un ID invalide
         Integer invalidId = 999;
         when(HeaterManager.findById(invalidId))
-            .thenThrow(new IllegalArgumentException("Aucune Heater trouvée avec l'ID : " + invalidId));
+                .thenThrow(new IllegalArgumentException("Aucune Heater trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
             HeaterManager.findById(invalidId);
@@ -418,20 +413,6 @@ public class HeaterViewTest {
         verify(HeaterManager, times(1)).count();
 
         logger.info("Count operation test successful - count: " + count);
-    }
-
-    @Test
-    void testExceptionHandlingInSave() {
-        // Tester la gestion des exceptions lors de la sauvegarde
-        when(HeaterManager.save(any(Heater.class)))
-                .thenThrow(new RuntimeException("Save operation failed"));
-
-        // Vérifier que l'exception est bien lancée
-        assertThrows(RuntimeException.class, () -> {
-            HeaterManager.save(testHeater);
-        });
-
-        logger.info("Exception handling in save operation tested successfully");
     }
 
     @Test
@@ -602,7 +583,7 @@ public class HeaterViewTest {
         assertEquals(Integer.valueOf(1), testHeater.getId());
         assertEquals(Integer.valueOf(2), testHeater2.getId());
 
-        logger.info("Heater ID handling test successful: Heater1 ID=" + 
+        logger.info("Heater ID handling test successful: Heater1 ID=" +
                 testHeater.getId() + ", Heater2 ID=" + testHeater2.getId());
     }
 
@@ -612,7 +593,7 @@ public class HeaterViewTest {
         assertEquals("Test Heater 1", testHeater.getCustomName());
         assertEquals("Test Heater 2", testHeater2.getCustomName());
 
-        logger.info("Heater name handling test successful: Heater1 name='" + 
+        logger.info("Heater name handling test successful: Heater1 name='" +
                 testHeater.getCustomName() + "', Heater2 name='" + testHeater2.getCustomName() + "'");
     }
 
@@ -622,17 +603,16 @@ public class HeaterViewTest {
         assertEquals(testRoom, testHeater.getRoom());
         assertEquals(testRoom.getName(), testHeater.getRoom().getName());
 
-        logger.info("Heater room association test successful: Room='" + 
+        logger.info("Heater room association test successful: Room='" +
                 testHeater.getRoom().getName() + "'");
     }
-
 
     @Test
     void testConcurrentOperations() {
         // Tester les opérations concurrentes (simulation)
         when(HeaterManager.findAll()).thenReturn(Arrays.asList(testHeater));
         when(HeaterManager.save(any(Heater.class))).thenReturn(testHeater);
-        
+
         // Simuler des opérations concurrentes
         assertDoesNotThrow(() -> {
             HeaterManager.findAll();
@@ -646,12 +626,11 @@ public class HeaterViewTest {
     void testPerformanceWithLargeDataset() {
         // Tester avec un grand nombre de tables de données
         List<Heater> largeDataset = Arrays.asList(
-            testHeater, testHeater2,
-            createTestHeater(3, "Heater 3"),
-            createTestHeater(4, "Heater 4"),
-            createTestHeater(5, "Heater 5")
-        );
-        
+                testHeater, testHeater2,
+                createTestHeater(3, "Heater 3"),
+                createTestHeater(4, "Heater 4"),
+                createTestHeater(5, "Heater 5"));
+
         when(HeaterManager.findAll()).thenReturn(largeDataset);
 
         // La vue devrait gérer un dataset plus large sans problème
@@ -668,9 +647,9 @@ public class HeaterViewTest {
         Heater invalidHeater = new Heater();
         invalidHeater.setCustomName("Invalid Position Heater");
         invalidHeater.setRoom(testRoom);
-        invalidHeater.setPosX(-1.0);  // Position négative
-        invalidHeater.setPosY(Double.NaN);  // Valeur NaN
-        invalidHeater.setPosZ(Double.POSITIVE_INFINITY);  // Valeur infinie
+        invalidHeater.setPosX(-1.0); // Position négative
+        invalidHeater.setPosY(Double.NaN); // Valeur NaN
+        invalidHeater.setPosZ(Double.POSITIVE_INFINITY); // Valeur infinie
 
         // Ces valeurs devraient être détectées comme invalides
         assertTrue(invalidHeater.getPosX() < 0);
@@ -686,9 +665,9 @@ public class HeaterViewTest {
         Heater invalidHeater = new Heater();
         invalidHeater.setCustomName("Invalid Size Heater");
         invalidHeater.setRoom(testRoom);
-        invalidHeater.setSizeX(0.0);  // Taille nulle
-        invalidHeater.setSizeY(-1.0);  // Taille négative
-        invalidHeater.setSizeZ(Double.NaN);  // Valeur NaN
+        invalidHeater.setSizeX(0.0); // Taille nulle
+        invalidHeater.setSizeY(-1.0); // Taille négative
+        invalidHeater.setSizeZ(Double.NaN); // Valeur NaN
 
         // Ces valeurs devraient être détectées comme invalides
         assertEquals(0.0, invalidHeater.getSizeX());

@@ -32,23 +32,23 @@ import com.vaadin.flow.component.UI;
 public class Sensor9in1EditorTest {
 
     @MockBean
-    private Sensor9in1Manager Sensor9in1Manager;
+    private Sensor9in1Manager sensor9in1Manager;
     
     @MockBean
     private RoomManager roomManager;
     
-    private Sensor9in1Editor Sensor9in1Editor;
+    private Sensor9in1Editor sensor9in1Editor;
     private Sensor9in1 testSensor9in1;
     private Room testRoom;
     private Building testBuilding;
 
-    Logger logger = Logger.getLogger(Sensor9in1EditorTest.class.getName());
+    private static final Logger logger = Logger.getLogger(Sensor9in1EditorTest.class.getName());
 
     @BeforeEach
     void setUp() {
         UI.setCurrent(new UI()); 
         // Initialiser le Sensor9in1Editor avec les mocks
-        Sensor9in1Editor = new Sensor9in1Editor(Sensor9in1Manager, roomManager);
+        sensor9in1Editor = new Sensor9in1Editor(sensor9in1Manager, roomManager);
         
         // Créer des données de test
         testBuilding = new Building();
@@ -74,14 +74,14 @@ public class Sensor9in1EditorTest {
     @Test
     void testSensor9in1EditorInstantiation() {
         // Vérifier que le Sensor9in1Editor peut être instancié correctement
-        assertNotNull(Sensor9in1Editor);
+        assertNotNull(sensor9in1Editor);
         logger.info("Sensor9in1Editor instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        Sensor9in1Editor editor = new Sensor9in1Editor(Sensor9in1Manager, roomManager);
+        Sensor9in1Editor editor = new Sensor9in1Editor(sensor9in1Manager, roomManager);
         assertNotNull(editor);
         logger.info("Sensor9in1Editor constructor works with valid managers");
     }
@@ -92,7 +92,7 @@ public class Sensor9in1EditorTest {
         Runnable testCallback = () -> logger.info("Callback executed");
         
         assertDoesNotThrow(() -> {
-            Sensor9in1Editor.setOnDataChanged(testCallback);
+            sensor9in1Editor.setOnDataChanged(testCallback);
         });
         
         logger.info("OnDataChanged callback set successfully");
@@ -102,7 +102,7 @@ public class Sensor9in1EditorTest {
     void testSetOnDataChangedWithNullCallback() {
         // Tester avec un callback null
         assertDoesNotThrow(() -> {
-            Sensor9in1Editor.setOnDataChanged(null);
+            sensor9in1Editor.setOnDataChanged(null);
         });
         
         logger.info("OnDataChanged handles null callback correctly");
@@ -116,7 +116,7 @@ public class Sensor9in1EditorTest {
         
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
-            Sensor9in1Editor.openAddDialog();
+            sensor9in1Editor.openAddDialog();
         });
         
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
@@ -133,7 +133,7 @@ public class Sensor9in1EditorTest {
         
         // Tester l'ouverture du dialog d'édition avec une table valide
         assertDoesNotThrow(() -> {
-            Sensor9in1Editor.openEditDialog(testSensor9in1);
+            sensor9in1Editor.openEditDialog(testSensor9in1);
         });
         
         // Vérifier que getAllRooms a été appelé
@@ -147,7 +147,7 @@ public class Sensor9in1EditorTest {
         // Tester l'ouverture du dialog d'édition avec une table null
         // Cela devrait afficher une notification d'avertissement
         assertDoesNotThrow(() -> {
-            Sensor9in1Editor.openEditDialog(null);
+            sensor9in1Editor.openEditDialog(null);
         });
         
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
@@ -160,7 +160,7 @@ public class Sensor9in1EditorTest {
     void testConfirmDeleteWithValidSensor9in1() {
         // Tester la confirmation de suppression avec une table valide
         assertDoesNotThrow(() -> {
-            Sensor9in1Editor.confirmDelete(testSensor9in1);
+            sensor9in1Editor.confirmDelete(testSensor9in1);
         });
         
         logger.info("Delete confirmation dialog opened for table: " + testSensor9in1.getCustomName());
@@ -170,7 +170,7 @@ public class Sensor9in1EditorTest {
     void testConfirmDeleteWithNullSensor9in1() {
         // Tester la confirmation de suppression avec une table null
         assertDoesNotThrow(() -> {
-            Sensor9in1Editor.confirmDelete(null);
+            sensor9in1Editor.confirmDelete(null);
         });
         
         logger.info("Delete confirmation correctly handles null Sensor9in1 input");
@@ -179,17 +179,17 @@ public class Sensor9in1EditorTest {
     @Test
     void testSensor9in1ManagerIntegration() {
         // Tester l'intégration avec Sensor9in1Manager
-        assertNotNull(Sensor9in1Manager);
+        assertNotNull(sensor9in1Manager);
         
         // Mock du comportement de sauvegarde
-        when(Sensor9in1Manager.save(any(Sensor9in1.class))).thenReturn(testSensor9in1);
+        when(sensor9in1Manager.save(any(Sensor9in1.class))).thenReturn(testSensor9in1);
         
-        Sensor9in1 savedTable = Sensor9in1Manager.save(testSensor9in1);
+        Sensor9in1 savedTable = sensor9in1Manager.save(testSensor9in1);
         assertNotNull(savedTable);
         assertEquals(testSensor9in1.getCustomName(), savedTable.getCustomName());
         
         // Vérifier que save a été appelé
-        verify(Sensor9in1Manager, times(1)).save(testSensor9in1);
+        verify(sensor9in1Manager, times(1)).save(testSensor9in1);
         
         logger.info("Sensor9in1Manager integration test successful");
     }
@@ -266,15 +266,15 @@ public class Sensor9in1EditorTest {
         Integer tableId = 1;
         
         // Mock de la méthode deleteById
-        doNothing().when(Sensor9in1Manager).deleteById(tableId);
+        doNothing().when(sensor9in1Manager).deleteById(tableId);
         
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            Sensor9in1Manager.deleteById(tableId);
+            sensor9in1Manager.deleteById(tableId);
         });
         
         // Vérifier que deleteById a été appelé
-        verify(Sensor9in1Manager, times(1)).deleteById(tableId);
+        verify(sensor9in1Manager, times(1)).deleteById(tableId);
         
         logger.info("Delete operation mock test successful for table ID: " + tableId);
     }
@@ -282,18 +282,18 @@ public class Sensor9in1EditorTest {
     @Test
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
-        when(Sensor9in1Manager.save(any(Sensor9in1.class))).thenReturn(testSensor9in1);
+        when(sensor9in1Manager.save(any(Sensor9in1.class))).thenReturn(testSensor9in1);
         
         // Simuler la sauvegarde
         Sensor9in1 result = assertDoesNotThrow(() -> {
-            return Sensor9in1Manager.save(testSensor9in1);
+            return sensor9in1Manager.save(testSensor9in1);
         });
         
         assertNotNull(result);
         assertEquals(testSensor9in1.getId(), result.getId());
         
         // Vérifier que save a été appelé
-        verify(Sensor9in1Manager, times(1)).save(testSensor9in1);
+        verify(sensor9in1Manager, times(1)).save(testSensor9in1);
         
         logger.info("Save operation mock test successful for table: " + result.getCustomName());
     }
@@ -301,12 +301,12 @@ public class Sensor9in1EditorTest {
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(Sensor9in1Manager.save(any(Sensor9in1.class)))
+        when(sensor9in1Manager.save(any(Sensor9in1.class)))
             .thenThrow(new RuntimeException("Database error"));
         
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            Sensor9in1Manager.save(testSensor9in1);
+            sensor9in1Manager.save(testSensor9in1);
         });
         
         logger.info("Exception handling in save operation tested successfully");
@@ -316,11 +316,11 @@ public class Sensor9in1EditorTest {
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
         Integer tableId = 1;
-        doThrow(new RuntimeException("Delete error")).when(Sensor9in1Manager).deleteById(tableId);
+        doThrow(new RuntimeException("Delete error")).when(sensor9in1Manager).deleteById(tableId);
         
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            Sensor9in1Manager.deleteById(tableId);
+            sensor9in1Manager.deleteById(tableId);
         });
         
         logger.info("Exception handling in delete operation tested successfully");
@@ -378,7 +378,7 @@ public class Sensor9in1EditorTest {
             logger.info("Test callback executed successfully");
         };
         
-        Sensor9in1Editor.setOnDataChanged(testCallback);
+        sensor9in1Editor.setOnDataChanged(testCallback);
         
         // Simuler l'exécution du callback
         testCallback.run();

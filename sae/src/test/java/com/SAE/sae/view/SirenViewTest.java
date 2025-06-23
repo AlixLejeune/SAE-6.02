@@ -1,6 +1,9 @@
 package com.SAE.sae.view;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,11 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
 import com.SAE.sae.entity.RoomObjects.Siren;
 import com.SAE.sae.entity.Room;
 import com.SAE.sae.entity.Building;
@@ -23,23 +21,21 @@ import com.SAE.sae.service.RoomObjects.SirenManager;
 import com.SAE.sae.service.RoomManager;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.button.Button;
 
-import com.vaadin.flow.component.UI;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ExtendWith(MockitoExtension.class)
 /**
  * Test class for the SirenView component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de gestion des tables de données
+ * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de
+ * gestion des tables de données
  * et de ses interactions avec les services.
  */
 public class SirenViewTest {
 
-    @MockBean
+    @Mock
     private SirenManager SirenManager;
 
-    @MockBean
+    @Mock
     private RoomManager roomManager;
 
     private SirenView SirenView;
@@ -53,7 +49,7 @@ public class SirenViewTest {
     @BeforeEach
     void setUp() {
         UI.setCurrent(new UI());
-        
+
         // Créer des données de test
         testBuilding = new Building();
         testBuilding.setId(1);
@@ -114,10 +110,10 @@ public class SirenViewTest {
 
         // Créer une nouvelle instance pour tester l'initialisation
         SirenView newView = new SirenView(SirenManager, roomManager);
-        
+
         // Vérifier que findAll a été appelé pendant l'initialisation
         verify(SirenManager, atLeastOnce()).findAll();
-        
+
         logger.info("Constructor correctly calls loadData method");
     }
 
@@ -159,7 +155,7 @@ public class SirenViewTest {
     void testLoadDataWithException() {
         // Mock qui lance une exception
         when(SirenManager.findAll())
-            .thenThrow(new RuntimeException("Database connection error"));
+                .thenThrow(new RuntimeException("Database connection error"));
 
         // La vue devrait gérer l'exception sans planter
         assertDoesNotThrow(() -> {
@@ -270,7 +266,7 @@ public class SirenViewTest {
         // Tester avec un ID invalide
         Integer invalidId = 999;
         when(SirenManager.findById(invalidId))
-            .thenThrow(new IllegalArgumentException("Aucune Siren trouvée avec l'ID : " + invalidId));
+                .thenThrow(new IllegalArgumentException("Aucune Siren trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
             SirenManager.findById(invalidId);
@@ -592,7 +588,7 @@ public class SirenViewTest {
         assertEquals(Integer.valueOf(1), testSiren.getId());
         assertEquals(Integer.valueOf(2), testSiren2.getId());
 
-        logger.info("Siren ID handling test successful: Siren1 ID=" + 
+        logger.info("Siren ID handling test successful: Siren1 ID=" +
                 testSiren.getId() + ", Siren2 ID=" + testSiren2.getId());
     }
 
@@ -602,7 +598,7 @@ public class SirenViewTest {
         assertEquals("Test Siren 1", testSiren.getCustomName());
         assertEquals("Test Siren 2", testSiren2.getCustomName());
 
-        logger.info("Siren name handling test successful: Siren1 name='" + 
+        logger.info("Siren name handling test successful: Siren1 name='" +
                 testSiren.getCustomName() + "', Siren2 name='" + testSiren2.getCustomName() + "'");
     }
 
@@ -611,7 +607,7 @@ public class SirenViewTest {
         // Tester les opérations concurrentes (simulation)
         when(SirenManager.findAll()).thenReturn(Arrays.asList(testSiren));
         when(SirenManager.save(any(Siren.class))).thenReturn(testSiren);
-        
+
         // Simuler des opérations concurrentes
         assertDoesNotThrow(() -> {
             SirenManager.findAll();
@@ -625,12 +621,11 @@ public class SirenViewTest {
     void testPerformanceWithLargeDataset() {
         // Tester avec un grand nombre de tables de données
         List<Siren> largeDataset = Arrays.asList(
-            testSiren, testSiren2,
-            createTestSiren(3, "Siren 3"),
-            createTestSiren(4, "Siren 4"),
-            createTestSiren(5, "Siren 5")
-        );
-        
+                testSiren, testSiren2,
+                createTestSiren(3, "Siren 3"),
+                createTestSiren(4, "Siren 4"),
+                createTestSiren(5, "Siren 5"));
+
         when(SirenManager.findAll()).thenReturn(largeDataset);
 
         // La vue devrait gérer un dataset plus large sans problème
@@ -641,16 +636,15 @@ public class SirenViewTest {
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
     }
 
-
     @Test
     void testInvalidPositionValues() {
         // Tester avec des valeurs de position invalides
         Siren invalidSiren = new Siren();
         invalidSiren.setCustomName("Invalid Position Siren");
         invalidSiren.setRoom(testRoom);
-        invalidSiren.setPosX(-1.0);  // Position négative
-        invalidSiren.setPosY(Double.NaN);  // Valeur NaN
-        invalidSiren.setPosZ(Double.POSITIVE_INFINITY);  // Valeur infinie
+        invalidSiren.setPosX(-1.0); // Position négative
+        invalidSiren.setPosY(Double.NaN); // Valeur NaN
+        invalidSiren.setPosZ(Double.POSITIVE_INFINITY); // Valeur infinie
 
         // Ces valeurs devraient être détectées comme invalides
         assertTrue(invalidSiren.getPosX() < 0);

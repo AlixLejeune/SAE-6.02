@@ -28,18 +28,18 @@ import com.vaadin.flow.component.UI;
 /**
  * Test class for the PlugEditor component.
  * Tests de bout en bout pour vérifier le bon fonctionnement de l'éditeur de
- * tables
+ * prises
  * et de ses interactions avec les services.
  */
 public class PlugEditorTest {
 
     @MockBean
-    private PlugManager PlugManager;
+    private PlugManager plugManager;
 
     @MockBean
     private RoomManager roomManager;
 
-    private PlugEditor PlugEditor;
+    private PlugEditor plugEditor;
     private Plug testPlug;
     private Room testRoom;
     private Building testBuilding;
@@ -51,7 +51,7 @@ public class PlugEditorTest {
         UI.setCurrent(new UI());
 
         // Initialiser le PlugEditor avec les mocks
-        PlugEditor = new PlugEditor(PlugManager, roomManager);
+        plugEditor = new PlugEditor(plugManager, roomManager);
 
         // Créer des données de test
         testBuilding = new Building();
@@ -65,7 +65,7 @@ public class PlugEditorTest {
 
         testPlug = new Plug();
         testPlug.setId(1);
-        testPlug.setCustomName("Test Table");
+        testPlug.setCustomName("Test Plug");
         testPlug.setRoom(testRoom);
         testPlug.setPosX(1.0);
         testPlug.setPosY(2.0);
@@ -82,14 +82,14 @@ public class PlugEditorTest {
     @Test
     void testPlugEditorInstantiation() {
         // Vérifier que le PlugEditor peut être instancié correctement
-        assertNotNull(PlugEditor);
+        assertNotNull(plugEditor);
         logger.info("PlugEditor instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        PlugEditor editor = new PlugEditor(PlugManager, roomManager);
+        PlugEditor editor = new PlugEditor(plugManager, roomManager);
         assertNotNull(editor);
         logger.info("PlugEditor constructor works with valid managers");
     }
@@ -100,7 +100,7 @@ public class PlugEditorTest {
         Runnable testCallback = () -> logger.info("Callback executed");
 
         assertDoesNotThrow(() -> {
-            PlugEditor.setOnDataChanged(testCallback);
+            plugEditor.setOnDataChanged(testCallback);
         });
 
         logger.info("OnDataChanged callback set successfully");
@@ -110,7 +110,7 @@ public class PlugEditorTest {
     void testSetOnDataChangedWithNullCallback() {
         // Tester avec un callback null
         assertDoesNotThrow(() -> {
-            PlugEditor.setOnDataChanged(null);
+            plugEditor.setOnDataChanged(null);
         });
 
         logger.info("OnDataChanged handles null callback correctly");
@@ -124,7 +124,7 @@ public class PlugEditorTest {
 
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
-            PlugEditor.openAddDialog();
+            plugEditor.openAddDialog();
         });
 
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
@@ -139,23 +139,23 @@ public class PlugEditorTest {
         List<Room> mockRooms = Arrays.asList(testRoom);
         when(roomManager.getAllRooms()).thenReturn(mockRooms);
 
-        // Tester l'ouverture du dialog d'édition avec une table valide
+        // Tester l'ouverture du dialog d'édition avec une prise valide
         assertDoesNotThrow(() -> {
-            PlugEditor.openEditDialog(testPlug);
+            plugEditor.openEditDialog(testPlug);
         });
 
         // Vérifier que getAllRooms a été appelé
         verify(roomManager, atLeastOnce()).getAllRooms();
 
-        logger.info("Edit dialog opened successfully for table: " + testPlug.getCustomName());
+        logger.info("Edit dialog opened successfully for plug: " + testPlug.getCustomName());
     }
 
     @Test
     void testOpenEditDialogWithNullPlug() {
-        // Tester l'ouverture du dialog d'édition avec une table null
+        // Tester l'ouverture du dialog d'édition avec une prise null
         // Cela devrait afficher une notification d'avertissement
         assertDoesNotThrow(() -> {
-            PlugEditor.openEditDialog(null);
+            plugEditor.openEditDialog(null);
         });
 
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
@@ -166,19 +166,19 @@ public class PlugEditorTest {
 
     @Test
     void testConfirmDeleteWithValidPlug() {
-        // Tester la confirmation de suppression avec une table valide
+        // Tester la confirmation de suppression avec une prise valide
         assertDoesNotThrow(() -> {
-            PlugEditor.confirmDelete(testPlug);
+            plugEditor.confirmDelete(testPlug);
         });
 
-        logger.info("Delete confirmation dialog opened for table: " + testPlug.getCustomName());
+        logger.info("Delete confirmation dialog opened for plug: " + testPlug.getCustomName());
     }
 
     @Test
     void testConfirmDeleteWithNullPlug() {
-        // Tester la confirmation de suppression avec une table null
+        // Tester la confirmation de suppression avec une prise null
         assertDoesNotThrow(() -> {
-            PlugEditor.confirmDelete(null);
+            plugEditor.confirmDelete(null);
         });
 
         logger.info("Delete confirmation correctly handles null Plug input");
@@ -187,17 +187,17 @@ public class PlugEditorTest {
     @Test
     void testPlugManagerIntegration() {
         // Tester l'intégration avec PlugManager
-        assertNotNull(PlugManager);
+        assertNotNull(plugManager);
 
         // Mock du comportement de sauvegarde
-        when(PlugManager.save(any(Plug.class))).thenReturn(testPlug);
+        when(plugManager.save(any(Plug.class))).thenReturn(testPlug);
 
-        Plug savedTable = PlugManager.save(testPlug);
-        assertNotNull(savedTable);
-        assertEquals(testPlug.getCustomName(), savedTable.getCustomName());
+        Plug savedPlug = plugManager.save(testPlug);
+        assertNotNull(savedPlug);
+        assertEquals(testPlug.getCustomName(), savedPlug.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(PlugManager, times(1)).save(testPlug);
+        verify(plugManager, times(1)).save(testPlug);
 
         logger.info("PlugManager integration test successful");
     }
@@ -225,18 +225,18 @@ public class PlugEditorTest {
 
     @Test
     void testPlugValidation() {
-        // Tester la validation des données de table
-        Plug validTable = new Plug();
-        validTable.setCustomName("Valid Table");
-        validTable.setRoom(testRoom);
-        validTable.setPosX(1.0);
-        validTable.setPosY(1.0);
-        validTable.setPosZ(1.0);
+        // Tester la validation des données de prise
+        Plug validPlug = new Plug();
+        validPlug.setCustomName("Valid Plug");
+        validPlug.setRoom(testRoom);
+        validPlug.setPosX(1.0);
+        validPlug.setPosY(1.0);
+        validPlug.setPosZ(1.0);
 
         // Les données devraient être valides
-        assertNotNull(validTable.getCustomName());
-        assertNotNull(validTable.getRoom());
-        assertNotNull(validTable.getPosX());
+        assertNotNull(validPlug.getCustomName());
+        assertNotNull(validPlug.getRoom());
+        assertNotNull(validPlug.getPosX());
 
         logger.info("Plug validation test - all required fields present");
     }
@@ -244,12 +244,12 @@ public class PlugEditorTest {
     @Test
     void testPlugWithEmptyName() {
         // Tester avec un nom vide
-        Plug emptyNameTable = new Plug();
-        emptyNameTable.setCustomName("");
-        emptyNameTable.setRoom(testRoom);
+        Plug emptyNamePlug = new Plug();
+        emptyNamePlug.setCustomName("");
+        emptyNamePlug.setRoom(testRoom);
 
         // Le nom ne devrait pas être vide
-        assertTrue(emptyNameTable.getCustomName().isEmpty());
+        assertTrue(emptyNamePlug.getCustomName().isEmpty());
 
         logger.info("Plug with empty name handled correctly");
     }
@@ -257,12 +257,12 @@ public class PlugEditorTest {
     @Test
     void testPlugWithNullRoom() {
         // Tester avec une salle null
-        Plug nullRoomTable = new Plug();
-        nullRoomTable.setCustomName("Test Table");
-        nullRoomTable.setRoom(null);
+        Plug nullRoomPlug = new Plug();
+        nullRoomPlug.setCustomName("Test Plug");
+        nullRoomPlug.setRoom(null);
 
-        // La salle ne devrait pas être null pour une table valide
-        assertNull(nullRoomTable.getRoom());
+        // La salle ne devrait pas être null pour une prise valide
+        assertNull(nullRoomPlug.getRoom());
 
         logger.info("Plug with null room detected correctly");
     }
@@ -270,50 +270,50 @@ public class PlugEditorTest {
     @Test
     void testDeleteOperationMocking() {
         // Tester l'opération de suppression
-        Integer tableId = 1;
+        Integer plugId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(PlugManager).deleteById(tableId);
+        doNothing().when(plugManager).deleteById(plugId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            PlugManager.deleteById(tableId);
+            plugManager.deleteById(plugId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(PlugManager, times(1)).deleteById(tableId);
+        verify(plugManager, times(1)).deleteById(plugId);
 
-        logger.info("Delete operation mock test successful for table ID: " + tableId);
+        logger.info("Delete operation mock test successful for plug ID: " + plugId);
     }
 
     @Test
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
-        when(PlugManager.save(any(Plug.class))).thenReturn(testPlug);
+        when(plugManager.save(any(Plug.class))).thenReturn(testPlug);
 
         // Simuler la sauvegarde
         Plug result = assertDoesNotThrow(() -> {
-            return PlugManager.save(testPlug);
+            return plugManager.save(testPlug);
         });
 
         assertNotNull(result);
         assertEquals(testPlug.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(PlugManager, times(1)).save(testPlug);
+        verify(plugManager, times(1)).save(testPlug);
 
-        logger.info("Save operation mock test successful for table: " + result.getCustomName());
+        logger.info("Save operation mock test successful for plug: " + result.getCustomName());
     }
 
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(PlugManager.save(any(Plug.class)))
+        when(plugManager.save(any(Plug.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            PlugManager.save(testPlug);
+            plugManager.save(testPlug);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -322,12 +322,12 @@ public class PlugEditorTest {
     @Test
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
-        Integer tableId = 1;
-        doThrow(new RuntimeException("Delete error")).when(PlugManager).deleteById(tableId);
+        Integer plugId = 1;
+        doThrow(new RuntimeException("Delete error")).when(plugManager).deleteById(plugId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            PlugManager.deleteById(tableId);
+            plugManager.deleteById(plugId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -385,7 +385,7 @@ public class PlugEditorTest {
             logger.info("Test callback executed successfully");
         };
 
-        PlugEditor.setOnDataChanged(testCallback);
+        plugEditor.setOnDataChanged(testCallback);
 
         // Simuler l'exécution du callback
         testCallback.run();

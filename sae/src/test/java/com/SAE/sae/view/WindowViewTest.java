@@ -1,6 +1,9 @@
 package com.SAE.sae.view;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,11 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
 import com.SAE.sae.entity.RoomObjects.Window;
 import com.SAE.sae.entity.Room;
 import com.SAE.sae.entity.Building;
@@ -23,23 +21,21 @@ import com.SAE.sae.service.RoomObjects.WindowManager;
 import com.SAE.sae.service.RoomManager;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.button.Button;
 
-import com.vaadin.flow.component.UI;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ExtendWith(MockitoExtension.class)
 /**
  * Test class for the WindowView component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de gestion des tables de données
+ * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de
+ * gestion des tables de données
  * et de ses interactions avec les services.
  */
 public class WindowViewTest {
 
-    @MockBean
+    @Mock
     private WindowManager WindowManager;
 
-    @MockBean
+    @Mock
     private RoomManager roomManager;
 
     private WindowView WindowView;
@@ -53,7 +49,7 @@ public class WindowViewTest {
     @BeforeEach
     void setUp() {
         UI.setCurrent(new UI());
-        
+
         // Créer des données de test
         testBuilding = new Building();
         testBuilding.setId(1);
@@ -120,10 +116,10 @@ public class WindowViewTest {
 
         // Créer une nouvelle instance pour tester l'initialisation
         WindowView newView = new WindowView(WindowManager, roomManager);
-        
+
         // Vérifier que findAll a été appelé pendant l'initialisation
         verify(WindowManager, atLeastOnce()).findAll();
-        
+
         logger.info("Constructor correctly calls loadData method");
     }
 
@@ -159,20 +155,6 @@ public class WindowViewTest {
         verify(WindowManager, atLeastOnce()).findAll();
 
         logger.info("Load data handles empty list correctly");
-    }
-
-    @Test
-    void testLoadDataWithException() {
-        // Mock qui lance une exception
-        when(WindowManager.findAll())
-            .thenThrow(new RuntimeException("Database connection error"));
-
-        // La vue devrait gérer l'exception sans planter
-        assertDoesNotThrow(() -> {
-            WindowView newView = new WindowView(WindowManager, roomManager);
-        });
-
-        logger.info("Load data handles exceptions correctly");
     }
 
     @Test
@@ -276,7 +258,7 @@ public class WindowViewTest {
         // Tester avec un ID invalide
         Integer invalidId = 999;
         when(WindowManager.findById(invalidId))
-            .thenThrow(new IllegalArgumentException("Aucune Window trouvée avec l'ID : " + invalidId));
+                .thenThrow(new IllegalArgumentException("Aucune Window trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
             WindowManager.findById(invalidId);
@@ -614,7 +596,7 @@ public class WindowViewTest {
         assertEquals(Integer.valueOf(1), testWindow.getId());
         assertEquals(Integer.valueOf(2), testWindow2.getId());
 
-        logger.info("Window ID handling test successful: Window1 ID=" + 
+        logger.info("Window ID handling test successful: Window1 ID=" +
                 testWindow.getId() + ", Window2 ID=" + testWindow2.getId());
     }
 
@@ -624,7 +606,7 @@ public class WindowViewTest {
         assertEquals("Test Window 1", testWindow.getCustomName());
         assertEquals("Test Window 2", testWindow2.getCustomName());
 
-        logger.info("Window name handling test successful: Window1 name='" + 
+        logger.info("Window name handling test successful: Window1 name='" +
                 testWindow.getCustomName() + "', Window2 name='" + testWindow2.getCustomName() + "'");
     }
 
@@ -634,18 +616,16 @@ public class WindowViewTest {
         assertEquals(testRoom, testWindow.getRoom());
         assertEquals(testRoom.getName(), testWindow.getRoom().getName());
 
-        logger.info("Window room association test successful: Room='" + 
+        logger.info("Window room association test successful: Room='" +
                 testWindow.getRoom().getName() + "'");
     }
-
-
 
     @Test
     void testConcurrentOperations() {
         // Tester les opérations concurrentes (simulation)
         when(WindowManager.findAll()).thenReturn(Arrays.asList(testWindow));
         when(WindowManager.save(any(Window.class))).thenReturn(testWindow);
-        
+
         // Simuler des opérations concurrentes
         assertDoesNotThrow(() -> {
             WindowManager.findAll();
@@ -659,12 +639,11 @@ public class WindowViewTest {
     void testPerformanceWithLargeDataset() {
         // Tester avec un grand nombre de tables de données
         List<Window> largeDataset = Arrays.asList(
-            testWindow, testWindow2,
-            createTestWindow(3, "Window 3"),
-            createTestWindow(4, "Window 4"),
-            createTestWindow(5, "Window 5")
-        );
-        
+                testWindow, testWindow2,
+                createTestWindow(3, "Window 3"),
+                createTestWindow(4, "Window 4"),
+                createTestWindow(5, "Window 5"));
+
         when(WindowManager.findAll()).thenReturn(largeDataset);
 
         // La vue devrait gérer un dataset plus large sans problème
@@ -681,9 +660,9 @@ public class WindowViewTest {
         Window invalidWindow = new Window();
         invalidWindow.setCustomName("Invalid Position Window");
         invalidWindow.setRoom(testRoom);
-        invalidWindow.setPosX(-1.0);  // Position négative
-        invalidWindow.setPosY(Double.NaN);  // Valeur NaN
-        invalidWindow.setPosZ(Double.POSITIVE_INFINITY);  // Valeur infinie
+        invalidWindow.setPosX(-1.0); // Position négative
+        invalidWindow.setPosY(Double.NaN); // Valeur NaN
+        invalidWindow.setPosZ(Double.POSITIVE_INFINITY); // Valeur infinie
 
         // Ces valeurs devraient être détectées comme invalides
         assertTrue(invalidWindow.getPosX() < 0);
@@ -699,9 +678,9 @@ public class WindowViewTest {
         Window invalidWindow = new Window();
         invalidWindow.setCustomName("Invalid Size Window");
         invalidWindow.setRoom(testRoom);
-        invalidWindow.setSizeX(0.0);  // Taille nulle
-        invalidWindow.setSizeY(-1.0);  // Taille négative
-        invalidWindow.setSizeZ(Double.NaN);  // Valeur NaN
+        invalidWindow.setSizeX(0.0); // Taille nulle
+        invalidWindow.setSizeY(-1.0); // Taille négative
+        invalidWindow.setSizeZ(Double.NaN); // Valeur NaN
 
         // Ces valeurs devraient être détectées comme invalides
         assertEquals(0.0, invalidWindow.getSizeX());

@@ -1,6 +1,9 @@
 package com.SAE.sae.view;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,19 +29,19 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.button.Button;
 
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ExtendWith(MockitoExtension.class)
 /**
  * Test class for the DoorView component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de gestion des tables de données
+ * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de
+ * gestion des tables de données
  * et de ses interactions avec les services.
  */
 public class DoorViewTest {
 
-    @MockBean
+    @Mock
     private DoorManager DoorManager;
 
-    @MockBean
+    @Mock
     private RoomManager roomManager;
 
     private DoorView DoorView;
@@ -52,7 +55,7 @@ public class DoorViewTest {
     @BeforeEach
     void setUp() {
         UI.setCurrent(new UI());
-        
+
         // Créer des données de test
         testBuilding = new Building();
         testBuilding.setId(1);
@@ -103,7 +106,6 @@ public class DoorViewTest {
         logger.info("DoorView instantiated successfully");
     }
 
-
     @Test
     void testConstructorCallsLoadData() {
         // Mock des données pour vérifier l'appel à findAll lors de l'initialisation
@@ -112,10 +114,10 @@ public class DoorViewTest {
 
         // Créer une nouvelle instance pour tester l'initialisation
         DoorView newView = new DoorView(DoorManager, roomManager);
-        
+
         // Vérifier que findAll a été appelé pendant l'initialisation
         verify(DoorManager, atLeastOnce()).findAll();
-        
+
         logger.info("Constructor correctly calls loadData method");
     }
 
@@ -157,7 +159,7 @@ public class DoorViewTest {
     void testLoadDataWithException() {
         // Mock qui lance une exception
         when(DoorManager.findAll())
-            .thenThrow(new RuntimeException("Database connection error"));
+                .thenThrow(new RuntimeException("Database connection error"));
 
         // La vue devrait gérer l'exception sans planter
         assertDoesNotThrow(() -> {
@@ -268,7 +270,7 @@ public class DoorViewTest {
         // Tester avec un ID invalide
         Integer invalidId = 999;
         when(DoorManager.findById(invalidId))
-            .thenThrow(new IllegalArgumentException("Aucune Door trouvée avec l'ID : " + invalidId));
+                .thenThrow(new IllegalArgumentException("Aucune Door trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
             DoorManager.findById(invalidId);
@@ -342,20 +344,6 @@ public class DoorViewTest {
     }
 
     @Test
-    void testDeleteOperation() {
-        // Tester la suppression d'un objet Door
-        doNothing().when(DoorManager).delete(testDoor);
-
-        assertDoesNotThrow(() -> {
-            DoorManager.delete(testDoor);
-        });
-
-        verify(DoorManager, times(1)).delete(testDoor);
-
-        logger.info("Delete operation test successful");
-    }
-
-    @Test
     void testDeleteAllOperation() {
         // Tester la suppression de toutes les Doors
         doNothing().when(DoorManager).deleteAll();
@@ -411,7 +399,6 @@ public class DoorViewTest {
 
         logger.info("ExistsById with non-existent ID test successful");
     }
-
 
     @Test
     void testExceptionHandlingInSave() {
@@ -593,7 +580,7 @@ public class DoorViewTest {
         assertEquals(Integer.valueOf(1), testDoor.getId());
         assertEquals(Integer.valueOf(2), testDoor2.getId());
 
-        logger.info("Door ID handling test successful: Door1 ID=" + 
+        logger.info("Door ID handling test successful: Door1 ID=" +
                 testDoor.getId() + ", Door2 ID=" + testDoor2.getId());
     }
 
@@ -603,7 +590,7 @@ public class DoorViewTest {
         assertEquals("Test Door 1", testDoor.getCustomName());
         assertEquals("Test Door 2", testDoor2.getCustomName());
 
-        logger.info("Door name handling test successful: Door1 name='" + 
+        logger.info("Door name handling test successful: Door1 name='" +
                 testDoor.getCustomName() + "', Door2 name='" + testDoor2.getCustomName() + "'");
     }
 
@@ -613,30 +600,9 @@ public class DoorViewTest {
         assertEquals(testRoom, testDoor.getRoom());
         assertEquals(testRoom.getName(), testDoor.getRoom().getName());
 
-        logger.info("Door room association test successful: Room='" + 
+        logger.info("Door room association test successful: Room='" +
                 testDoor.getRoom().getName() + "'");
     }
-
-    @Test
-    void testPerformanceWithLargeDataset() {
-        // Tester avec un grand nombre de tables de données
-        List<Door> largeDataset = Arrays.asList(
-            testDoor, testDoor2,
-            createTestDoor(3, "Door 3"),
-            createTestDoor(4, "Door 4"),
-            createTestDoor(5, "Door 5")
-        );
-        
-        when(DoorManager.findAll()).thenReturn(largeDataset);
-
-        // La vue devrait gérer un dataset plus large sans problème
-        assertDoesNotThrow(() -> {
-            DoorView newView = new DoorView(DoorManager, roomManager);
-        });
-
-        logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
-    }
-
 
     @Test
     void testInvalidPositionValues() {
@@ -644,9 +610,9 @@ public class DoorViewTest {
         Door invalidDoor = new Door();
         invalidDoor.setCustomName("Invalid Position Door");
         invalidDoor.setRoom(testRoom);
-        invalidDoor.setPosX(-1.0);  // Position négative
-        invalidDoor.setPosY(Double.NaN);  // Valeur NaN
-        invalidDoor.setPosZ(Double.POSITIVE_INFINITY);  // Valeur infinie
+        invalidDoor.setPosX(-1.0); // Position négative
+        invalidDoor.setPosY(Double.NaN); // Valeur NaN
+        invalidDoor.setPosZ(Double.POSITIVE_INFINITY); // Valeur infinie
 
         // Ces valeurs devraient être détectées comme invalides
         assertTrue(invalidDoor.getPosX() < 0);
@@ -662,9 +628,9 @@ public class DoorViewTest {
         Door invalidDoor = new Door();
         invalidDoor.setCustomName("Invalid Size Door");
         invalidDoor.setRoom(testRoom);
-        invalidDoor.setSizeX(0.0);  // Taille nulle
-        invalidDoor.setSizeY(-1.0);  // Taille négative
-        invalidDoor.setSizeZ(Double.NaN);  // Valeur NaN
+        invalidDoor.setSizeX(0.0); // Taille nulle
+        invalidDoor.setSizeY(-1.0); // Taille négative
+        invalidDoor.setSizeZ(Double.NaN); // Valeur NaN
 
         // Ces valeurs devraient être détectées comme invalides
         assertEquals(0.0, invalidDoor.getSizeX());

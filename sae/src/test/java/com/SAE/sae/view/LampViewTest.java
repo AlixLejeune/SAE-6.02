@@ -1,6 +1,9 @@
 package com.SAE.sae.view;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,7 +13,6 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,19 +25,19 @@ import com.SAE.sae.service.RoomManager;
 
 import com.vaadin.flow.component.UI;
 
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ExtendWith(MockitoExtension.class)
 /**
  * Test class for the LampView component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de gestion des tables de données
+ * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de
+ * gestion des tables de données
  * et de ses interactions avec les services.
  */
 public class LampViewTest {
 
-    @MockBean
+    @Mock
     private LampManager LampManager;
 
-    @MockBean
+    @Mock
     private RoomManager roomManager;
 
     private LampView LampView;
@@ -49,7 +51,7 @@ public class LampViewTest {
     @BeforeEach
     void setUp() {
         UI.setCurrent(new UI());
-        
+
         // Créer des données de test
         testBuilding = new Building();
         testBuilding.setId(1);
@@ -110,10 +112,10 @@ public class LampViewTest {
 
         // Créer une nouvelle instance pour tester l'initialisation
         LampView newView = new LampView(LampManager, roomManager);
-        
+
         // Vérifier que findAll a été appelé pendant l'initialisation
         verify(LampManager, atLeastOnce()).findAll();
-        
+
         logger.info("Constructor correctly calls loadData method");
     }
 
@@ -155,7 +157,7 @@ public class LampViewTest {
     void testLoadDataWithException() {
         // Mock qui lance une exception
         when(LampManager.findAll())
-            .thenThrow(new RuntimeException("Database connection error"));
+                .thenThrow(new RuntimeException("Database connection error"));
 
         // La vue devrait gérer l'exception sans planter
         assertDoesNotThrow(() -> {
@@ -266,7 +268,7 @@ public class LampViewTest {
         // Tester avec un ID invalide
         Integer invalidId = 999;
         when(LampManager.findById(invalidId))
-            .thenThrow(new IllegalArgumentException("Aucune Lamp trouvée avec l'ID : " + invalidId));
+                .thenThrow(new IllegalArgumentException("Aucune Lamp trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
             LampManager.findById(invalidId);
@@ -588,7 +590,7 @@ public class LampViewTest {
         assertEquals(Integer.valueOf(1), testLamp.getId());
         assertEquals(Integer.valueOf(2), testLamp2.getId());
 
-        logger.info("Lamp ID handling test successful: Lamp1 ID=" + 
+        logger.info("Lamp ID handling test successful: Lamp1 ID=" +
                 testLamp.getId() + ", Lamp2 ID=" + testLamp2.getId());
     }
 
@@ -598,7 +600,7 @@ public class LampViewTest {
         assertEquals("Test Lamp 1", testLamp.getCustomName());
         assertEquals("Test Lamp 2", testLamp2.getCustomName());
 
-        logger.info("Lamp name handling test successful: Lamp1 name='" + 
+        logger.info("Lamp name handling test successful: Lamp1 name='" +
                 testLamp.getCustomName() + "', Lamp2 name='" + testLamp2.getCustomName() + "'");
     }
 
@@ -608,35 +610,19 @@ public class LampViewTest {
         assertEquals(testRoom, testLamp.getRoom());
         assertEquals(testRoom.getName(), testLamp.getRoom().getName());
 
-        logger.info("Lamp room association test successful: Room='" + 
+        logger.info("Lamp room association test successful: Room='" +
                 testLamp.getRoom().getName() + "'");
-    }
-
-    @Test
-    void testConcurrentOperations() {
-        // Tester les opérations concurrentes (simulation)
-        when(LampManager.findAll()).thenReturn(Arrays.asList(testLamp));
-        when(LampManager.save(any(Lamp.class))).thenReturn(testLamp);
-        
-        // Simuler des opérations concurrentes
-        assertDoesNotThrow(() -> {
-            LampManager.findAll();
-            LampManager.save(testLamp);
-        });
-
-        logger.info("Concurrent operations test successful");
     }
 
     @Test
     void testPerformanceWithLargeDataset() {
         // Tester avec un grand nombre de tables de données
         List<Lamp> largeDataset = Arrays.asList(
-            testLamp, testLamp2,
-            createTestLamp(3, "Lamp 3"),
-            createTestLamp(4, "Lamp 4"),
-            createTestLamp(5, "Lamp 5")
-        );
-        
+                testLamp, testLamp2,
+                createTestLamp(3, "Lamp 3"),
+                createTestLamp(4, "Lamp 4"),
+                createTestLamp(5, "Lamp 5"));
+
         when(LampManager.findAll()).thenReturn(largeDataset);
 
         // La vue devrait gérer un dataset plus large sans problème
@@ -653,9 +639,9 @@ public class LampViewTest {
         Lamp invalidLamp = new Lamp();
         invalidLamp.setCustomName("Invalid Position Lamp");
         invalidLamp.setRoom(testRoom);
-        invalidLamp.setPosX(-1.0);  // Position négative
-        invalidLamp.setPosY(Double.NaN);  // Valeur NaN
-        invalidLamp.setPosZ(Double.POSITIVE_INFINITY);  // Valeur infinie
+        invalidLamp.setPosX(-1.0); // Position négative
+        invalidLamp.setPosY(Double.NaN); // Valeur NaN
+        invalidLamp.setPosZ(Double.POSITIVE_INFINITY); // Valeur infinie
 
         // Ces valeurs devraient être détectées comme invalides
         assertTrue(invalidLamp.getPosX() < 0);

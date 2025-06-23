@@ -28,18 +28,18 @@ import com.vaadin.flow.component.UI;
 /**
  * Test class for the LampEditor component.
  * Tests de bout en bout pour vérifier le bon fonctionnement de l'éditeur de
- * tables
+ * lampes
  * et de ses interactions avec les services.
  */
 public class LampEditorTest {
 
     @MockBean
-    private LampManager LampManager;
+    private LampManager lampManager;
 
     @MockBean
     private RoomManager roomManager;
 
-    private LampEditor LampEditor;
+    private LampEditor lampEditor;
     private Lamp testLamp;
     private Room testRoom;
     private Building testBuilding;
@@ -51,7 +51,7 @@ public class LampEditorTest {
         UI.setCurrent(new UI());
 
         // Initialiser le LampEditor avec les mocks
-        LampEditor = new LampEditor(LampManager, roomManager);
+        lampEditor = new LampEditor(lampManager, roomManager);
 
         // Créer des données de test
         testBuilding = new Building();
@@ -65,7 +65,7 @@ public class LampEditorTest {
 
         testLamp = new Lamp();
         testLamp.setId(1);
-        testLamp.setCustomName("Test Table");
+        testLamp.setCustomName("Test Lamp");
         testLamp.setRoom(testRoom);
         testLamp.setPosX(1.0);
         testLamp.setPosY(2.0);
@@ -82,14 +82,14 @@ public class LampEditorTest {
     @Test
     void testLampEditorInstantiation() {
         // Vérifier que le LampEditor peut être instancié correctement
-        assertNotNull(LampEditor);
+        assertNotNull(lampEditor);
         logger.info("LampEditor instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        LampEditor editor = new LampEditor(LampManager, roomManager);
+        LampEditor editor = new LampEditor(lampManager, roomManager);
         assertNotNull(editor);
         logger.info("LampEditor constructor works with valid managers");
     }
@@ -100,7 +100,7 @@ public class LampEditorTest {
         Runnable testCallback = () -> logger.info("Callback executed");
 
         assertDoesNotThrow(() -> {
-            LampEditor.setOnDataChanged(testCallback);
+            lampEditor.setOnDataChanged(testCallback);
         });
 
         logger.info("OnDataChanged callback set successfully");
@@ -110,7 +110,7 @@ public class LampEditorTest {
     void testSetOnDataChangedWithNullCallback() {
         // Tester avec un callback null
         assertDoesNotThrow(() -> {
-            LampEditor.setOnDataChanged(null);
+            lampEditor.setOnDataChanged(null);
         });
 
         logger.info("OnDataChanged handles null callback correctly");
@@ -124,7 +124,7 @@ public class LampEditorTest {
 
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
-            LampEditor.openAddDialog();
+            lampEditor.openAddDialog();
         });
 
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
@@ -139,23 +139,23 @@ public class LampEditorTest {
         List<Room> mockRooms = Arrays.asList(testRoom);
         when(roomManager.getAllRooms()).thenReturn(mockRooms);
 
-        // Tester l'ouverture du dialog d'édition avec une table valide
+        // Tester l'ouverture du dialog d'édition avec une lampe valide
         assertDoesNotThrow(() -> {
-            LampEditor.openEditDialog(testLamp);
+            lampEditor.openEditDialog(testLamp);
         });
 
         // Vérifier que getAllRooms a été appelé
         verify(roomManager, atLeastOnce()).getAllRooms();
 
-        logger.info("Edit dialog opened successfully for table: " + testLamp.getCustomName());
+        logger.info("Edit dialog opened successfully for lamp: " + testLamp.getCustomName());
     }
 
     @Test
     void testOpenEditDialogWithNullLamp() {
-        // Tester l'ouverture du dialog d'édition avec une table null
+        // Tester l'ouverture du dialog d'édition avec une lampe null
         // Cela devrait afficher une notification d'avertissement
         assertDoesNotThrow(() -> {
-            LampEditor.openEditDialog(null);
+            lampEditor.openEditDialog(null);
         });
 
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
@@ -166,19 +166,19 @@ public class LampEditorTest {
 
     @Test
     void testConfirmDeleteWithValidLamp() {
-        // Tester la confirmation de suppression avec une table valide
+        // Tester la confirmation de suppression avec une lampe valide
         assertDoesNotThrow(() -> {
-            LampEditor.confirmDelete(testLamp);
+            lampEditor.confirmDelete(testLamp);
         });
 
-        logger.info("Delete confirmation dialog opened for table: " + testLamp.getCustomName());
+        logger.info("Delete confirmation dialog opened for lamp: " + testLamp.getCustomName());
     }
 
     @Test
     void testConfirmDeleteWithNullLamp() {
-        // Tester la confirmation de suppression avec une table null
+        // Tester la confirmation de suppression avec une lampe null
         assertDoesNotThrow(() -> {
-            LampEditor.confirmDelete(null);
+            lampEditor.confirmDelete(null);
         });
 
         logger.info("Delete confirmation correctly handles null Lamp input");
@@ -187,17 +187,17 @@ public class LampEditorTest {
     @Test
     void testLampManagerIntegration() {
         // Tester l'intégration avec LampManager
-        assertNotNull(LampManager);
+        assertNotNull(lampManager);
 
         // Mock du comportement de sauvegarde
-        when(LampManager.save(any(Lamp.class))).thenReturn(testLamp);
+        when(lampManager.save(any(Lamp.class))).thenReturn(testLamp);
 
-        Lamp savedTable = LampManager.save(testLamp);
-        assertNotNull(savedTable);
-        assertEquals(testLamp.getCustomName(), savedTable.getCustomName());
+        Lamp savedLamp = lampManager.save(testLamp);
+        assertNotNull(savedLamp);
+        assertEquals(testLamp.getCustomName(), savedLamp.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(LampManager, times(1)).save(testLamp);
+        verify(lampManager, times(1)).save(testLamp);
 
         logger.info("LampManager integration test successful");
     }
@@ -225,18 +225,18 @@ public class LampEditorTest {
 
     @Test
     void testLampValidation() {
-        // Tester la validation des données de table
-        Lamp validTable = new Lamp();
-        validTable.setCustomName("Valid Table");
-        validTable.setRoom(testRoom);
-        validTable.setPosX(1.0);
-        validTable.setPosY(1.0);
-        validTable.setPosZ(1.0);
+        // Tester la validation des données de lampe
+        Lamp validLamp = new Lamp();
+        validLamp.setCustomName("Valid Lamp");
+        validLamp.setRoom(testRoom);
+        validLamp.setPosX(1.0);
+        validLamp.setPosY(1.0);
+        validLamp.setPosZ(1.0);
 
         // Les données devraient être valides
-        assertNotNull(validTable.getCustomName());
-        assertNotNull(validTable.getRoom());
-        assertNotNull(validTable.getPosX());
+        assertNotNull(validLamp.getCustomName());
+        assertNotNull(validLamp.getRoom());
+        assertNotNull(validLamp.getPosX());
 
         logger.info("Lamp validation test - all required fields present");
     }
@@ -244,12 +244,12 @@ public class LampEditorTest {
     @Test
     void testLampWithEmptyName() {
         // Tester avec un nom vide
-        Lamp emptyNameTable = new Lamp();
-        emptyNameTable.setCustomName("");
-        emptyNameTable.setRoom(testRoom);
+        Lamp emptyNameLamp = new Lamp();
+        emptyNameLamp.setCustomName("");
+        emptyNameLamp.setRoom(testRoom);
 
         // Le nom ne devrait pas être vide
-        assertTrue(emptyNameTable.getCustomName().isEmpty());
+        assertTrue(emptyNameLamp.getCustomName().isEmpty());
 
         logger.info("Lamp with empty name handled correctly");
     }
@@ -257,12 +257,12 @@ public class LampEditorTest {
     @Test
     void testLampWithNullRoom() {
         // Tester avec une salle null
-        Lamp nullRoomTable = new Lamp();
-        nullRoomTable.setCustomName("Test Table");
-        nullRoomTable.setRoom(null);
+        Lamp nullRoomLamp = new Lamp();
+        nullRoomLamp.setCustomName("Test Lamp");
+        nullRoomLamp.setRoom(null);
 
-        // La salle ne devrait pas être null pour une table valide
-        assertNull(nullRoomTable.getRoom());
+        // La salle ne devrait pas être null pour une lampe valide
+        assertNull(nullRoomLamp.getRoom());
 
         logger.info("Lamp with null room detected correctly");
     }
@@ -270,50 +270,50 @@ public class LampEditorTest {
     @Test
     void testDeleteOperationMocking() {
         // Tester l'opération de suppression
-        Integer tableId = 1;
+        Integer lampId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(LampManager).deleteById(tableId);
+        doNothing().when(lampManager).deleteById(lampId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            LampManager.deleteById(tableId);
+            lampManager.deleteById(lampId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(LampManager, times(1)).deleteById(tableId);
+        verify(lampManager, times(1)).deleteById(lampId);
 
-        logger.info("Delete operation mock test successful for table ID: " + tableId);
+        logger.info("Delete operation mock test successful for lamp ID: " + lampId);
     }
 
     @Test
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
-        when(LampManager.save(any(Lamp.class))).thenReturn(testLamp);
+        when(lampManager.save(any(Lamp.class))).thenReturn(testLamp);
 
         // Simuler la sauvegarde
         Lamp result = assertDoesNotThrow(() -> {
-            return LampManager.save(testLamp);
+            return lampManager.save(testLamp);
         });
 
         assertNotNull(result);
         assertEquals(testLamp.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(LampManager, times(1)).save(testLamp);
+        verify(lampManager, times(1)).save(testLamp);
 
-        logger.info("Save operation mock test successful for table: " + result.getCustomName());
+        logger.info("Save operation mock test successful for lamp: " + result.getCustomName());
     }
 
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(LampManager.save(any(Lamp.class)))
+        when(lampManager.save(any(Lamp.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            LampManager.save(testLamp);
+            lampManager.save(testLamp);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -322,12 +322,12 @@ public class LampEditorTest {
     @Test
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
-        Integer tableId = 1;
-        doThrow(new RuntimeException("Delete error")).when(LampManager).deleteById(tableId);
+        Integer lampId = 1;
+        doThrow(new RuntimeException("Delete error")).when(lampManager).deleteById(lampId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            LampManager.deleteById(tableId);
+            lampManager.deleteById(lampId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -385,7 +385,7 @@ public class LampEditorTest {
             logger.info("Test callback executed successfully");
         };
 
-        LampEditor.setOnDataChanged(testCallback);
+        lampEditor.setOnDataChanged(testCallback);
 
         // Simuler l'exécution du callback
         testCallback.run();

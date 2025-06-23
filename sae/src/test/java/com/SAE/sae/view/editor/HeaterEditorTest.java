@@ -28,18 +28,18 @@ import com.vaadin.flow.component.UI;
 /**
  * Test class for the HeaterEditor component.
  * Tests de bout en bout pour vérifier le bon fonctionnement de l'éditeur de
- * tables
+ * radiateurs
  * et de ses interactions avec les services.
  */
 public class HeaterEditorTest {
 
     @MockBean
-    private HeaterManager HeaterManager;
+    private HeaterManager heaterManager;
 
     @MockBean
     private RoomManager roomManager;
 
-    private HeaterEditor HeaterEditor;
+    private HeaterEditor heaterEditor;
     private Heater testHeater;
     private Room testRoom;
     private Building testBuilding;
@@ -51,7 +51,7 @@ public class HeaterEditorTest {
 
         UI.setCurrent(new UI());
         // Initialiser le HeaterEditor avec les mocks
-        HeaterEditor = new HeaterEditor(HeaterManager, roomManager);
+        heaterEditor = new HeaterEditor(heaterManager, roomManager);
 
         // Créer des données de test
         testBuilding = new Building();
@@ -65,7 +65,7 @@ public class HeaterEditorTest {
 
         testHeater = new Heater();
         testHeater.setId(1);
-        testHeater.setCustomName("Test Table");
+        testHeater.setCustomName("Test Heater");
         testHeater.setRoom(testRoom);
         testHeater.setPosX(1.0);
         testHeater.setPosY(2.0);
@@ -85,14 +85,14 @@ public class HeaterEditorTest {
     @Test
     void testHeaterEditorInstantiation() {
         // Vérifier que le HeaterEditor peut être instancié correctement
-        assertNotNull(HeaterEditor);
+        assertNotNull(heaterEditor);
         logger.info("HeaterEditor instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        HeaterEditor editor = new HeaterEditor(HeaterManager, roomManager);
+        HeaterEditor editor = new HeaterEditor(heaterManager, roomManager);
         assertNotNull(editor);
         logger.info("HeaterEditor constructor works with valid managers");
     }
@@ -103,7 +103,7 @@ public class HeaterEditorTest {
         Runnable testCallback = () -> logger.info("Callback executed");
 
         assertDoesNotThrow(() -> {
-            HeaterEditor.setOnDataChanged(testCallback);
+            heaterEditor.setOnDataChanged(testCallback);
         });
 
         logger.info("OnDataChanged callback set successfully");
@@ -113,7 +113,7 @@ public class HeaterEditorTest {
     void testSetOnDataChangedWithNullCallback() {
         // Tester avec un callback null
         assertDoesNotThrow(() -> {
-            HeaterEditor.setOnDataChanged(null);
+            heaterEditor.setOnDataChanged(null);
         });
 
         logger.info("OnDataChanged handles null callback correctly");
@@ -127,7 +127,7 @@ public class HeaterEditorTest {
 
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
-            HeaterEditor.openAddDialog();
+            heaterEditor.openAddDialog();
         });
 
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
@@ -142,23 +142,23 @@ public class HeaterEditorTest {
         List<Room> mockRooms = Arrays.asList(testRoom);
         when(roomManager.getAllRooms()).thenReturn(mockRooms);
 
-        // Tester l'ouverture du dialog d'édition avec une table valide
+        // Tester l'ouverture du dialog d'édition avec un radiateur valide
         assertDoesNotThrow(() -> {
-            HeaterEditor.openEditDialog(testHeater);
+            heaterEditor.openEditDialog(testHeater);
         });
 
         // Vérifier que getAllRooms a été appelé
         verify(roomManager, atLeastOnce()).getAllRooms();
 
-        logger.info("Edit dialog opened successfully for table: " + testHeater.getCustomName());
+        logger.info("Edit dialog opened successfully for heater: " + testHeater.getCustomName());
     }
 
     @Test
     void testOpenEditDialogWithNullHeater() {
-        // Tester l'ouverture du dialog d'édition avec une table null
+        // Tester l'ouverture du dialog d'édition avec un radiateur null
         // Cela devrait afficher une notification d'avertissement
         assertDoesNotThrow(() -> {
-            HeaterEditor.openEditDialog(null);
+            heaterEditor.openEditDialog(null);
         });
 
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
@@ -169,19 +169,19 @@ public class HeaterEditorTest {
 
     @Test
     void testConfirmDeleteWithValidHeater() {
-        // Tester la confirmation de suppression avec une table valide
+        // Tester la confirmation de suppression avec un radiateur valide
         assertDoesNotThrow(() -> {
-            HeaterEditor.confirmDelete(testHeater);
+            heaterEditor.confirmDelete(testHeater);
         });
 
-        logger.info("Delete confirmation dialog opened for table: " + testHeater.getCustomName());
+        logger.info("Delete confirmation dialog opened for heater: " + testHeater.getCustomName());
     }
 
     @Test
     void testConfirmDeleteWithNullHeater() {
-        // Tester la confirmation de suppression avec une table null
+        // Tester la confirmation de suppression avec un radiateur null
         assertDoesNotThrow(() -> {
-            HeaterEditor.confirmDelete(null);
+            heaterEditor.confirmDelete(null);
         });
 
         logger.info("Delete confirmation correctly handles null Heater input");
@@ -190,17 +190,17 @@ public class HeaterEditorTest {
     @Test
     void testHeaterManagerIntegration() {
         // Tester l'intégration avec HeaterManager
-        assertNotNull(HeaterManager);
+        assertNotNull(heaterManager);
 
         // Mock du comportement de sauvegarde
-        when(HeaterManager.save(any(Heater.class))).thenReturn(testHeater);
+        when(heaterManager.save(any(Heater.class))).thenReturn(testHeater);
 
-        Heater savedTable = HeaterManager.save(testHeater);
-        assertNotNull(savedTable);
-        assertEquals(testHeater.getCustomName(), savedTable.getCustomName());
+        Heater savedHeater = heaterManager.save(testHeater);
+        assertNotNull(savedHeater);
+        assertEquals(testHeater.getCustomName(), savedHeater.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(HeaterManager, times(1)).save(testHeater);
+        verify(heaterManager, times(1)).save(testHeater);
 
         logger.info("HeaterManager integration test successful");
     }
@@ -228,22 +228,22 @@ public class HeaterEditorTest {
 
     @Test
     void testHeaterValidation() {
-        // Tester la validation des données de table
-        Heater validTable = new Heater();
-        validTable.setCustomName("Valid Table");
-        validTable.setRoom(testRoom);
-        validTable.setPosX(1.0);
-        validTable.setPosY(1.0);
-        validTable.setPosZ(1.0);
-        validTable.setSizeX(1.0);
-        validTable.setSizeY(1.0);
-        validTable.setSizeZ(1.0);
+        // Tester la validation des données de radiateur
+        Heater validHeater = new Heater();
+        validHeater.setCustomName("Valid Heater");
+        validHeater.setRoom(testRoom);
+        validHeater.setPosX(1.0);
+        validHeater.setPosY(1.0);
+        validHeater.setPosZ(1.0);
+        validHeater.setSizeX(1.0);
+        validHeater.setSizeY(1.0);
+        validHeater.setSizeZ(1.0);
 
         // Les données devraient être valides
-        assertNotNull(validTable.getCustomName());
-        assertNotNull(validTable.getRoom());
-        assertNotNull(validTable.getPosX());
-        assertNotNull(validTable.getSizeX());
+        assertNotNull(validHeater.getCustomName());
+        assertNotNull(validHeater.getRoom());
+        assertNotNull(validHeater.getPosX());
+        assertNotNull(validHeater.getSizeX());
 
         logger.info("Heater validation test - all required fields present");
     }
@@ -251,12 +251,12 @@ public class HeaterEditorTest {
     @Test
     void testHeaterWithEmptyName() {
         // Tester avec un nom vide
-        Heater emptyNameTable = new Heater();
-        emptyNameTable.setCustomName("");
-        emptyNameTable.setRoom(testRoom);
+        Heater emptyNameHeater = new Heater();
+        emptyNameHeater.setCustomName("");
+        emptyNameHeater.setRoom(testRoom);
 
         // Le nom ne devrait pas être vide
-        assertTrue(emptyNameTable.getCustomName().isEmpty());
+        assertTrue(emptyNameHeater.getCustomName().isEmpty());
 
         logger.info("Heater with empty name handled correctly");
     }
@@ -264,12 +264,12 @@ public class HeaterEditorTest {
     @Test
     void testHeaterWithNullRoom() {
         // Tester avec une salle null
-        Heater nullRoomTable = new Heater();
-        nullRoomTable.setCustomName("Test Table");
-        nullRoomTable.setRoom(null);
+        Heater nullRoomHeater = new Heater();
+        nullRoomHeater.setCustomName("Test Heater");
+        nullRoomHeater.setRoom(null);
 
-        // La salle ne devrait pas être null pour une table valide
-        assertNull(nullRoomTable.getRoom());
+        // La salle ne devrait pas être null pour un radiateur valide
+        assertNull(nullRoomHeater.getRoom());
 
         logger.info("Heater with null room detected correctly");
     }
@@ -277,50 +277,50 @@ public class HeaterEditorTest {
     @Test
     void testDeleteOperationMocking() {
         // Tester l'opération de suppression
-        Integer tableId = 1;
+        Integer heaterId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(HeaterManager).deleteById(tableId);
+        doNothing().when(heaterManager).deleteById(heaterId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            HeaterManager.deleteById(tableId);
+            heaterManager.deleteById(heaterId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(HeaterManager, times(1)).deleteById(tableId);
+        verify(heaterManager, times(1)).deleteById(heaterId);
 
-        logger.info("Delete operation mock test successful for table ID: " + tableId);
+        logger.info("Delete operation mock test successful for heater ID: " + heaterId);
     }
 
     @Test
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
-        when(HeaterManager.save(any(Heater.class))).thenReturn(testHeater);
+        when(heaterManager.save(any(Heater.class))).thenReturn(testHeater);
 
         // Simuler la sauvegarde
         Heater result = assertDoesNotThrow(() -> {
-            return HeaterManager.save(testHeater);
+            return heaterManager.save(testHeater);
         });
 
         assertNotNull(result);
         assertEquals(testHeater.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(HeaterManager, times(1)).save(testHeater);
+        verify(heaterManager, times(1)).save(testHeater);
 
-        logger.info("Save operation mock test successful for table: " + result.getCustomName());
+        logger.info("Save operation mock test successful for heater: " + result.getCustomName());
     }
 
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(HeaterManager.save(any(Heater.class)))
+        when(heaterManager.save(any(Heater.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            HeaterManager.save(testHeater);
+            heaterManager.save(testHeater);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -329,12 +329,12 @@ public class HeaterEditorTest {
     @Test
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
-        Integer tableId = 1;
-        doThrow(new RuntimeException("Delete error")).when(HeaterManager).deleteById(tableId);
+        Integer heaterId = 1;
+        doThrow(new RuntimeException("Delete error")).when(heaterManager).deleteById(heaterId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            HeaterManager.deleteById(tableId);
+            heaterManager.deleteById(heaterId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -404,7 +404,7 @@ public class HeaterEditorTest {
             logger.info("Test callback executed successfully");
         };
 
-        HeaterEditor.setOnDataChanged(testCallback);
+        heaterEditor.setOnDataChanged(testCallback);
 
         // Simuler l'exécution du callback
         testCallback.run();

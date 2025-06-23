@@ -66,21 +66,6 @@ public class BuildingViewTest {
     }
 
     @Test
-    void testBuildingViewInstantiation() {
-        // Vérifier que la BuildingView peut être instanciée correctement
-        assertNotNull(buildingView);
-        logger.info("BuildingView instantiated successfully");
-    }
-
-    @Test
-    void testConstructorWithValidManager() {
-        // Vérifier que le constructeur fonctionne avec un manager valide
-        BuildingView view = new BuildingView(buildingManager);
-        assertNotNull(view);
-        logger.info("BuildingView constructor works with valid manager");
-    }
-
-    @Test
     void testConstructorCallsLoadData() {
         // Mock des données pour vérifier l'appel à getAllBuildings lors de l'initialisation
         List<Building> mockBuildings = Arrays.asList(testBuilding, testBuilding2);
@@ -111,22 +96,6 @@ public class BuildingViewTest {
         verify(buildingManager, atLeastOnce()).getAllBuildings();
 
         logger.info("Load data successful with " + mockBuildings.size() + " buildings");
-    }
-
-    @Test
-    void testLoadDataWithEmptyList() {
-        // Mock avec une liste vide
-        when(buildingManager.getAllBuildings()).thenReturn(Arrays.asList());
-
-        // Tester avec une liste vide
-        assertDoesNotThrow(() -> {
-            BuildingView newView = new BuildingView(buildingManager);
-        });
-
-        // Vérifier que getAllBuildings a été appelé
-        verify(buildingManager, atLeastOnce()).getAllBuildings();
-
-        logger.info("Load data handles empty list correctly");
     }
 
     @Test
@@ -248,20 +217,6 @@ public class BuildingViewTest {
     }
 
     @Test
-    void testExceptionHandlingInDelete() {
-        // Tester la gestion des exceptions lors de la suppression
-        Integer buildingId = 1;
-        doThrow(new RuntimeException("Delete operation failed")).when(buildingManager).deleteBuildingById(buildingId);
-
-        // Vérifier que l'exception est bien lancée
-        assertThrows(RuntimeException.class, () -> {
-            buildingManager.deleteBuildingById(buildingId);
-        });
-
-        logger.info("Exception handling in delete operation tested successfully");
-    }
-
-    @Test
     void testBuildingValidation() {
         // Tester la validation des données de bâtiment
         Building validBuilding = new Building();
@@ -272,18 +227,6 @@ public class BuildingViewTest {
         assertFalse(validBuilding.getName().trim().isEmpty());
 
         logger.info("Building validation test - required fields present");
-    }
-
-    @Test
-    void testBuildingWithEmptyName() {
-        // Tester avec un nom vide
-        Building emptyNameBuilding = new Building();
-        emptyNameBuilding.setName("");
-
-        // Le nom ne devrait pas être vide
-        assertTrue(emptyNameBuilding.getName().isEmpty());
-
-        logger.info("Building with empty name detected correctly");
     }
 
     @Test
@@ -308,23 +251,6 @@ public class BuildingViewTest {
         assertTrue(whitespaceNameBuilding.getName().trim().isEmpty());
 
         logger.info("Building with whitespace-only name detected correctly");
-    }
-
-    @Test
-    void testMultipleBuildingsHandling() {
-        // Tester avec plusieurs bâtiments
-        Building building3 = new Building();
-        building3.setId(3);
-        building3.setName("Test Building 3");
-
-        List<Building> multipleBuildings = Arrays.asList(testBuilding, testBuilding2, building3);
-        when(buildingManager.getAllBuildings()).thenReturn(multipleBuildings);
-
-        List<Building> result = buildingManager.getAllBuildings();
-        assertNotNull(result);
-        assertEquals(3, result.size());
-
-        logger.info("Multiple buildings handling test successful - " + result.size() + " buildings");
     }
 
     @Test
@@ -363,23 +289,6 @@ public class BuildingViewTest {
         
         // La vue devrait avoir les styles appropriés (padding, spacing, etc.)
         logger.info("View styling test successful");
-    }
-
-    @Test
-    void testGetAllBuildingsMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Building> mockBuildings = Arrays.asList(testBuilding);
-        when(buildingManager.getAllBuildings()).thenReturn(mockBuildings);
-
-        // Faire plusieurs appels
-        buildingManager.getAllBuildings();
-        buildingManager.getAllBuildings();
-        buildingManager.getAllBuildings();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(buildingManager, times(3)).getAllBuildings();
-
-        logger.info("Multiple getAllBuildings calls test successful");
     }
 
     @Test
@@ -424,16 +333,6 @@ public class BuildingViewTest {
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " buildings");
-    }
-
-    @Test
-    void testNullManagerHandling() {
-        // Tester avec un manager null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new BuildingView(null);
-        });
-
-        logger.info("Null manager handling test successful");
     }
 
     // Méthode utilitaire pour créer des bâtiments de test

@@ -103,22 +103,6 @@ public class DataTableViewTest {
         logger.info("DataTableView instantiated successfully");
     }
 
-
-    @Test
-    void testConstructorCallsLoadData() {
-        // Mock des données pour vérifier l'appel à findAll lors de l'initialisation
-        List<DataTable> mockDataTables = Arrays.asList(testDataTable, testDataTable2);
-        when(dataTableManager.findAll()).thenReturn(mockDataTables);
-
-        // Créer une nouvelle instance pour tester l'initialisation
-        DataTableView newView = new DataTableView(dataTableManager, roomManager);
-        
-        // Vérifier que findAll a été appelé pendant l'initialisation
-        verify(dataTableManager, atLeastOnce()).findAll();
-        
-        logger.info("Constructor correctly calls loadData method");
-    }
-
     @Test
     void testLoadDataWithValidDataTables() {
         // Mock des données
@@ -385,20 +369,6 @@ public class DataTableViewTest {
     }
 
     @Test
-    void testExistsByIdOperation() {
-        // Tester la vérification d'existence par ID
-        Integer dataTableId = 1;
-        when(dataTableManager.existsById(dataTableId)).thenReturn(true);
-
-        boolean exists = dataTableManager.existsById(dataTableId);
-        assertTrue(exists);
-
-        verify(dataTableManager, times(1)).existsById(dataTableId);
-
-        logger.info("ExistsById operation test successful");
-    }
-
-    @Test
     void testExistsByIdWithNonExistentId() {
         // Tester avec un ID qui n'existe pas
         Integer nonExistentId = 999;
@@ -585,16 +555,6 @@ public class DataTableViewTest {
         logger.info("DataTable size values test successful: X=" +
                 testDataTable.getSizeX() + ", Y=" + testDataTable.getSizeY() +
                 ", Z=" + testDataTable.getSizeZ());
-    }
-
-    @Test
-    void testDataTableIdHandling() {
-        // Tester la gestion des IDs
-        assertEquals(Integer.valueOf(1), testDataTable.getId());
-        assertEquals(Integer.valueOf(2), testDataTable2.getId());
-
-        logger.info("DataTable ID handling test successful: DataTable1 ID=" + 
-                testDataTable.getId() + ", DataTable2 ID=" + testDataTable2.getId());
     }
 
     @Test

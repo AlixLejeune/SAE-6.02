@@ -1,6 +1,9 @@
 package com.SAE.sae.view;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,18 +31,19 @@ import com.vaadin.flow.component.button.Button;
 
 import com.vaadin.flow.component.UI;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ExtendWith(MockitoExtension.class)
 /**
  * Test class for the Sensor9in1View component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de gestion des tables de données
+ * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de
+ * gestion des tables de données
  * et de ses interactions avec les services.
  */
 public class Sensor9in1ViewTest {
 
-    @MockBean
+    @Mock
     private Sensor9in1Manager Sensor9in1Manager;
 
-    @MockBean
+    @Mock
     private RoomManager roomManager;
 
     private Sensor9in1View Sensor9in1View;
@@ -53,7 +57,7 @@ public class Sensor9in1ViewTest {
     @BeforeEach
     void setUp() {
         UI.setCurrent(new UI());
-        
+
         // Créer des données de test
         testBuilding = new Building();
         testBuilding.setId(1);
@@ -114,10 +118,10 @@ public class Sensor9in1ViewTest {
 
         // Créer une nouvelle instance pour tester l'initialisation
         Sensor9in1View newView = new Sensor9in1View(Sensor9in1Manager, roomManager);
-        
+
         // Vérifier que findAll a été appelé pendant l'initialisation
         verify(Sensor9in1Manager, atLeastOnce()).findAll();
-        
+
         logger.info("Constructor correctly calls loadData method");
     }
 
@@ -159,7 +163,7 @@ public class Sensor9in1ViewTest {
     void testLoadDataWithException() {
         // Mock qui lance une exception
         when(Sensor9in1Manager.findAll())
-            .thenThrow(new RuntimeException("Database connection error"));
+                .thenThrow(new RuntimeException("Database connection error"));
 
         // La vue devrait gérer l'exception sans planter
         assertDoesNotThrow(() -> {
@@ -270,7 +274,7 @@ public class Sensor9in1ViewTest {
         // Tester avec un ID invalide
         Integer invalidId = 999;
         when(Sensor9in1Manager.findById(invalidId))
-            .thenThrow(new IllegalArgumentException("Aucune Sensor9in1 trouvée avec l'ID : " + invalidId));
+                .thenThrow(new IllegalArgumentException("Aucune Sensor9in1 trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
             Sensor9in1Manager.findById(invalidId);
@@ -466,7 +470,6 @@ public class Sensor9in1ViewTest {
         validSensor9in1.setPosY(1.0);
         validSensor9in1.setPosZ(1.0);
 
-
         // Les données devraient être valides
         assertNotNull(validSensor9in1.getCustomName());
         assertNotNull(validSensor9in1.getRoom());
@@ -587,14 +590,13 @@ public class Sensor9in1ViewTest {
                 ", Z=" + testSensor9in1.getPosZ());
     }
 
-
     @Test
     void testSensor9in1IdHandling() {
         // Tester la gestion des IDs
         assertEquals(Integer.valueOf(1), testSensor9in1.getId());
         assertEquals(Integer.valueOf(2), testSensor9in12.getId());
 
-        logger.info("Sensor9in1 ID handling test successful: Sensor9in11 ID=" + 
+        logger.info("Sensor9in1 ID handling test successful: Sensor9in11 ID=" +
                 testSensor9in1.getId() + ", Sensor9in12 ID=" + testSensor9in12.getId());
     }
 
@@ -604,7 +606,7 @@ public class Sensor9in1ViewTest {
         assertEquals("Test Sensor9in1 1", testSensor9in1.getCustomName());
         assertEquals("Test Sensor9in1 2", testSensor9in12.getCustomName());
 
-        logger.info("Sensor9in1 name handling test successful: Sensor9in11 name='" + 
+        logger.info("Sensor9in1 name handling test successful: Sensor9in11 name='" +
                 testSensor9in1.getCustomName() + "', Sensor9in12 name='" + testSensor9in12.getCustomName() + "'");
     }
 
@@ -614,7 +616,7 @@ public class Sensor9in1ViewTest {
         assertEquals(testRoom, testSensor9in1.getRoom());
         assertEquals(testRoom.getName(), testSensor9in1.getRoom().getName());
 
-        logger.info("Sensor9in1 room association test successful: Room='" + 
+        logger.info("Sensor9in1 room association test successful: Room='" +
                 testSensor9in1.getRoom().getName() + "'");
     }
 
@@ -623,7 +625,7 @@ public class Sensor9in1ViewTest {
         // Tester les opérations concurrentes (simulation)
         when(Sensor9in1Manager.findAll()).thenReturn(Arrays.asList(testSensor9in1));
         when(Sensor9in1Manager.save(any(Sensor9in1.class))).thenReturn(testSensor9in1);
-        
+
         // Simuler des opérations concurrentes
         assertDoesNotThrow(() -> {
             Sensor9in1Manager.findAll();
@@ -637,12 +639,11 @@ public class Sensor9in1ViewTest {
     void testPerformanceWithLargeDataset() {
         // Tester avec un grand nombre de tables de données
         List<Sensor9in1> largeDataset = Arrays.asList(
-            testSensor9in1, testSensor9in12,
-            createTestSensor9in1(3, "Sensor9in1 3"),
-            createTestSensor9in1(4, "Sensor9in1 4"),
-            createTestSensor9in1(5, "Sensor9in1 5")
-        );
-        
+                testSensor9in1, testSensor9in12,
+                createTestSensor9in1(3, "Sensor9in1 3"),
+                createTestSensor9in1(4, "Sensor9in1 4"),
+                createTestSensor9in1(5, "Sensor9in1 5"));
+
         when(Sensor9in1Manager.findAll()).thenReturn(largeDataset);
 
         // La vue devrait gérer un dataset plus large sans problème
@@ -659,9 +660,9 @@ public class Sensor9in1ViewTest {
         Sensor9in1 invalidSensor9in1 = new Sensor9in1();
         invalidSensor9in1.setCustomName("Invalid Position Sensor9in1");
         invalidSensor9in1.setRoom(testRoom);
-        invalidSensor9in1.setPosX(-1.0);  // Position négative
-        invalidSensor9in1.setPosY(Double.NaN);  // Valeur NaN
-        invalidSensor9in1.setPosZ(Double.POSITIVE_INFINITY);  // Valeur infinie
+        invalidSensor9in1.setPosX(-1.0); // Position négative
+        invalidSensor9in1.setPosY(Double.NaN); // Valeur NaN
+        invalidSensor9in1.setPosZ(Double.POSITIVE_INFINITY); // Valeur infinie
 
         // Ces valeurs devraient être détectées comme invalides
         assertTrue(invalidSensor9in1.getPosX() < 0);
@@ -670,8 +671,6 @@ public class Sensor9in1ViewTest {
 
         logger.info("Invalid position values test successful");
     }
-
-
 
     // Méthode utilitaire pour créer des tables de données de test
     private Sensor9in1 createTestSensor9in1(Integer id, String name) {

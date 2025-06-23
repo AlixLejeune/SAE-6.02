@@ -154,11 +154,11 @@ public class MainLayout extends AppLayout {
             UI.getCurrent().navigate("sensorco2");
         });
 
-        Button sensors9Btn = createMenuButton("📡 Capteurs 9in1", VaadinIcon.SIGNAL, () -> {
+        Button sensors9Btn = createMenuButton("📡 Capteurs 9 en 1", VaadinIcon.SIGNAL, () -> {
             UI.getCurrent().navigate("sensor9in1");
         });
         
-        Button sensors6Btn = createMenuButton("📡 Capteurs 6-in-1", VaadinIcon.SIGNAL, () -> {
+        Button sensors6Btn = createMenuButton("📡 Capteurs 6 en 1", VaadinIcon.SIGNAL, () -> {
             UI.getCurrent().navigate("sensor6in1");
         });
         

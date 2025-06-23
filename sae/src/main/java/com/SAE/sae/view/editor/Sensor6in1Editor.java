@@ -1,8 +1,8 @@
 package com.SAE.sae.view.editor;
 
-import com.SAE.sae.entity.RoomObjects.SensorCO2;
+import com.SAE.sae.entity.RoomObjects.Sensor6in1;
 import com.SAE.sae.entity.Room;
-import com.SAE.sae.service.RoomObjects.SensorCO2Manager;
+import com.SAE.sae.service.RoomObjects.Sensor6in1Manager;
 import com.SAE.sae.service.RoomManager;
 
 import com.vaadin.flow.component.textfield.TextField;
@@ -20,14 +20,14 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 
 
-public class SensorCO2Editor {
+public class Sensor6in1Editor {
     
-    private final SensorCO2Manager sensorCO2Manager;
+    private final Sensor6in1Manager sensor6in1Manager;
     private final RoomManager roomManager;
     private Runnable onDataChanged;
 
-    public SensorCO2Editor(SensorCO2Manager sensorCO2Manager, RoomManager roomManager) {
-        this.sensorCO2Manager = sensorCO2Manager;
+    public Sensor6in1Editor(Sensor6in1Manager sensor6in1Manager, RoomManager roomManager) {
+        this.sensor6in1Manager = sensor6in1Manager;
         this.roomManager = roomManager;
     }
 
@@ -36,25 +36,25 @@ public class SensorCO2Editor {
     }
 
     public void openAddDialog() {
-        Dialog dialog = createSensorCO2Dialog("Nouveau Capteur CO2", null);
+        Dialog dialog = createSensor6in1Dialog("Nouveau Capteur 6-en-1", null);
         dialog.open();
     }
 
-    public void openEditDialog(SensorCO2 sensorCO2) {
-        if (sensorCO2 != null) {
-            Dialog dialog = createSensorCO2Dialog("Modifier le Capteur CO2", sensorCO2);
+    public void openEditDialog(Sensor6in1 sensor6in1) {
+        if (sensor6in1 != null) {
+            Dialog dialog = createSensor6in1Dialog("Modifier le Capteur 6-en-1", sensor6in1);
             dialog.open();
         } else {
-            showWarningNotification("Veuillez sélectionner un capteur CO2 à modifier");
+            showWarningNotification("Veuillez sélectionner un capteur 6-en-1 à modifier");
         }
     }
 
-    public void confirmDelete(SensorCO2 sensorCO2) {
-        if (sensorCO2 != null) {
+    public void confirmDelete(Sensor6in1 sensor6in1) {
+        if (sensor6in1 != null) {
             ConfirmDialog confirmDialog = new ConfirmDialog();
             confirmDialog.setHeader("Confirmer la suppression");
-            confirmDialog.setText("Êtes-vous sûr de vouloir supprimer le capteur CO2 \"" + 
-                                 sensorCO2.getCustomName() + "\" ? Cette action est irréversible.");
+            confirmDialog.setText("Êtes-vous sûr de vouloir supprimer le capteur 6-en-1 \"" + 
+                                 sensor6in1.getCustomName() + "\" ? Cette action est irréversible.");
 
             confirmDialog.setCancelable(true);
             confirmDialog.setCancelText("❌ Annuler");
@@ -63,8 +63,8 @@ public class SensorCO2Editor {
 
             confirmDialog.addConfirmListener(e -> {
                 try {
-                    sensorCO2Manager.deleteById(sensorCO2.getId());
-                    showSuccessNotification("Capteur CO2 supprimé avec succès !");
+                    sensor6in1Manager.deleteById(sensor6in1.getId());
+                    showSuccessNotification("Capteur 6-en-1 supprimé avec succès !");
                     if (onDataChanged != null) {
                         onDataChanged.run();
                     }
@@ -75,11 +75,11 @@ public class SensorCO2Editor {
 
             confirmDialog.open();
         } else {
-            showWarningNotification("Veuillez sélectionner un capteur CO2 à supprimer");
+            showWarningNotification("Veuillez sélectionner un capteur 6-en-1 à supprimer");
         }
     }
 
-    private Dialog createSensorCO2Dialog(String title, SensorCO2 sensorCO2) {
+    private Dialog createSensor6in1Dialog(String title, Sensor6in1 sensor6in1) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle(title);
         dialog.setModal(true);
@@ -91,8 +91,8 @@ public class SensorCO2Editor {
             .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)");
 
         // Champs de saisie
-        TextField nameField = new TextField("Nom du capteur CO2");
-        nameField.setPlaceholder("Entrez le nom du capteur CO2...");
+        TextField nameField = new TextField("Nom du capteur 6-en-1");
+        nameField.setPlaceholder("Entrez le nom du capteur 6-en-1...");
         nameField.setWidthFull();
 
         // ComboBox pour la room
@@ -112,12 +112,12 @@ public class SensorCO2Editor {
         posZField.setStep(0.1);
         positionLayout.add(posXField, posYField, posZField);
 
-        if (sensorCO2 != null) {
-            nameField.setValue(sensorCO2.getCustomName() != null ? sensorCO2.getCustomName() : "");
-            roomComboBox.setValue(sensorCO2.getRoom());
-            posXField.setValue(sensorCO2.getPosX());
-            posYField.setValue(sensorCO2.getPosY());
-            posZField.setValue(sensorCO2.getPosZ());
+        if (sensor6in1 != null) {
+            nameField.setValue(sensor6in1.getCustomName() != null ? sensor6in1.getCustomName() : "");
+            roomComboBox.setValue(sensor6in1.getRoom());
+            posXField.setValue(sensor6in1.getPosX());
+            posYField.setValue(sensor6in1.getPosY());
+            posZField.setValue(sensor6in1.getPosZ());
         }
 
         VerticalLayout content = new VerticalLayout(nameField, roomComboBox, positionLayout);
@@ -126,8 +126,8 @@ public class SensorCO2Editor {
         dialog.add(content);
 
         // Boutons
-        Button saveButton = new Button(sensorCO2 == null ? "✅ Créer" : "💾 Sauvegarder", 
-            new Icon(sensorCO2 == null ? VaadinIcon.CHECK : VaadinIcon.DOWNLOAD));
+        Button saveButton = new Button(sensor6in1 == null ? "✅ Créer" : "💾 Sauvegarder", 
+            new Icon(sensor6in1 == null ? VaadinIcon.CHECK : VaadinIcon.DOWNLOAD));
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         Button cancelButton = new Button("❌ Annuler", new Icon(VaadinIcon.CLOSE));
@@ -136,15 +136,15 @@ public class SensorCO2Editor {
         saveButton.addClickListener(e -> {
             if (validateFields(nameField, roomComboBox, posXField, posYField, posZField)) {
                 try {
-                    if (sensorCO2 == null) {
-                        SensorCO2 newSensorCO2 = new SensorCO2();
-                        setSensorCO2Fields(newSensorCO2, nameField, roomComboBox, posXField, posYField, posZField);
-                        sensorCO2Manager.save(newSensorCO2);
-                        showSuccessNotification("Capteur CO2 créé avec succès !");
+                    if (sensor6in1 == null) {
+                        Sensor6in1 newSensor6in1 = new Sensor6in1();
+                        setSensor6in1Fields(newSensor6in1, nameField, roomComboBox, posXField, posYField, posZField);
+                        sensor6in1Manager.save(newSensor6in1);
+                        showSuccessNotification("Capteur 6-en-1 créé avec succès !");
                     } else {
-                        setSensorCO2Fields(sensorCO2, nameField, roomComboBox, posXField, posYField, posZField);
-                        sensorCO2Manager.save(sensorCO2);
-                        showSuccessNotification("Capteur CO2 modifié avec succès !");
+                        setSensor6in1Fields(sensor6in1, nameField, roomComboBox, posXField, posYField, posZField);
+                        sensor6in1Manager.save(sensor6in1);
+                        showSuccessNotification("Capteur 6-en-1 modifié avec succès !");
                     }
                     
                     if (onDataChanged != null) {
@@ -195,13 +195,13 @@ public class SensorCO2Editor {
         return true;
     }
 
-    private void setSensorCO2Fields(SensorCO2 sensorCO2, TextField nameField, ComboBox<Room> roomComboBox,
-                                   NumberField posXField, NumberField posYField, NumberField posZField) {
-        sensorCO2.setCustomName(nameField.getValue().trim());
-        sensorCO2.setRoom(roomComboBox.getValue());
-        sensorCO2.setPosX(posXField.getValue());
-        sensorCO2.setPosY(posYField.getValue());
-        sensorCO2.setPosZ(posZField.getValue());
+    private void setSensor6in1Fields(Sensor6in1 sensor6in1, TextField nameField, ComboBox<Room> roomComboBox,
+                                    NumberField posXField, NumberField posYField, NumberField posZField) {
+        sensor6in1.setCustomName(nameField.getValue().trim());
+        sensor6in1.setRoom(roomComboBox.getValue());
+        sensor6in1.setPosX(posXField.getValue());
+        sensor6in1.setPosY(posYField.getValue());
+        sensor6in1.setPosZ(posZField.getValue());
     }
 
     // Méthodes utilitaires pour les notifications

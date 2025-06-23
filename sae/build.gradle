@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.vaadin' version '24.7.6'
+    id 'jacoco'
 }
 
 group = 'com.SAE'
@@ -48,4 +49,17 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+jacoco {
+    toolVersion = "0.8.10" // ou la version que tu veux
+}
+
+jacocoTestReport {
+    dependsOn test // exécute les tests avant de créer le rapport
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
 }

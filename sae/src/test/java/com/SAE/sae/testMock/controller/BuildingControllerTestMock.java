@@ -48,14 +48,14 @@ public class BuildingControllerTestMock {
     }
 
     @Test
-    @DisplayName("GET /api/v1/building - Récupérer toutes les Buildings")
+    @DisplayName("GET /api/v1/buildings - Récupérer toutes les Buildings")
     void getAllBuildings_ShouldReturnAllBuildings() throws Exception {
         // Given
         List<Building> Buildings = Arrays.asList(sampleBuilding, new Building());
         when(buildingManager.getAllBuildings()).thenReturn(Buildings);
 
         // When & Then
-        mockMvc.perform(get("/api/v1/building"))
+        mockMvc.perform(get("/api/v1/buildings"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
@@ -64,13 +64,13 @@ public class BuildingControllerTestMock {
     }
 
     @Test
-    @DisplayName("GET /api/v1/building - Retourner liste vide quand aucune Building")
+    @DisplayName("GET /api/v1/buildings - Retourner liste vide quand aucune Building")
     void getAllBuildings_WhenEmpty_ShouldReturnEmptyList() throws Exception {
         // Given
         when(buildingManager.getAllBuildings()).thenReturn(Arrays.asList());
 
         // When & Then
-        mockMvc.perform(get("/api/v1/building"))
+        mockMvc.perform(get("/api/v1/buildings"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
@@ -78,14 +78,14 @@ public class BuildingControllerTestMock {
     }
 
     @Test
-    @DisplayName("GET /api/v1/building/{id} - Récupérer une Building par ID existant")
+    @DisplayName("GET /api/v1/buildings/{id} - Récupérer une Building par ID existant")
     void getBuildingById_WhenExists_ShouldReturnBuilding() throws Exception {
         // Given
         Integer id = 1;
         when(buildingManager.getBuildingById(id)).thenReturn(sampleBuilding);
 
         // When & Then
-        mockMvc.perform(get("/api/v1/building/{id}", id))
+        mockMvc.perform(get("/api/v1/buildings/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1));
@@ -94,21 +94,21 @@ public class BuildingControllerTestMock {
     }
 
     @Test
-    @DisplayName("GET /api/v1/building/{id} - Retourner 404 pour ID inexistant")
+    @DisplayName("GET /api/v1/buildings/{id} - Retourner 404 pour ID inexistant")
     void getBuildingById_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
         when(buildingManager.getBuildingById(id)).thenThrow(new IllegalArgumentException("Building non trouvée"));
 
         // When & Then
-        mockMvc.perform(get("/api/v1/building/{id}", id))
+        mockMvc.perform(get("/api/v1/buildings/{id}", id))
                 .andExpect(status().isNotFound());
 
         verify(buildingManager, times(1)).getBuildingById(id);
     }
 
     @Test
-    @DisplayName("POST /api/v1/building - Créer une nouvelle Building")
+    @DisplayName("POST /api/v1/buildings - Créer une nouvelle Building")
     void createBuilding_ShouldCreateAndReturnBuilding() throws Exception {
         // Given
         Building newBuilding = new Building();
@@ -117,7 +117,7 @@ public class BuildingControllerTestMock {
         when(buildingManager.saveBuilding(any(Building.class))).thenReturn(sampleBuilding);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/building")
+        mockMvc.perform(post("/api/v1/buildings")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newBuilding)))
                 .andExpect(status().isOk())
@@ -128,7 +128,7 @@ public class BuildingControllerTestMock {
     }
 
     @Test
-    @DisplayName("PUT /api/v1/building - Mettre à jour une Building existante")
+    @DisplayName("PUT /api/v1/buildings - Mettre à jour une Building existante")
     void updateBuilding_ShouldUpdateAndReturnBuilding() throws Exception {
         // Given
         Building updatedBuilding = new Building();
@@ -138,7 +138,7 @@ public class BuildingControllerTestMock {
         when(buildingManager.saveBuilding(any(Building.class))).thenReturn(updatedBuilding);
 
         // When & Then
-        mockMvc.perform(put("/api/v1/building")
+        mockMvc.perform(put("/api/v1/buildings")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedBuilding)))
                 .andExpect(status().isOk())
@@ -149,13 +149,13 @@ public class BuildingControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/building/{id} - Retourner 404 pour ID inexistant")
+    @DisplayName("DELETE /api/v1/buildings/{id} - Retourner 404 pour ID inexistant")
     void deleteBuilding_WhenNotExists_ShouldReturn404() throws Exception {
         // Given
         Integer id = 999;
 
         // When & Then
-        mockMvc.perform(delete("/api/v1/building/{id}", id))
+        mockMvc.perform(delete("/api/v1/buildings/{id}", id))
                 .andExpect(status().isNotFound());
 
         verify(buildingManager, never()).deleteBuildingById(id);

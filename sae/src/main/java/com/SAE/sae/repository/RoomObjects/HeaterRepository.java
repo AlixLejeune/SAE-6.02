@@ -29,13 +29,6 @@ public interface HeaterRepository extends JpaRepository<Heater, Integer> {
     List<Heater> findByCustomName(String customName);
 
     /**
-     * Supprimer tous les chauffages d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les chauffages par nom personnalisé
      */
     @Modifying

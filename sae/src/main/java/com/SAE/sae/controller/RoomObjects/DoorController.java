@@ -100,18 +100,6 @@ public class DoorController {
     }
 
     /**
-     * Supprime toutes les Doors d'une salle spécifique.
-     * @param roomId ID de la salle.
-     * @return Message de confirmation.
-     */
-      @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        doorManager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les Doors de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime toutes les Doors avec un nom personnalisé spécifique.
      * @param customName Nom personnalisé.
      * @return Message de confirmation.

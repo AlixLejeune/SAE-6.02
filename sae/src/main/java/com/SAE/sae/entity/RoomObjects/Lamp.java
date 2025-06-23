@@ -25,4 +25,8 @@ public class Lamp extends RoomObject implements IPosition, ISize{
 
     @Column(name = "lam_posz")
     private Double posZ;
+
+    public Lamp(String name){
+        this.customName = name;
+    }
 }

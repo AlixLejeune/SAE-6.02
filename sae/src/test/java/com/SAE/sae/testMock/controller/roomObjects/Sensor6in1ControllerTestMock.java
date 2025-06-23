@@ -231,21 +231,6 @@ public class Sensor6in1ControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/sensor6in1s/by-room/{roomId} - Supprimer toutes les Sensor6in1s d'une salle")
-    void deleteByRoomId_ShouldDeleteAllSensor6in1sInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(sensor6in1Manager).deleteByRoomId(roomId);
-
-        // When & Then
-        mockMvc.perform(delete("/api/v1/sensor6in1s/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les Sensor6in1s de la salle ont été supprimées"));
-
-        verify(sensor6in1Manager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/sensor6in1s/by-custom-name - Supprimer toutes les Sensor6in1s avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllSensor6in1sWithCustomName() throws Exception {
         // Given

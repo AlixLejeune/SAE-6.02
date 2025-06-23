@@ -96,14 +96,6 @@ public class RoomObjectManager {
     }
 
     /**
-     * Supprimer tous les RoomObjects d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        roomObjectRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les RoomObjects par nom personnalisé
      */
     @Transactional

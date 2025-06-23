@@ -96,14 +96,6 @@ public class DataTableManager {
     }
 
     /**
-     * Supprimer toutes les DataTables d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        dataTableRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les DataTables par nom personnalisé
      */
     @Transactional

@@ -34,4 +34,8 @@ public class Heater extends RoomObject implements IPosition, ISize{
     
     @Column(name = "hea_sizez")
     private Double sizeZ;
+
+    public Heater(String name){
+        this.customName = name;
+    }
 }

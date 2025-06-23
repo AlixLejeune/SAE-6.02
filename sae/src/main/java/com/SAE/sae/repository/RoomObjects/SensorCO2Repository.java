@@ -29,13 +29,6 @@ public interface SensorCO2Repository extends JpaRepository<SensorCO2, Integer> {
     List<SensorCO2> findByCustomName(String customName);
 
     /**
-     * Supprimer tous les capteurs CO₂ d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les capteurs CO₂ par nom personnalisé
      */
     @Modifying

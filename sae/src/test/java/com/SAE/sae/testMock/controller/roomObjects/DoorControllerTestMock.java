@@ -230,21 +230,6 @@ public class DoorControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/doors/by-room/{roomId} - Supprimer toutes les Doors d'une salle")
-    void deleteByRoomId_ShouldDeleteAllDoorsInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(doorManager).deleteByRoomId(roomId);
-
-        // When & Then
-        mockMvc.perform(delete("/api/v1/doors/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les Doors de la salle ont été supprimées"));
-
-        verify(doorManager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/doors/by-custom-name - Supprimer toutes les Doors avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllDoorsWithCustomName() throws Exception {
         // Given

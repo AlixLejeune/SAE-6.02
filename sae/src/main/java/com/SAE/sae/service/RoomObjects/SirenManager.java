@@ -96,14 +96,6 @@ public class SirenManager {
     }
 
     /**
-     * Supprimer toutes les Sirens d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        sirenRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les Sirens par nom personnalisé
      */
     @Transactional

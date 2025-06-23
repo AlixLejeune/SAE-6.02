@@ -106,19 +106,6 @@ public class DataTableController {
     }
 
     /**
-     * Supprime toutes les DataTables d'une salle spécifique.
-     * 
-     * @param roomId ID de la salle.
-     * @return Message de confirmation.
-     */
-    @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        dataTableManager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les DataTables de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime toutes les DataTables avec un nom personnalisé spécifique.
      * 
      * @param customName Nom personnalisé.
@@ -129,5 +116,4 @@ public class DataTableController {
     public ResponseEntity<String> deleteByCustomName(@RequestParam String customName) {
         dataTableManager.deleteByCustomName(customName);
         return ResponseEntity.ok("Toutes les DataTables avec ce nom ont été supprimées");
-    }
-}
+    }}

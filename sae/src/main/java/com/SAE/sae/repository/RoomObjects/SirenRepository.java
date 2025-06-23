@@ -29,13 +29,6 @@ public interface SirenRepository extends JpaRepository<Siren, Integer> {
     List<Siren> findByCustomName(String customName);
 
     /**
-     * Supprimer toutes les sirènes d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les sirènes par nom personnalisé
      */
     @Modifying

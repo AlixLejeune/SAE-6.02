@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
+import com.SAE.sae.entity.Room;
 import com.SAE.sae.entity.RoomType;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -23,16 +24,16 @@ public class RoomTypeControllerTest {
 
     @Test
     void testCreateRoomType() {
-        RoomType create = new RoomType(6,"createTest");
+        RoomType create = new RoomType("createTest");
 
-        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/room_types", create, RoomType.class);
+        RoomType res = restTemplate.postForEntity("http://localhost:" + port + "/api/v1/room_types", create, RoomType.class).getBody();
 
-        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/room_types/6",
-                RoomType.class)).satisfies(roomtypes -> {
-                    assertThat(roomtypes).isNotNull();
-                    assertThat(roomtypes).isEqualTo(create);
+        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/room_types/" + res.getId(),
+                RoomType.class)).satisfies(roomTypes -> {
+                    assertThat(roomTypes).isNotNull();
+                    assertThat(roomTypes.getName()).isEqualTo(create.getName());
                 });
-        restTemplate.delete("http://localhost:" + port + "/api/v1/room_types/6");
+        restTemplate.delete("http://localhost:" + port + "/api/v1/room_types/" + res.getId());
     }
 
     @Test

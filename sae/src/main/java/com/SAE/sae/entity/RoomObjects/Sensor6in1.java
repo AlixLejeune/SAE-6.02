@@ -25,4 +25,8 @@ public class Sensor6in1 extends RoomObject implements IPosition, ISize {
 
     @Column(name = "sio_posz")
     private Double posZ;
+
+    public Sensor6in1(String name){
+        this.customName = name;
+    }
 }

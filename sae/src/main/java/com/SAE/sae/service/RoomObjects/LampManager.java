@@ -96,14 +96,6 @@ public class LampManager {
     }
 
     /**
-     * Supprimer toutes les Lamps d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        lampRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les Lamps par nom personnalisé
      */
     @Transactional

@@ -96,14 +96,6 @@ public class SensorCO2Manager {
     }
 
     /**
-     * Supprimer tous les SensorCO2s d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        sensorCO2Repository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les SensorCO2s par nom personnalisé
      */
     @Transactional

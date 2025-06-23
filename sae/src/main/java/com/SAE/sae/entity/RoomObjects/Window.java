@@ -34,4 +34,8 @@ public class Window  extends RoomObject implements IPosition, ISize {
     
     @Column(name = "win_sizez")
     private Double sizeZ;
+
+    public Window(String name){
+        this.customName = name;
+    }
 }

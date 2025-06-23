@@ -96,14 +96,6 @@ public class WindowManager {
     }
 
     /**
-     * Supprimer toutes les Windows d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        windowRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les Windows par nom personnalisé
      */
     @Transactional

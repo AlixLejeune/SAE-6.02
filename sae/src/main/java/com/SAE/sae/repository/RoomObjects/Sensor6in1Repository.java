@@ -29,13 +29,6 @@ public interface Sensor6in1Repository extends JpaRepository<Sensor6in1, Integer>
     List<Sensor6in1> findByCustomName(String customName);
 
     /**
-     * Supprimer tous les capteurs d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les capteurs par nom personnalisé
      */
     @Modifying

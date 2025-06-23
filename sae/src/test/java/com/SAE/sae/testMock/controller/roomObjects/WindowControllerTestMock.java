@@ -231,21 +231,6 @@ public class WindowControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/windows/by-room/{roomId} - Supprimer toutes les Windows d'une salle")
-    void deleteByRoomId_ShouldDeleteAllWindowsInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(windowManager).deleteByRoomId(roomId);
-
-        // When & Then
-        mockMvc.perform(delete("/api/v1/windows/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les Windows de la salle ont été supprimées"));
-
-        verify(windowManager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/windows/by-custom-name - Supprimer toutes les Windows avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllWindowsWithCustomName() throws Exception {
         // Given

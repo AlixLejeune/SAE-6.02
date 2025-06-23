@@ -9,7 +9,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import com.SAE.sae.entity.Room;
-import com.SAE.sae.entity.Building;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RoomControllerTest {
@@ -22,16 +21,16 @@ public class RoomControllerTest {
 
     @Test
     void testCreateRoom() {
-        Room create = new Room(6,"createTest",0,0,0,new Building(),1);
+        Room create = new Room("createTest",0,0,0,1);
 
-        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/rooms", create, Room.class);
+        Room res = restTemplate.postForEntity("http://localhost:" + port + "/api/v1/rooms", create, Room.class).getBody();
 
-        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/rooms/6",
+        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/rooms/" + res.getId(),
                 Room.class)).satisfies(rooms -> {
-                    //assertThat(rooms).isNotNull();
-                    assertThat(rooms).isEqualTo(create);
+                    assertThat(rooms).isNotNull();
+                    assertThat(rooms.getName()).isEqualTo(create.getName());
                 });
-        restTemplate.delete("http://localhost:" + port + "/api/v1/rooms/6");
+        restTemplate.delete("http://localhost:" + port + "/api/v1/rooms/" + res.getId());
     }
 
     @Test
@@ -72,14 +71,16 @@ public class RoomControllerTest {
 
     @Test
     void testUpdateRoom() {
-        Room update = new Room(5,"updateTest",6,8,3,null,5);
-        restTemplate.put("http://localhost:" + port + "/api/v1/rooms", update);
-        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/rooms/5",
+        Room update = new Room("test",6.0,8.0,3.0,5);
+        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/rooms", update, Room.class);
+        Room get = restTemplate.getForObject("http://localhost:" + port + "/api/v1/rooms/by-custom-name?name=test", Room[].class)[0];
+        get.setName("updateTest");
+        restTemplate.put("http://localhost:" + port + "/api/v1/rooms", get);
+        assertThat(restTemplate.getForObject("http://localhost:" + port + "/api/v1/rooms/"+ get.getId(),
                 Room.class)).satisfies(rooms -> {
                     assertThat(rooms).isNotNull();
                     assertThat(rooms.getName()).isEqualTo("updateTest");
                 });
-        update.setName("Réunion R1");
-        restTemplate.put("http://localhost:" + port + "/api/v1/rooms", update);
+        restTemplate.delete("http://localhost:" + port + "/api/v1/rooms/" + get.getId());
     }
 }

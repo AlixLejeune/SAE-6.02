@@ -229,19 +229,6 @@ class RoomObjectControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/room-objects/by-room/{roomId} - Supprimer tous les RoomObjects d'une salle")
-    void deleteByRoomId_ShouldDeleteAllRoomObjectsInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(roomObjectManager).deleteByRoomId(roomId);
-        // When & Then
-        mockMvc.perform(delete("/api/v1/room-objects/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les RoomObjects de la salle ont été supprimées"));
-        verify(roomObjectManager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/room-objects/by-custom-name - Supprimer tous les RoomObjects avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllRoomObjectsWithCustomName() throws Exception {
         // Given

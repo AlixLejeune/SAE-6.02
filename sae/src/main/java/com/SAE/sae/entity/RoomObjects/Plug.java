@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 @Table(name = "t_e_plug_plu")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Plug  extends RoomObject implements IPosition, ISize{
+public class Plug extends RoomObject implements IPosition, ISize{
      @Column(name = "plu_posx")
     private Double posX;
 
@@ -25,4 +25,8 @@ public class Plug  extends RoomObject implements IPosition, ISize{
 
     @Column(name = "plu_posz")
     private Double posZ;
+
+    public Plug(String name){
+        this.customName = name;
+    }
 }

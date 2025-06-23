@@ -232,21 +232,6 @@ public class LampControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/lamps/by-room/{roomId} - Supprimer toutes les Lamps d'une salle")
-    void deleteByRoomId_ShouldDeleteAllLampsInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(lampManager).deleteByRoomId(roomId);
-
-        // When & Then
-        mockMvc.perform(delete("/api/v1/lamps/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les Lamps de la salle ont été supprimées"));
-
-        verify(lampManager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/lamps/by-custom-name - Supprimer toutes les Lamps avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllLampsWithCustomName() throws Exception {
         // Given

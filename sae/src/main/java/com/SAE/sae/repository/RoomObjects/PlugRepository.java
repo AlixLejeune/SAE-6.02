@@ -28,12 +28,6 @@ public interface PlugRepository extends JpaRepository<Plug, Integer> {
      */
     List<Plug> findByCustomName(String customName);
 
-    /**
-     * Supprimer toutes les prises d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
 
     /**
      * Supprimer les prises par nom personnalisé

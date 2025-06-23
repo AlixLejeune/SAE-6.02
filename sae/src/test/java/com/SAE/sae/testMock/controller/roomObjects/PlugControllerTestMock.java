@@ -234,21 +234,6 @@ public class PlugControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/plugs/by-room/{roomId} - Supprimer toutes les Plugs d'une salle")
-    void deleteByRoomId_ShouldDeleteAllPlugsInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(plugManager).deleteByRoomId(roomId);
-
-        // When & Then
-        mockMvc.perform(delete("/api/v1/plugs/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les Plugs de la salle ont été supprimées"));
-
-        verify(plugManager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/plugs/by-custom-name - Supprimer toutes les Plugs avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllPlugsWithCustomName() throws Exception {
         // Given

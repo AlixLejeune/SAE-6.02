@@ -100,18 +100,6 @@ public class WindowController {
     }
 
     /**
-     * Supprime toutes les Windows d'une salle spécifique.
-     * @param roomId ID de la salle.
-     * @return Message de confirmation.
-     */
-     @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        windowManager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les Windows de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime toutes les Windows avec un nom personnalisé spécifique.
      * @param customName Nom personnalisé.
      * @return Message de confirmation.

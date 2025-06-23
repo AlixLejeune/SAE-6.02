@@ -20,4 +20,8 @@ public class RoomType {
     private int id;
 
     private String name;
+
+    public RoomType(String name){
+        this.name = name;
+    }
 }

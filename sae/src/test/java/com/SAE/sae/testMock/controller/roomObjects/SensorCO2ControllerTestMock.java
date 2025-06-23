@@ -234,21 +234,6 @@ public class SensorCO2ControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/sensorco2s/by-room/{roomId} - Supprimer toutes les SensorCO2s d'une salle")
-    void deleteByRoomId_ShouldDeleteAllSensorCO2sInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(sensorCO2Manager).deleteByRoomId(roomId);
-
-        // When & Then
-        mockMvc.perform(delete("/api/v1/sensorco2s/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les SensorCO2s de la salle ont été supprimées"));
-
-        verify(sensorCO2Manager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/sensorco2s/by-custom-name - Supprimer toutes les SensorCO2s avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllSensorCO2sWithCustomName() throws Exception {
         // Given

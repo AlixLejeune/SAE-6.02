@@ -14,12 +14,12 @@ public interface DataTableRepository extends JpaRepository<DataTable, Integer> {
     // ========== REQUÊTES PERSONNALISÉES ==========
 
     /**
-     * Trouver toutes les portes d'une salle spécifique
+     * Trouver toutes les tables d'une salle spécifique
      */
     List<DataTable> findByRoomId(Integer roomId);
 
     /**
-     * Trouver toutes les portes d'une salle (alternative avec l'objet Room)
+     * Trouver toutes les tables d'une salle (alternative avec l'objet Room)
      */
     List<DataTable> findByRoom_Id(Long roomId);
 
@@ -29,14 +29,7 @@ public interface DataTableRepository extends JpaRepository<DataTable, Integer> {
     List<DataTable> findByCustomName(String customName);
 
     /**
-     * Supprimer toutes les portes d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
-     * Supprimer les portes par nom personnalisé
+     * Supprimer les tables par nom personnalisé
      */
     @Modifying
     @Transactional

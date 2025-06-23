@@ -208,19 +208,6 @@ public class HeaterControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/heaters/by-room/{roomId} - Supprimer toutes les Heaters d'une salle")
-    void deleteByRoomId_ShouldDeleteAllHeatersInRoom() throws Exception {
-        Integer roomId = 1;
-        doNothing().when(heaterManager).deleteByRoomId(roomId);
-
-        mockMvc.perform(delete("/api/v1/heaters/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les Heaters de la salle ont été supprimées"));
-
-        verify(heaterManager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/heaters/by-custom-name - Supprimer toutes les Heaters avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllHeatersWithCustomName() throws Exception {
         String customName = "Table à supprimer";

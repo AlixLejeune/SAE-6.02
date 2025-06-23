@@ -29,13 +29,6 @@ public interface RoomObjectRepository extends JpaRepository<RoomObject, Integer>
     List<RoomObject> findByCustomName(String customName);
 
     /**
-     * Supprimer tous les objets d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les objets par nom personnalisé
      */
     @Modifying

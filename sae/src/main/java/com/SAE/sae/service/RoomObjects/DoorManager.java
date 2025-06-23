@@ -96,14 +96,6 @@ public class DoorManager {
     }
 
     /**
-     * Supprimer toutes les Doors d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        doorRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les Doors par nom personnalisé
      */
     @Transactional

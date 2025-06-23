@@ -10,4 +10,5 @@ import com.SAE.sae.entity.Room;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Integer> {
     List<Room> findByBuilding_Id(int buildingId);
+    List<Room> findByName(String name);
 }

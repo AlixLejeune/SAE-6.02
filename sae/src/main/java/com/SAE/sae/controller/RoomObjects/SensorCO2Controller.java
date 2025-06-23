@@ -100,18 +100,6 @@ public class SensorCO2Controller {
     }
 
     /**
-     * Supprime toutes les SensorCO2s d'une salle spécifique.
-     * @param roomId ID de la salle.
-     * @return Message de confirmation.
-     */
-      @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        sensorCO2Manager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les SensorCO2s de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime toutes les SensorCO2s avec un nom personnalisé spécifique.
      * @param customName Nom personnalisé.
      * @return Message de confirmation.

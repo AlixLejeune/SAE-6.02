@@ -96,14 +96,6 @@ public class PlugManager {
     }
 
     /**
-     * Supprimer toutes les Plugs d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        plugRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les Plugs par nom personnalisé
      */
     @Transactional

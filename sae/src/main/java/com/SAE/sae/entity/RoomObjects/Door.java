@@ -36,4 +36,8 @@ public class Door extends RoomObject implements IPosition, ISize {
     
     @Column(name = "doo_sizez")
     private Double sizeZ;
+
+    public Door(String name){
+        this.customName = name;
+    }
 }

@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.SAE.sae.entity.Building;
 import com.SAE.sae.entity.Room;
+import com.SAE.sae.repository.BuildingRepository;
 import com.SAE.sae.repository.RoomRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -47,6 +50,16 @@ public class RoomController {
         return roomRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Récupère toutes les Rooms ayant un nom personnalisé spécifique.
+     * @param name Nom personnalisé.
+     * @return Liste des Rooms correspondantes.
+     */
+    @GetMapping("/by-custom-name")
+    public ResponseEntity<List<Room>> getByName(@RequestParam String name) {
+        return  ResponseEntity.ok(roomRepository.findByName(name));
     }
 
     /**

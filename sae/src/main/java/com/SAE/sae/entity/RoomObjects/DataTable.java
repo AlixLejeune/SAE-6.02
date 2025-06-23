@@ -34,4 +34,8 @@ public class DataTable extends RoomObject implements IPosition, ISize {
 
     @Column(name = "tab_sizez")
     private Double sizeZ;
+
+    public DataTable(String name){
+        this.customName = name;
+    }
 }

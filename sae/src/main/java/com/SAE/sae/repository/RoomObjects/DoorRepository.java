@@ -29,13 +29,6 @@ public interface DoorRepository extends JpaRepository<Door, Integer> {
     List<Door> findByCustomName(String customName);
 
     /**
-     * Supprimer toutes les portes d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les portes par nom personnalisé
      */
     @Modifying

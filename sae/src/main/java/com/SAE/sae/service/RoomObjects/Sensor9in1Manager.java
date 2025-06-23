@@ -96,14 +96,6 @@ public class Sensor9in1Manager {
     }
 
     /**
-     * Supprimer tous les Sensor9in1s d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        sensor9in1Repository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les Sensor9in1s par nom personnalisé
      */
     @Transactional

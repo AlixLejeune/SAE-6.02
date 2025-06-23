@@ -29,13 +29,6 @@ public interface LampRepository extends JpaRepository<Lamp, Integer> {
     List<Lamp> findByCustomName(String customName);
 
     /**
-     * Supprimer toutes les lampes d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les lampes par nom personnalisé
      */
     @Modifying

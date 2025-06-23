@@ -25,4 +25,8 @@ public class SensorCO2  extends RoomObject implements IPosition, ISize{
 
     @Column(name = "co2_posz")
     private Double posZ;
+
+    public SensorCO2(String name){
+        this.customName = name;
+    }
 }

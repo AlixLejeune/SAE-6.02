@@ -29,13 +29,6 @@ public interface WindowRepository extends JpaRepository<Window, Integer> {
     List<Window> findByCustomName(String customName);
 
     /**
-     * Supprimer toutes les fenêtres d'une salle
-     */
-    @Modifying
-    @Transactional
-    void deleteByRoomId(Integer id);
-
-    /**
      * Supprimer les fenêtres par nom personnalisé
      */
     @Modifying

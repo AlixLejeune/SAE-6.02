@@ -100,18 +100,6 @@ public class Sensor6in1Controller {
     }
 
     /**
-     * Supprime toutes les Sensor6in1s d'une salle spécifique.
-     * @param roomId ID de la salle.
-     * @return Message de confirmation.
-     */
-    @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        sensor6in1Manager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les Sensor6in1s de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime toutes les Sensor6in1s avec un nom personnalisé spécifique.
      * @param customName Nom personnalisé.
      * @return Message de confirmation.

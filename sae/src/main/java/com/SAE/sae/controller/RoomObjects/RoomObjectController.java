@@ -100,18 +100,6 @@ public class RoomObjectController {
     }
 
     /**
-     * Supprime tous les objets associés à une salle spécifique.
-     * @param roomId L'ID de la salle.
-     * @return Message de confirmation.
-     */
-      @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        roomObjectManager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les RoomObjects de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime tous les objets ayant un nom personnalisé spécifique.
      * @param customName Le nom personnalisé à supprimer.
      * @return Message de confirmation.

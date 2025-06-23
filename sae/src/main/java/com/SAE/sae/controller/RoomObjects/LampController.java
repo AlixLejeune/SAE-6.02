@@ -107,19 +107,6 @@ public class LampController {
     }
 
     /**
-     * Supprime toutes les Lamps d'une salle spécifique.
-     * 
-     * @param roomId ID de la salle.
-     * @return Message de confirmation.
-     */
-    @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        lampManager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les Lamps de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime toutes les Lamps avec un nom personnalisé spécifique.
      * 
      * @param customName Nom personnalisé.

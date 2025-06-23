@@ -107,19 +107,6 @@ public class PlugController {
     }
 
     /**
-     * Supprime toutes les Plugs d'une salle spécifique.
-     * 
-     * @param roomId ID de la salle.
-     * @return Message de confirmation.
-     */
-    @DeleteMapping("/by-room/{roomId}")
-    @Transactional
-    public ResponseEntity<String> deleteByRoomId(@PathVariable Integer roomId) {
-        plugManager.deleteByRoomId(roomId);
-        return ResponseEntity.ok("Toutes les Plugs de la salle ont été supprimées");
-    }
-
-    /**
      * Supprime toutes les Plugs avec un nom personnalisé spécifique.
      * 
      * @param customName Nom personnalisé.

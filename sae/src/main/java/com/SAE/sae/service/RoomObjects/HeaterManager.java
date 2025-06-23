@@ -96,14 +96,6 @@ public class HeaterManager {
     }
 
     /**
-     * Supprimer tous les Heaters d'une salle
-     */
-    @Transactional
-    public void deleteByRoomId(Integer roomId) {
-        heaterRepository.deleteByRoomId(roomId);
-    }
-
-    /**
      * Supprimer les Heaters par nom personnalisé
      */
     @Transactional

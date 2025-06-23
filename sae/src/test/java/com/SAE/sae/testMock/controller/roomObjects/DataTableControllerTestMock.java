@@ -231,21 +231,6 @@ public class DataTableControllerTestMock {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/data-tables/by-room/{roomId} - Supprimer toutes les DataTables d'une salle")
-    void deleteByRoomId_ShouldDeleteAllDataTablesInRoom() throws Exception {
-        // Given
-        Integer roomId = 1;
-        doNothing().when(dataTableManager).deleteByRoomId(roomId);
-
-        // When & Then
-        mockMvc.perform(delete("/api/v1/data-tables/by-room/{roomId}", roomId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Toutes les DataTables de la salle ont été supprimées"));
-
-        verify(dataTableManager, times(1)).deleteByRoomId(roomId);
-    }
-
-    @Test
     @DisplayName("DELETE /api/v1/data-tables/by-custom-name - Supprimer toutes les DataTables avec un nom spécifique")
     void deleteByCustomName_ShouldDeleteAllDataTablesWithCustomName() throws Exception {
         // Given

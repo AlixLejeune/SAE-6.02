@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.SAE.sae.entity.Building;
 import com.SAE.sae.entity.Room;
-import com.SAE.sae.repository.BuildingRepository;
-import com.SAE.sae.repository.RoomRepository;
+import com.SAE.sae.service.RoomManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoomController {
 
-    private final RoomRepository roomRepository;
+    private final RoomManager roomManager;
 
     /**
      * Récupère toutes les entités Room.
@@ -37,7 +35,7 @@ public class RoomController {
      */
     @GetMapping
     public ResponseEntity<List<Room>> getAllRooms() {
-        return ResponseEntity.ok(roomRepository.findAll());
+        return ResponseEntity.ok(roomManager.getAllRooms());
     }
 
     /**
@@ -47,9 +45,7 @@ public class RoomController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Room> getRoomById(@PathVariable Integer id) {
-        return roomRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(roomManager.getRoomById(id));
     }
 
     /**
@@ -59,7 +55,7 @@ public class RoomController {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<Room>> getByName(@RequestParam String name) {
-        return  ResponseEntity.ok(roomRepository.findByName(name));
+        return  ResponseEntity.ok(roomManager.getRoomsByName(name));
     }
 
     /**
@@ -69,7 +65,7 @@ public class RoomController {
      */
     @PostMapping
     public ResponseEntity<Room> createRoom(@RequestBody Room room) {
-        return ResponseEntity.ok(roomRepository.save(room));
+        return ResponseEntity.ok(roomManager.saveRoom(room));
     }
 
     /**
@@ -79,7 +75,7 @@ public class RoomController {
      */
     @PutMapping
     public ResponseEntity<Room> updateRoom(@RequestBody Room room) {
-        return ResponseEntity.ok(roomRepository.save(room));
+        return ResponseEntity.ok(roomManager.updateRoom(room));
     }
 
     /**
@@ -89,10 +85,7 @@ public class RoomController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoom(@PathVariable Integer id) {
-        if (!roomRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        roomRepository.deleteById(id);
+        roomManager.deleteRoomById(id);
         return ResponseEntity.ok("Room supprimée avec succès");
     }
 

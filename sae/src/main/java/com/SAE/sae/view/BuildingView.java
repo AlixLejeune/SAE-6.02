@@ -3,6 +3,7 @@ package com.SAE.sae.view;
 import com.SAE.sae.entity.Building;
 import com.SAE.sae.service.BuildingManager;
 import com.SAE.sae.view.layouts.MainLayout;
+import com.SAE.sae.view.editor.BuildingEditor;
 
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -11,7 +12,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.html.H2;
@@ -19,18 +19,21 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Route(value = "buildings", layout = MainLayout.class)
 public class BuildingView extends VerticalLayout {
 
     private final BuildingManager buildingManager;
+    private final BuildingEditor buildingEditor;
     private final Grid<Building> grid = new Grid<>(Building.class);
     private Building selectedBuilding = null;
+    private List<Building> allBuildings; // Liste complète pour la recherche
+    private TextField searchField; // Champ de recherche
 
     // Boutons d'action
     private Button refreshButton;
@@ -41,13 +44,15 @@ public class BuildingView extends VerticalLayout {
     @Autowired
     public BuildingView(BuildingManager buildingManager) {
         this.buildingManager = buildingManager;
+        this.buildingEditor = new BuildingEditor(buildingManager);
         
-        // Configuration générale de la vue - CORRECTION : utiliser le même style que MainLayout
+        // Configuration du callback pour rafraîchir les données
+        this.buildingEditor.setOnDataChanged(this::loadData);
+        
+        // Configuration générale de la vue
         setSizeFull();
         setPadding(true);
         setSpacing(true);
-        // Retirer le fond car il est déjà géré par MainLayout
-        // getStyle().set("background", "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)");
 
         createHeader();
         createToolbar();
@@ -61,17 +66,31 @@ public class BuildingView extends VerticalLayout {
     private void createHeader() {
         H2 title = new H2("🏢 Gestion des Bâtiments");
         title.getStyle()
-            .set("color", "white") // CORRECTION : texte blanc comme dans HomeView
+            .set("color", "white")
             .set("margin", "0 0 20px 0")
             .set("text-align", "center")
             .set("font-weight", "300")
-            .set("text-shadow", "2px 2px 4px rgba(0,0,0,0.3)"); // Ombre plus prononcée pour le contraste
+            .set("text-shadow", "2px 2px 4px rgba(0,0,0,0.3)");
         
         add(title);
     }
 
+    private void createSearchField() {
+        searchField = new TextField();
+        searchField.setPlaceholder("🔍 Rechercher un bâtiment...");
+        searchField.setWidth("300px");
+        searchField.setClearButtonVisible(true);
+        searchField.setValueChangeMode(ValueChangeMode.LAZY);
+        searchField.setValueChangeTimeout(300);
+        
+        searchField.getStyle()
+            .set("border-radius", "8px")
+            .set("font-size", "14px");
+
+        searchField.addValueChangeListener(e -> filterBuildings(e.getValue()));
+    }
+
     private void createToolbar() {
-        // Container pour la barre d'outils
         HorizontalLayout toolbar = new HorizontalLayout();
         toolbar.setWidthFull();
         toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
@@ -84,36 +103,47 @@ public class BuildingView extends VerticalLayout {
             .set("margin-bottom", "20px");
 
         // Groupe de boutons principaux (gauche)
-        HorizontalLayout actionButtons = new HorizontalLayout();
-        actionButtons.setSpacing(true);
+        HorizontalLayout leftGroup = new HorizontalLayout();
+        leftGroup.setSpacing(true);
+        leftGroup.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        // Bouton Actualiser
         refreshButton = createStyledButton("🔄 Actualiser", VaadinIcon.REFRESH, "#3498db", ButtonVariant.LUMO_PRIMARY);
         refreshButton.addClickListener(e -> loadData());
 
-        // Bouton Ajouter
         addButton = createStyledButton("➕ Ajouter", VaadinIcon.PLUS, "#27ae60", ButtonVariant.LUMO_SUCCESS);
-        addButton.addClickListener(e -> openAddDialog());
+        addButton.addClickListener(e -> buildingEditor.openAddDialog());
 
-        actionButtons.add(refreshButton, addButton);
+        leftGroup.add(refreshButton, addButton);
+
+        // Groupe central avec la recherche
+        HorizontalLayout centerGroup = new HorizontalLayout();
+        centerGroup.setAlignItems(FlexComponent.Alignment.CENTER);
+        centerGroup.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        
+        // Créer le champ de recherche
+        createSearchField();
+        centerGroup.add(searchField);
 
         // Groupe de boutons d'action sur sélection (droite)
-        HorizontalLayout selectionButtons = new HorizontalLayout();
-        selectionButtons.setSpacing(true);
+        HorizontalLayout rightGroup = new HorizontalLayout();
+        rightGroup.setSpacing(true);
+        rightGroup.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        // Bouton Modifier
         editButton = createStyledButton("✏️ Modifier", VaadinIcon.EDIT, "#f39c12", ButtonVariant.LUMO_CONTRAST);
-        editButton.addClickListener(e -> openEditDialog());
+        editButton.addClickListener(e -> buildingEditor.openEditDialog(selectedBuilding));
         editButton.setEnabled(false);
 
-        // Bouton Supprimer
         deleteButton = createStyledButton("🗑️ Supprimer", VaadinIcon.TRASH, "#e74c3c", ButtonVariant.LUMO_ERROR);
-        deleteButton.addClickListener(e -> confirmDelete());
+        deleteButton.addClickListener(e -> buildingEditor.confirmDelete(selectedBuilding));
         deleteButton.setEnabled(false);
 
-        selectionButtons.add(editButton, deleteButton);
+        rightGroup.add(editButton, deleteButton);
 
-        toolbar.add(actionButtons, selectionButtons);
+        toolbar.add(leftGroup, centerGroup, rightGroup);
+        toolbar.setFlexGrow(0, leftGroup);
+        toolbar.setFlexGrow(1, centerGroup);
+        toolbar.setFlexGrow(0, rightGroup);
+        
         add(toolbar);
     }
 
@@ -127,7 +157,6 @@ public class BuildingView extends VerticalLayout {
             .set("transition", "all 0.3s ease")
             .set("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
-        // Effet hover personnalisé
         button.getElement().addEventListener("mouseenter", e -> {
             button.getStyle().set("transform", "translateY(-2px)");
         });
@@ -168,7 +197,6 @@ public class BuildingView extends VerticalLayout {
         // Style des lignes
         grid.setClassNameGenerator(building -> "custom-grid-row");
         
-        // CSS personnalisé pour le grid
         grid.getElement().executeJs(
             "this.shadowRoot.querySelector('style').textContent += " +
             "'.custom-grid-row { transition: background-color 0.2s ease; }' + " +
@@ -197,15 +225,15 @@ public class BuildingView extends VerticalLayout {
     private void createSelectionInfo() {
         Div infoContainer = new Div();
         infoContainer.getStyle()
-            .set("background", "rgba(255,255,255,0.1)") // CORRECTION : utiliser la transparence comme dans MainLayout
+            .set("background", "rgba(255,255,255,0.1)")
             .set("color", "white")
             .set("padding", "15px")
             .set("border-radius", "12px")
             .set("margin-top", "20px")
             .set("text-align", "center")
             .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
-            .set("backdrop-filter", "blur(10px)") // Effet de flou comme dans MainLayout
-            .set("border", "1px solid rgba(255,255,255,0.2)"); // Bordure subtile
+            .set("backdrop-filter", "blur(10px)")
+            .set("border", "1px solid rgba(255,255,255,0.2)");
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
@@ -220,6 +248,53 @@ public class BuildingView extends VerticalLayout {
         add(infoContainer);
     }
 
+    private void filterBuildings(String searchTerm) {
+        if (allBuildings == null) {
+            return;
+        }
+
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            grid.setItems(allBuildings);
+            updateResultsInfo(allBuildings.size(), allBuildings.size());
+            return;
+        }
+
+        String lowerCaseFilter = searchTerm.toLowerCase().trim();
+        List<Building> filteredBuildings = allBuildings.stream()
+            .filter(building -> matchesSearch(building, lowerCaseFilter))
+            .collect(Collectors.toList());
+
+        grid.setItems(filteredBuildings);
+        updateResultsInfo(filteredBuildings.size(), allBuildings.size());
+        
+        // Clear selection après filtrage
+        grid.asSingleSelect().clear();
+    }
+
+    private boolean matchesSearch(Building building, String searchTerm) {
+        // Recherche dans le nom
+        if (building.getName() != null && 
+            building.getName().toLowerCase().contains(searchTerm)) {
+            return true;
+        }
+
+        // Recherche dans l'ID (converti en string)
+        if (String.valueOf(building.getId()).contains(searchTerm)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updateResultsInfo(int filteredCount, int totalCount) {
+        if (filteredCount != totalCount) {
+            String message = String.format("🔍 %d résultat(s) sur %d bâtiment(s)", 
+                filteredCount, totalCount);
+            Notification notification = Notification.show(message, 2000, Notification.Position.BOTTOM_END);
+            notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+        }
+    }
+
     private void updateButtonStates() {
         boolean hasSelection = selectedBuilding != null;
         editButton.setEnabled(hasSelection);
@@ -228,156 +303,26 @@ public class BuildingView extends VerticalLayout {
 
     private void loadData() {
         try {
-            List<Building> buildings = buildingManager.getAllBuildings();
-            grid.setItems(buildings);
+            allBuildings = buildingManager.getAllBuildings(); // Stocker la liste complète
+            grid.setItems(allBuildings);
             
             // Notification de succès
             Notification notification = Notification.show(
-                "✅ " + buildings.size() + " bâtiment(s) chargé(s)", 
+                "✅ " + allBuildings.size() + " bâtiment(s) chargé(s)", 
                 3000, 
                 Notification.Position.TOP_END
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             
-            // Reset de la sélection
+            // Clear la sélection et la recherche
             grid.asSingleSelect().clear();
+            if (searchField != null) {
+                searchField.clear();
+            }
             
         } catch (Exception e) {
             showErrorNotification("Erreur lors du chargement", e.getMessage());
         }
-    }
-
-    private void openAddDialog() {
-        Dialog dialog = createBuildingDialog("Nouveau Bâtiment", null);
-        dialog.open();
-    }
-
-    private void openEditDialog() {
-        if (selectedBuilding != null) {
-            Dialog dialog = createBuildingDialog("Modifier le Bâtiment", selectedBuilding);
-            dialog.open();
-        }
-    }
-
-    private Dialog createBuildingDialog(String title, Building building) {
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle(title);
-        dialog.setModal(true);
-        dialog.setCloseOnEsc(true);
-        dialog.setCloseOnOutsideClick(false);
-
-        // Style du dialog
-        dialog.getElement().getStyle()
-            .set("border-radius", "12px")
-            .set("box-shadow", "0 8px 25px rgba(0,0,0,0.15)");
-
-        // Champ de saisie
-        TextField nameField = new TextField("Nom du bâtiment");
-        nameField.setPlaceholder("Entrez le nom du bâtiment...");
-        nameField.setWidthFull();
-        nameField.getStyle()
-            .set("margin-bottom", "20px");
-
-        if (building != null) {
-            nameField.setValue(building.getName());
-        }
-
-        // Layout du contenu
-        VerticalLayout content = new VerticalLayout(nameField);
-        content.setPadding(false);
-        content.setSpacing(true);
-        dialog.add(content);
-
-        // Boutons
-        Button saveButton = new Button(building == null ? "✅ Créer" : "💾 Sauvegarder", 
-            new Icon(building == null ? VaadinIcon.CHECK : VaadinIcon.DOWNLOAD));
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.getStyle().set("margin-right", "10px");
-
-        Button cancelButton = new Button("❌ Annuler", new Icon(VaadinIcon.CLOSE));
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-
-        // Actions des boutons
-        saveButton.addClickListener(e -> {
-            String name = nameField.getValue();
-            if (name != null && !name.trim().isEmpty()) {
-                try {
-                    if (building == null) {
-                        // Nouveau bâtiment
-                        Building newBuilding = new Building();
-                        newBuilding.setName(name.trim());
-                        buildingManager.saveBuilding(newBuilding);
-                        showSuccessNotification("Bâtiment créé avec succès !");
-                    } else {
-                        // Modification
-                        building.setName(name.trim());
-                        buildingManager.updateBuilding(building);
-                        showSuccessNotification("Bâtiment modifié avec succès !");
-                    }
-                    
-                    loadData();
-                    dialog.close();
-                    
-                } catch (Exception ex) {
-                    showErrorNotification("Erreur lors de la sauvegarde", ex.getMessage());
-                }
-            } else {
-                showWarningNotification("Le nom ne peut pas être vide");
-                nameField.focus();
-            }
-        });
-
-        cancelButton.addClickListener(e -> dialog.close());
-
-        // Layout des boutons
-        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
-        dialog.getFooter().add(buttonLayout);
-
-        // Focus automatique
-        dialog.addOpenedChangeListener(e -> {
-            if (e.isOpened()) {
-                nameField.focus();
-            }
-        });
-
-        return dialog;
-    }
-
-    private void confirmDelete() {
-        if (selectedBuilding != null) {
-            ConfirmDialog confirmDialog = new ConfirmDialog();
-            confirmDialog.setHeader("Confirmer la suppression");
-            confirmDialog.setText("Êtes-vous sûr de vouloir supprimer le bâtiment \"" + 
-                                 selectedBuilding.getName() + "\" ? Cette action est irréversible.");
-
-            confirmDialog.setCancelable(true);
-            confirmDialog.setCancelText("❌ Annuler");
-            confirmDialog.setConfirmText("🗑️ Supprimer");
-            confirmDialog.setConfirmButtonTheme("error primary");
-
-            confirmDialog.addConfirmListener(e -> {
-                try {
-                    buildingManager.deleteBuildingById(selectedBuilding.getId());
-                    showSuccessNotification("Bâtiment supprimé avec succès !");
-                    loadData();
-                } catch (Exception ex) {
-                    showErrorNotification("Erreur lors de la suppression", ex.getMessage());
-                }
-            });
-
-            confirmDialog.open();
-        }
-    }
-
-    // Méthodes utilitaires pour les notifications
-    private void showSuccessNotification(String message) {
-        Notification notification = Notification.show("✅ " + message, 3000, Notification.Position.TOP_END);
-        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-    }
-
-    private void showWarningNotification(String message) {
-        Notification notification = Notification.show("⚠️ " + message, 3000, Notification.Position.TOP_END);
-        notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
     }
 
     private void showErrorNotification(String title, String message) {

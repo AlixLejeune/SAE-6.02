@@ -1,8 +1,8 @@
 package com.SAE.sae.entity.RoomObjects;
 
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;

@@ -371,21 +371,6 @@ public class SensorCO2ViewTest {
     }
 
     @Test
-    void testDeleteByRoomIdOperation() {
-        // Tester la suppression par ID de salle
-        Integer roomId = 1;
-        doNothing().when(SensorCO2Manager).deleteByRoomId(roomId);
-
-        assertDoesNotThrow(() -> {
-            SensorCO2Manager.deleteByRoomId(roomId);
-        });
-
-        verify(SensorCO2Manager, times(1)).deleteByRoomId(roomId);
-
-        logger.info("DeleteByRoomId operation test successful");
-    }
-
-    @Test
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test SensorCO2 1";

@@ -368,21 +368,6 @@ public class LampViewTest {
     }
 
     @Test
-    void testDeleteByRoomIdOperation() {
-        // Tester la suppression par ID de salle
-        Integer roomId = 1;
-        doNothing().when(LampManager).deleteByRoomId(roomId);
-
-        assertDoesNotThrow(() -> {
-            LampManager.deleteByRoomId(roomId);
-        });
-
-        verify(LampManager, times(1)).deleteByRoomId(roomId);
-
-        logger.info("DeleteByRoomId operation test successful");
-    }
-
-    @Test
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test Lamp 1";

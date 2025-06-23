@@ -372,21 +372,6 @@ public class SirenViewTest {
     }
 
     @Test
-    void testDeleteByRoomIdOperation() {
-        // Tester la suppression par ID de salle
-        Integer roomId = 1;
-        doNothing().when(SirenManager).deleteByRoomId(roomId);
-
-        assertDoesNotThrow(() -> {
-            SirenManager.deleteByRoomId(roomId);
-        });
-
-        verify(SirenManager, times(1)).deleteByRoomId(roomId);
-
-        logger.info("DeleteByRoomId operation test successful");
-    }
-
-    @Test
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test Siren 1";

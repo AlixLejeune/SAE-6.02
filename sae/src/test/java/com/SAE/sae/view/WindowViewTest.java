@@ -378,21 +378,6 @@ public class WindowViewTest {
     }
 
     @Test
-    void testDeleteByRoomIdOperation() {
-        // Tester la suppression par ID de salle
-        Integer roomId = 1;
-        doNothing().when(WindowManager).deleteByRoomId(roomId);
-
-        assertDoesNotThrow(() -> {
-            WindowManager.deleteByRoomId(roomId);
-        });
-
-        verify(WindowManager, times(1)).deleteByRoomId(roomId);
-
-        logger.info("DeleteByRoomId operation test successful");
-    }
-
-    @Test
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test Window 1";

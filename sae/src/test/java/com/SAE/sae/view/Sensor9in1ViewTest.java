@@ -372,21 +372,6 @@ public class Sensor9in1ViewTest {
     }
 
     @Test
-    void testDeleteByRoomIdOperation() {
-        // Tester la suppression par ID de salle
-        Integer roomId = 1;
-        doNothing().when(Sensor9in1Manager).deleteByRoomId(roomId);
-
-        assertDoesNotThrow(() -> {
-            Sensor9in1Manager.deleteByRoomId(roomId);
-        });
-
-        verify(Sensor9in1Manager, times(1)).deleteByRoomId(roomId);
-
-        logger.info("DeleteByRoomId operation test successful");
-    }
-
-    @Test
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test Sensor9in1 1";

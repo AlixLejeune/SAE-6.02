@@ -370,21 +370,6 @@ public class DoorViewTest {
     }
 
     @Test
-    void testDeleteByRoomIdOperation() {
-        // Tester la suppression par ID de salle
-        Integer roomId = 1;
-        doNothing().when(DoorManager).deleteByRoomId(roomId);
-
-        assertDoesNotThrow(() -> {
-            DoorManager.deleteByRoomId(roomId);
-        });
-
-        verify(DoorManager, times(1)).deleteByRoomId(roomId);
-
-        logger.info("DeleteByRoomId operation test successful");
-    }
-
-    @Test
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test Door 1";

@@ -1,452 +1,548 @@
 package com.SAE.sae.view;
 
 import com.SAE.sae.entity.Room;
+import com.SAE.sae.entity.RoomType;
 import com.SAE.sae.entity.RoomObjects.*;
 import com.SAE.sae.service.RoomManager;
+import com.SAE.sae.service.RoomTypeManager;
+import com.SAE.sae.service.RoomObjects.*;
 import com.SAE.sae.view.layouts.MainLayout;
-import com.vaadin.flow.component.html.H1;
+
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.router.*;
-
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Route(value = "room", layout = MainLayout.class)
-@PageTitle("Détails de la salle")
 public class RoomByIdView extends VerticalLayout implements HasUrlParameter<Integer> {
 
     private final RoomManager roomManager;
+    private final RoomTypeManager roomTypeManager;
+    private final LampManager lampManager;
+    private final PlugManager plugManager;
+    private final SensorCO2Manager sensorCO2Manager;
+    private final Sensor6in1Manager sensor6in1Manager;
+    private final Sensor9in1Manager sensor9in1Manager;
+    private final HeaterManager heaterManager;
+    private final WindowManager windowManager;
+    private final DoorManager doorManager;
+    private final DataTableManager dataTableManager;
+    private final SirenManager sirenManager;
+
+    private Room currentRoom;
+    private Grid<EquipmentItem> equipmentGrid = new Grid<>(EquipmentItem.class);
+    private List<EquipmentItem> allEquipmentItems; // Liste complète pour la recherche
+    private TextField searchField; // Champ de recherche
 
     @Autowired
-    public RoomByIdView(RoomManager roomManager) {
+    public RoomByIdView(RoomManager roomManager, RoomTypeManager roomTypeManager,
+                       LampManager lampManager, PlugManager plugManager,
+                       SensorCO2Manager sensorCO2Manager, Sensor6in1Manager sensor6in1Manager,
+                       Sensor9in1Manager sensor9in1Manager, HeaterManager heaterManager,
+                       WindowManager windowManager, DoorManager doorManager,
+                       DataTableManager dataTableManager, SirenManager sirenManager) {
         this.roomManager = roomManager;
-        setSpacing(true);
+        this.roomTypeManager = roomTypeManager;
+        this.lampManager = lampManager;
+        this.plugManager = plugManager;
+        this.sensorCO2Manager = sensorCO2Manager;
+        this.sensor6in1Manager = sensor6in1Manager;
+        this.sensor9in1Manager = sensor9in1Manager;
+        this.heaterManager = heaterManager;
+        this.windowManager = windowManager;
+        this.doorManager = doorManager;
+        this.dataTableManager = dataTableManager;
+        this.sirenManager = sirenManager;
+
+        // Configuration générale de la vue
+        setSizeFull();
         setPadding(true);
-        setMaxWidth("1200px");
-        setMargin(true);
+        setSpacing(true);
     }
 
     @Override
-    public void setParameter(BeforeEvent event, @OptionalParameter Integer id) {
-        removeAll(); // Clear previous content
-        
-        if (id == null) {
-            displayError("Aucun ID fourni", "Veuillez spécifier un ID de salle valide dans l'URL.");
-            return;
-        }
-
+    public void setParameter(BeforeEvent event, Integer roomId) {
         try {
-            Room room = roomManager.getRoomById(id);
-            
-            if (room == null) {
-                displayError("Salle introuvable", "Aucune salle trouvée avec l'ID " + id);
-            } else {
-                displayRoomDetails(room);
-            }
+            currentRoom = roomManager.getRoomById(roomId);
+            initializeView();
         } catch (Exception e) {
-            displayError("Erreur", "Erreur lors de la récupération de la salle : " + e.getMessage());
+            showErrorNotification("Erreur", "Salle non trouvée avec l'ID: " + roomId);
+            // Rediriger vers la liste des salles
+            event.getUI().navigate("rooms");
         }
     }
 
-    private void displayRoomDetails(Room room) {
-        // Header with room name
-        HorizontalLayout header = new HorizontalLayout();
-        header.setAlignItems(Alignment.CENTER);
+    private void initializeView() {
+        removeAll();
         
-        Icon roomIcon = new Icon(VaadinIcon.BUILDING);
-        roomIcon.setSize("2em");
-        roomIcon.getStyle().set("color", "var(--lumo-primary-color)");
+        createHeader();
+        createRoomInfoPanelCompact(); // Déplacé au sommet
+        createEquipmentGrid();
+        createLayout();
         
-        H1 title = new H1(room.getName());
-        title.getStyle().set("margin", "0").set("color", "var(--lumo-primary-color)");
-        
-        header.add(roomIcon, title);
-        add(header);
-
-        // Room ID badge
-        if (room.getId() != null) {
-            Span idBadge = new Span("ID: " + room.getId());
-            idBadge.getStyle()
-                .set("background-color", "var(--lumo-primary-color-10pct)")
-                .set("color", "var(--lumo-primary-text-color)")
-                .set("padding", "0.25rem 0.5rem")
-                .set("border-radius", "1rem")
-                .set("font-size", "0.875rem")
-                .set("font-weight", "500");
-            add(idBadge);
-        }
-
-        // Main content in horizontal layout for larger screens
-        HorizontalLayout mainContent = new HorizontalLayout();
-        mainContent.setWidthFull();
-        mainContent.setSpacing(true);
-
-        // Left column - Room info
-        VerticalLayout leftColumn = new VerticalLayout();
-        leftColumn.setWidth("40%");
-        leftColumn.setSpacing(true);
-
-        // Dimensions section
-        leftColumn.add(createSectionTitle("Dimensions", VaadinIcon.RESIZE_H));
-        leftColumn.add(createDimensionsCard(room));
-
-        // Building information section
-        if (room.getBuilding() != null) {
-            leftColumn.add(createSectionTitle("Bâtiment", VaadinIcon.BUILDING_O));
-            leftColumn.add(createBuildingCard(room));
-        }
-
-        // Room type section
-        leftColumn.add(createSectionTitle("Type de salle", VaadinIcon.TAG));
-        leftColumn.add(createRoomTypeCard(room));
-
-        // Volume calculation
-        leftColumn.add(createSectionTitle("Informations calculées", VaadinIcon.CALC));
-        leftColumn.add(createVolumeCard(room));
-
-        // Right column - Room objects
-        VerticalLayout rightColumn = new VerticalLayout();
-        rightColumn.setWidth("60%");
-        rightColumn.setSpacing(true);
-
-        rightColumn.add(createSectionTitle("Équipements et objets", VaadinIcon.CUBE));
-        rightColumn.add(createRoomObjectsSection(room));
-
-        mainContent.add(leftColumn, rightColumn);
-        add(mainContent);
+        loadEquipmentData();
     }
 
-    private Div createRoomObjectsSection(Room room) {
-        Div section = new Div();
-        section.setWidthFull();
-
-        // Group room objects by type
-        Map<String, List<RoomObject>> groupedObjects = groupRoomObjectsByType(room);
-
-        if (groupedObjects.isEmpty()) {
-            Div emptyState = createCard();
-            HorizontalLayout emptyLayout = new HorizontalLayout();
-            emptyLayout.setAlignItems(Alignment.CENTER);
-            
-            Icon emptyIcon = new Icon(VaadinIcon.INFO_CIRCLE);
-            emptyIcon.getStyle().set("color", "var(--lumo-secondary-text-color)");
-            
-            Span emptyMessage = new Span("Aucun équipement répertorié dans cette salle");
-            emptyMessage.getStyle().set("color", "var(--lumo-secondary-text-color)").set("font-style", "italic");
-            
-            emptyLayout.add(emptyIcon, emptyMessage);
-            emptyState.add(emptyLayout);
-            section.add(emptyState);
-            return section;
-        }
-
-        // Create sections for each object type
-        groupedObjects.entrySet().stream()
-            .sorted(Map.Entry.comparingByKey())
-            .forEach(entry -> {
-                String objectType = entry.getKey();
-                List<RoomObject> objects = entry.getValue();
-                
-                section.add(createObjectTypeSection(objectType, objects));
-            });
-
-        return section;
+    private void createHeader() {
+        H2 title = new H2("🏠 Détails de la Salle");
+        title.getStyle()
+            .set("color", "white")
+            .set("margin", "0 0 20px 0")
+            .set("text-align", "center")
+            .set("font-weight", "300")
+            .set("text-shadow", "2px 2px 4px rgba(0,0,0,0.3)");
+        
+        add(title);
     }
 
-    private Div createObjectTypeSection(String objectType, List<RoomObject> objects) {
-        Div typeSection = createCard();
-        
-        // Type header
-        HorizontalLayout typeHeader = new HorizontalLayout();
-        typeHeader.setAlignItems(Alignment.CENTER);
-        typeHeader.setWidthFull();
-        
-        Icon typeIcon = getIconForObjectType(objectType);
-        typeIcon.getStyle().set("color", "var(--lumo-primary-color)");
-        
-        H3 typeTitle = new H3(getDisplayNameForObjectType(objectType));
-        typeTitle.getStyle().set("margin", "0").set("flex-grow", "1");
-        
-        Span countBadge = new Span(String.valueOf(objects.size()));
-        countBadge.getStyle()
-            .set("background-color", "var(--lumo-primary-color)")
-            .set("color", "var(--lumo-primary-contrast-color)")
-            .set("padding", "0.25rem 0.5rem")
-            .set("border-radius", "50%")
-            .set("font-size", "0.75rem")
-            .set("font-weight", "bold")
-            .set("min-width", "1.5rem")
-            .set("text-align", "center");
-        
-        typeHeader.add(typeIcon, typeTitle, countBadge);
-        typeSection.add(typeHeader);
+    private void createRoomInfoPanelCompact() {
+        // Panel principal d'informations compact au sommet
+        Div infoPanel = new Div();
+        infoPanel.getStyle()
+            .set("background", "white")
+            .set("border-radius", "12px")
+            .set("padding", "15px")
+            .set("margin-bottom", "15px")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)");
 
-        // Objects grid
-        Grid<RoomObject> grid = new Grid<>();
-        grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
-        grid.setHeight("auto");
-        
-        grid.addColumn(obj -> obj.getId()).setHeader("ID").setWidth("80px").setFlexGrow(0);
-        grid.addColumn(obj -> obj.getCustomName() != null ? obj.getCustomName() : "Sans nom")
-            .setHeader("Nom personnalisé").setFlexGrow(1);
-        
-        // Position columns (if object implements IPosition)
-        grid.addColumn(obj -> formatPosition(obj)).setHeader("Position (X, Y, Z)").setFlexGrow(1);
-        
-        // Size columns (if object implements ISize)
-        grid.addColumn(obj -> formatSize(obj)).setHeader("Dimensions (L×l×h)").setFlexGrow(1);
+        // Titre de la salle
+        H3 roomTitle = new H3("📍 " + currentRoom.getName());
+        roomTitle.getStyle()
+            .set("margin", "0 0 12px 0")
+            .set("color", "#2c3e50")
+            .set("font-weight", "600")
+            .set("font-size", "1.3em");
 
-        grid.setItems(objects);
-        typeSection.add(grid);
-        
-        return typeSection;
+        // Layout horizontal pour les informations - SEULEMENT 2 colonnes
+        HorizontalLayout infoLayout = new HorizontalLayout();
+        infoLayout.setWidthFull();
+        infoLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        infoLayout.setAlignItems(FlexComponent.Alignment.START);
+        infoLayout.setSpacing(true);
+
+        // Informations générales
+        VerticalLayout generalInfo = createCompactInfoCard("🏢 Informations", 
+            "ID: " + currentRoom.getId(),
+            "Bâtiment: " + (currentRoom.getBuilding() != null ? currentRoom.getBuilding().getName() : "Aucun"),
+            "Type: " + getRoomTypeName());
+
+        // Dimensions
+        VerticalLayout dimensionsInfo = createCompactInfoCard("📐 Dimensions",
+            String.format("%.1f × %.1f × %.1f m", currentRoom.getWidth(), currentRoom.getLength(), currentRoom.getHeight()),
+            String.format("Volume: %.1f m³", currentRoom.getWidth() * currentRoom.getLength() * currentRoom.getHeight()));
+
+        // SEULEMENT 2 colonnes - pas de colonne équipements vide
+        infoLayout.add(generalInfo, dimensionsInfo);
+        infoPanel.add(roomTitle, infoLayout);
+        add(infoPanel);
     }
 
-    private String formatPosition(RoomObject obj) {
-        try {
-            // Use reflection to get position values
-            Double posX = getFieldValue(obj, "posX");
-            Double posY = getFieldValue(obj, "posY");
-            Double posZ = getFieldValue(obj, "posZ");
-            
-            if (posX != null && posY != null && posZ != null) {
-                return String.format("%.1f, %.1f, %.1f", posX, posY, posZ);
-            }
-        } catch (Exception e) {
-            // Ignore reflection errors
-        }
-        return "Non définie";
-    }
-
-    private String formatSize(RoomObject obj) {
-        try {
-            // Use reflection to get size values
-            Double sizeX = getFieldValue(obj, "sizeX");
-            Double sizeY = getFieldValue(obj, "sizeY");
-            Double sizeZ = getFieldValue(obj, "sizeZ");
-            
-            if (sizeX != null && sizeY != null && sizeZ != null) {
-                return String.format("%.1f×%.1f×%.1f", sizeX, sizeY, sizeZ);
-            }
-        } catch (Exception e) {
-            // Ignore reflection errors
-        }
-        return "Non définie";
-    }
-
-    private Double getFieldValue(Object obj, String fieldName) {
-        try {
-            var field = obj.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return (Double) field.get(obj);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private Map<String, List<RoomObject>> groupRoomObjectsByType(Room room) {
-        // This would need to be implemented based on your service layer
-        // For now, return empty map as we don't have access to the room objects
-        // You'll need to add a method to get room objects by room ID
-        return new HashMap<>();
-    }
-
-    private Icon getIconForObjectType(String objectType) {
-        return switch (objectType.toLowerCase()) {
-            case "door" -> new Icon(VaadinIcon.ARROW_RIGHT);
-            case "window" -> new Icon(VaadinIcon.MODAL);
-            case "datatable" -> new Icon(VaadinIcon.TABLE);
-            case "heater" -> new Icon(VaadinIcon.FIRE);
-            case "lamp" -> new Icon(VaadinIcon.LIGHTBULB);
-            case "plug" -> new Icon(VaadinIcon.PLUG);
-            case "siren" -> new Icon(VaadinIcon.BELL);
-            case "sensor6in1", "sensor9in1", "sensorco2" -> new Icon(VaadinIcon.DOT_CIRCLE);
-            default -> new Icon(VaadinIcon.CUBE);
-        };
-    }
-
-    private String getDisplayNameForObjectType(String objectType) {
-        return switch (objectType.toLowerCase()) {
-            case "door" -> "Portes";
-            case "window" -> "Fenêtres";
-            case "datatable" -> "Tables";
-            case "heater" -> "Radiateurs";
-            case "lamp" -> "Éclairages";
-            case "plug" -> "Prises électriques";
-            case "siren" -> "Sirènes";
-            case "sensor6in1" -> "Capteurs 6-en-1";
-            case "sensor9in1" -> "Capteurs 9-en-1";
-            case "sensorco2" -> "Capteurs CO2";
-            default -> objectType;
-        };
-    }
-
-    private HorizontalLayout createSectionTitle(String title, VaadinIcon iconType) {
-        HorizontalLayout titleLayout = new HorizontalLayout();
-        titleLayout.setAlignItems(Alignment.CENTER);
-        titleLayout.getStyle().set("margin-top", "1.5rem").set("margin-bottom", "0.5rem");
-        
-        Icon icon = new Icon(iconType);
-        icon.setSize("1.2em");
-        icon.getStyle().set("color", "var(--lumo-secondary-text-color)");
-        
-        H2 sectionTitle = new H2(title);
-        sectionTitle.getStyle().set("margin", "0").set("font-size", "1.25rem");
-        
-        titleLayout.add(icon, sectionTitle);
-        return titleLayout;
-    }
-
-    private Div createDimensionsCard(Room room) {
-        Div card = createCard();
-        
-        HorizontalLayout dimensionsLayout = new HorizontalLayout();
-        dimensionsLayout.setWidthFull();
-        dimensionsLayout.setJustifyContentMode(JustifyContentMode.AROUND);
-        
-        dimensionsLayout.add(
-            createDimensionItem("Longueur", room.getLength(), "m", VaadinIcon.ARROW_CIRCLE_RIGHT_O),
-            createDimensionItem("Largeur", room.getWidth(), "m", VaadinIcon.ARROW_CIRCLE_LEFT_O),
-            createDimensionItem("Hauteur", room.getHeight(), "m", VaadinIcon.ARROW_CIRCLE_UP_O)
-        );
-        
-        card.add(dimensionsLayout);
-        return card;
-    }
-
-    private VerticalLayout createDimensionItem(String label, double value, String unit, VaadinIcon iconType) {
-        VerticalLayout item = new VerticalLayout();
-        item.setAlignItems(Alignment.CENTER);
-        item.setSpacing(false);
-        
-        Icon icon = new Icon(iconType);
-        icon.getStyle().set("color", "var(--lumo-primary-color)");
-        
-        Span valueSpan = new Span(String.format("%.1f %s", value, unit));
-        valueSpan.getStyle().set("font-size", "1.5rem").set("font-weight", "bold");
-        
-        Span labelSpan = new Span(label);
-        labelSpan.getStyle().set("color", "var(--lumo-secondary-text-color)").set("font-size", "0.875rem");
-        
-        item.add(icon, valueSpan, labelSpan);
-        return item;
-    }
-
-    private Div createBuildingCard(Room room) {
-        Div card = createCard();
-        
-        HorizontalLayout buildingLayout = new HorizontalLayout();
-        buildingLayout.setAlignItems(Alignment.CENTER);
-        
-        Icon buildingIcon = new Icon(VaadinIcon.BUILDING);
-        buildingIcon.getStyle().set("color", "var(--lumo-primary-color)");
-        
-        VerticalLayout buildingInfo = new VerticalLayout();
-        buildingInfo.setSpacing(false);
-        buildingInfo.setPadding(false);
-        
-        Span buildingName = new Span(room.getBuilding().getName() != null ? room.getBuilding().getName() : "Nom non disponible");
-        buildingName.getStyle().set("font-weight", "bold");
-        
-        buildingInfo.add(buildingName);
-        
-        buildingLayout.add(buildingIcon, buildingInfo);
-        card.add(buildingLayout);
-        return card;
-    }
-
-    private Div createRoomTypeCard(Room room) {
-        Div card = createCard();
-        
-        HorizontalLayout typeLayout = new HorizontalLayout();
-        typeLayout.setAlignItems(Alignment.CENTER);
-        
-        Icon typeIcon = new Icon(VaadinIcon.TAG);
-        typeIcon.getStyle().set("color", "var(--lumo-primary-color)");
-        
-        Span typeId = new Span("ID du type: " + room.getFkRoomTypeId());
-        typeId.getStyle().set("font-weight", "500");
-        
-        typeLayout.add(typeIcon, typeId);
-        card.add(typeLayout);
-        return card;
-    }
-
-    private Div createVolumeCard(Room room) {
-        Div card = createCard();
-        
-        double volume = room.getLength() * room.getWidth() * room.getHeight();
-        
-        HorizontalLayout volumeLayout = new HorizontalLayout();
-        volumeLayout.setAlignItems(Alignment.CENTER);
-        
-        Icon volumeIcon = new Icon(VaadinIcon.CUBE);
-        volumeIcon.getStyle().set("color", "var(--lumo-primary-color)");
-        
-        VerticalLayout volumeInfo = new VerticalLayout();
-        volumeInfo.setSpacing(false);
-        volumeInfo.setPadding(false);
-        
-        Span volumeValue = new Span(String.format("%.2f m³", volume));
-        volumeValue.getStyle().set("font-size", "1.25rem").set("font-weight", "bold");
-        
-        Span volumeLabel = new Span("Volume total");
-        volumeLabel.getStyle().set("color", "var(--lumo-secondary-text-color)").set("font-size", "0.875rem");
-        
-        volumeInfo.add(volumeValue, volumeLabel);
-        volumeLayout.add(volumeIcon, volumeInfo);
-        card.add(volumeLayout);
-        return card;
-    }
-
-    private Div createCard() {
-        Div card = new Div();
+    private VerticalLayout createCompactInfoCard(String title, String... items) {
+        VerticalLayout card = new VerticalLayout();
+        card.setPadding(false);
+        card.setSpacing(false);
         card.getStyle()
-            .set("background-color", "var(--lumo-base-color)")
-            .set("border", "1px solid var(--lumo-contrast-20pct)")
+            .set("background", "#f8f9fa")
             .set("border-radius", "8px")
-            .set("padding", "1rem")
-            .set("margin-bottom", "1rem")
-            .set("box-shadow", "0 1px 3px rgba(0, 0, 0, 0.1)");
+            .set("padding", "12px")
+            .set("min-width", "250px")
+            .set("flex", "1"); // Permet aux cards de prendre l'espace disponible
+
+        H3 cardTitle = new H3(title);
+        cardTitle.getStyle()
+            .set("margin", "0 0 8px 0")
+            .set("font-size", "1em")
+            .set("color", "#495057")
+            .set("font-weight", "500");
+
+        card.add(cardTitle);
+
+        for (String item : items) {
+            Span itemSpan = new Span(item);
+            itemSpan.getStyle()
+                .set("font-size", "0.9em")
+                .set("color", "#6c757d")
+                .set("display", "block")
+                .set("margin-bottom", "4px")
+                .set("line-height", "1.3");
+            card.add(itemSpan);
+        }
+
         return card;
     }
 
-    private void displayError(String title, String message) {
-        HorizontalLayout errorHeader = new HorizontalLayout();
-        errorHeader.setAlignItems(Alignment.CENTER);
+    private void createEquipmentSearchField() {
+        searchField = new TextField();
+        searchField.setPlaceholder("🔍 Rechercher dans les équipements...");
+        searchField.setWidth("400px");
+        searchField.setClearButtonVisible(true);
+        searchField.setValueChangeMode(ValueChangeMode.LAZY);
+        searchField.setValueChangeTimeout(300);
         
-        Icon errorIcon = new Icon(VaadinIcon.EXCLAMATION_CIRCLE);
-        errorIcon.setSize("1.5em");
-        errorIcon.getStyle().set("color", "var(--lumo-error-color)");
-        
-        H2 errorTitle = new H2(title);
-        errorTitle.getStyle().set("margin", "0").set("color", "var(--lumo-error-color)");
-        
-        errorHeader.add(errorIcon, errorTitle);
-        add(errorHeader);
-        
-        Div errorCard = new Div();
-        errorCard.getStyle()
-            .set("background-color", "var(--lumo-error-color-10pct)")
-            .set("border", "1px solid var(--lumo-error-color-50pct)")
+        searchField.getStyle()
             .set("border-radius", "8px")
-            .set("padding", "1rem")
-            .set("margin-top", "1rem");
+            .set("font-size", "14px")
+            .set("background", "white")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
+            .set("border", "1px solid rgba(255,255,255,0.3)");
+
+        searchField.addValueChangeListener(e -> filterEquipment(e.getValue()));
+
+        // Container pour centrer la barre de recherche avec style blanc
+        Div searchContainer = new Div();
+        searchContainer.getStyle()
+            .set("text-align", "center")
+            .set("margin-bottom", "15px")
+            .set("background", "white")
+            .set("border-radius", "10px")
+            .set("padding", "15px")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
+            .set("backdrop-filter", "blur(10px)")
+            .set("border", "1px solid rgba(255,255,255,0.2)");
         
-        Span errorMessage = new Span(message);
-        errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
-        errorCard.add(errorMessage);
-        add(errorCard);
+        searchContainer.add(searchField);
+        add(searchContainer);
+    }
+
+    private void createEquipmentGrid() {
+        // En-tête pour le tableau des équipements
+        H3 equipmentTitle = new H3("🔧 Équipements de la salle");
+        equipmentTitle.getStyle()
+            .set("color", "white")
+            .set("margin", "20px 0 10px 0")
+            .set("text-align", "center")
+            .set("font-weight", "300")
+            .set("text-shadow", "2px 2px 4px rgba(0,0,0,0.3)");
+
+        add(equipmentTitle);
+
+        // Créer la barre de recherche
+        createEquipmentSearchField();
+
+        // Configuration du grid
+        equipmentGrid.removeAllColumns();
+
+        equipmentGrid.addColumn(EquipmentItem::getType)
+            .setHeader("Type")
+            .setWidth("140px")
+            .setFlexGrow(0);
+
+        equipmentGrid.addColumn(EquipmentItem::getName)
+            .setHeader("Nom")
+            .setFlexGrow(2);
+
+        equipmentGrid.addColumn(EquipmentItem::getPosition)
+            .setHeader("Position (X, Y, Z)")
+            .setFlexGrow(1);
+
+        equipmentGrid.addColumn(EquipmentItem::getSize)
+            .setHeader("Taille (L × l × H)")
+            .setFlexGrow(1);
+
+        // Configuration pour occuper BEAUCOUP plus d'espace vertical
+        equipmentGrid.setSizeFull();
+        equipmentGrid.setMinHeight("600px"); // Augmenté de 400px à 600px
+        equipmentGrid.setMaxHeight("90vh"); // Augmenté de 80vh à 90vh
+        
+        // Style du grid
+        equipmentGrid.getStyle()
+            .set("border-radius", "12px")
+            .set("overflow", "hidden")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)");
+
+        // Classe pour les types d'équipements avec couleurs
+        equipmentGrid.setClassNameGenerator(item -> "equipment-" + item.getType().toLowerCase().replace(" ", "-").replace("💡", "").replace("🔌", "").replace("🌫️", "").replace("🔬", "").replace("🔥", "").replace("🪟", "").replace("🚪", "").replace("📊", "").replace("🚨", "").trim());
+
+        // Injection CSS pour les couleurs
+        equipmentGrid.getElement().executeJs(
+            "this.shadowRoot.querySelector('style').textContent += " +
+            "'.equipment-lampe { background-color: #fff3cd; }' + " +
+            "'.equipment-prise { background-color: #d4edda; }' + " +
+            "'.equipment-capteur-co2 { background-color: #cce5ff; }' + " +
+            "'.equipment-capteur-6-en-1 { background-color: #e2d5f1; }' + " +
+            "'.equipment-capteur-9-en-1 { background-color: #f8d7da; }' + " +
+            "'.equipment-radiateur { background-color: #ffeaa7; }' + " +
+            "'.equipment-fenêtre { background-color: #a8e6cf; }' + " +
+            "'.equipment-porte { background-color: #dcedc1; }' + " +
+            "'.equipment-table-de-données { background-color: #ffd3a5; }' + " +
+            "'.equipment-sirène { background-color: #ffaaa5; }'"
+        );
+    }
+
+    private void createLayout() {
+        // Container pour le grid avec BEAUCOUP plus d'espace vertical
+        Div gridContainer = new Div();
+        gridContainer.setSizeFull();
+        gridContainer.getStyle()
+            .set("background", "white")
+            .set("border-radius", "12px")
+            .set("padding", "20px")
+            .set("box-shadow", "0 4px 15px rgba(0,0,0,0.1)")
+            .set("overflow", "hidden")
+            .set("flex-grow", "2") // Augmenté de 1 à 2
+            .set("min-height", "70vh"); // Hauteur minimale augmentée
+
+        gridContainer.add(equipmentGrid);
+        add(gridContainer);
+        
+        // Permet à ce container de prendre tout l'espace disponible
+        expand(gridContainer);
+    }
+
+    private void filterEquipment(String searchTerm) {
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            equipmentGrid.setItems(allEquipmentItems);
+        } else {
+            List<EquipmentItem> filteredItems = allEquipmentItems.stream()
+                .filter(item -> item.getName().toLowerCase().contains(searchTerm.toLowerCase()) ||
+                                item.getType().toLowerCase().contains(searchTerm.toLowerCase()))
+                .collect(Collectors.toList());
+            equipmentGrid.setItems(filteredItems);
+        }
+    }
+
+    private void loadEquipmentData() {
+        List<EquipmentItem> equipmentList = new ArrayList<>();
+        Long roomId = currentRoom.getId().longValue();
+
+        try {
+            // Charger tous les types d'équipements
+            loadLamps(equipmentList, roomId);
+            loadPlugs(equipmentList, roomId);
+            loadSensorCO2s(equipmentList, roomId);
+            loadSensor6in1s(equipmentList, roomId);
+            loadSensor9in1s(equipmentList, roomId);
+            loadHeaters(equipmentList, roomId);
+            loadWindows(equipmentList, roomId);
+            loadDoors(equipmentList, roomId);
+            loadDataTables(equipmentList, roomId);
+            loadSirens(equipmentList, roomId);
+
+            // Stocker la liste complète pour la recherche
+            allEquipmentItems = new ArrayList<>(equipmentList);
+            
+            equipmentGrid.setItems(equipmentList);
+            updateEquipmentStats(equipmentList);
+
+            Notification notification = Notification.show(
+                "✅ " + equipmentList.size() + " équipement(s) trouvé(s)",
+                3000,
+                Notification.Position.TOP_END
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+            // Clear la recherche
+            if (searchField != null) {
+                searchField.clear();
+            }
+
+        } catch (Exception e) {
+            
+        }
+    }
+
+    private void loadLamps(List<EquipmentItem> list, Long roomId) {
+        List<Lamp> lamps = lampManager.findByRoomId(roomId);
+        for (Lamp lamp : lamps) {
+            list.add(new EquipmentItem(
+                "💡 Lampe",
+                lamp.getCustomName(),
+                formatPosition(lamp.getPosX(), lamp.getPosY(), lamp.getPosZ()),
+                "-"
+            ));
+        }
+    }
+
+    private void loadPlugs(List<EquipmentItem> list, Long roomId) {
+        List<Plug> plugs = plugManager.findByRoomId(roomId);
+        for (Plug plug : plugs) {
+            list.add(new EquipmentItem(
+                "🔌 Prise",
+                plug.getCustomName(),
+                formatPosition(plug.getPosX(), plug.getPosY(), plug.getPosZ()),
+                "-"
+            ));
+        }
+    }
+
+    private void loadSensorCO2s(List<EquipmentItem> list, Long roomId) {
+        List<SensorCO2> sensors = sensorCO2Manager.findByRoomId(roomId);
+        for (SensorCO2 sensor : sensors) {
+            list.add(new EquipmentItem(
+                "🌫️ Capteur CO2",
+                sensor.getCustomName(),
+                formatPosition(sensor.getPosX(), sensor.getPosY(), sensor.getPosZ()),
+                "-"
+            ));
+        }
+    }
+
+    private void loadSensor6in1s(List<EquipmentItem> list, Long roomId) {
+        List<Sensor6in1> sensors = sensor6in1Manager.findByRoomId(roomId);
+        for (Sensor6in1 sensor : sensors) {
+            list.add(new EquipmentItem(
+                "🔬 Capteur 6-en-1",
+                sensor.getCustomName(),
+                formatPosition(sensor.getPosX(), sensor.getPosY(), sensor.getPosZ()),
+                "-"
+            ));
+        }
+    }
+
+    private void loadSensor9in1s(List<EquipmentItem> list, Long roomId) {
+        List<Sensor9in1> sensors = sensor9in1Manager.findByRoomId(roomId);
+        for (Sensor9in1 sensor : sensors) {
+            list.add(new EquipmentItem(
+                "🔬 Capteur 9-en-1",
+                sensor.getCustomName(),
+                formatPosition(sensor.getPosX(), sensor.getPosY(), sensor.getPosZ()),
+                "-"
+            ));
+        }
+    }
+
+    private void loadHeaters(List<EquipmentItem> list, Long roomId) {
+        List<Heater> heaters = heaterManager.findByRoomId(roomId);
+        for (Heater heater : heaters) {
+            list.add(new EquipmentItem(
+                "🔥 Radiateur",
+                heater.getCustomName(),
+                formatPosition(heater.getPosX(), heater.getPosY(), heater.getPosZ()),
+                formatSize(heater.getSizeX(), heater.getSizeY(), heater.getSizeZ())
+            ));
+        }
+    }
+
+    private void loadWindows(List<EquipmentItem> list, Long roomId) {
+        List<Window> windows = windowManager.findByRoomId(roomId);
+        for (Window window : windows) {
+            list.add(new EquipmentItem(
+                "🪟 Fenêtre",
+                window.getCustomName(),
+                formatPosition(window.getPosX(), window.getPosY(), window.getPosZ()),
+                formatSize(window.getSizeX(), window.getSizeY(), window.getSizeZ())
+            ));
+        }
+    }
+
+    private void loadDoors(List<EquipmentItem> list, Long roomId) {
+        List<Door> doors = doorManager.findByRoomId(roomId);
+        for (Door door : doors) {
+            list.add(new EquipmentItem(
+                "🚪 Porte",
+                door.getCustomName(),
+                formatPosition(door.getPosX(), door.getPosY(), door.getPosZ()),
+                formatSize(door.getSizeX(), door.getSizeY(), door.getSizeZ())
+            ));
+        }
+    }
+
+    private void loadDataTables(List<EquipmentItem> list, Long roomId) {
+        List<DataTable> dataTables = dataTableManager.findByRoomId(roomId);
+        for (DataTable dataTable : dataTables) {
+            list.add(new EquipmentItem(
+                "📊 Table de données",
+                dataTable.getCustomName(),
+                formatPosition(dataTable.getPosX(), dataTable.getPosY(), dataTable.getPosZ()),
+                formatSize(dataTable.getSizeX(), dataTable.getSizeY(), dataTable.getSizeZ())
+            ));
+        }
+    }
+
+    private void loadSirens(List<EquipmentItem> list, Long roomId) {
+        List<Siren> sirens = sirenManager.findByRoomId(roomId);
+        for (Siren siren : sirens) {
+            list.add(new EquipmentItem(
+                "🚨 Sirène",
+                siren.getCustomName(),
+                formatPosition(siren.getPosX(), siren.getPosY(), siren.getPosZ()),
+                "-"
+            ));
+        }
+    }
+
+    private void updateEquipmentStats(List<EquipmentItem> equipmentList) {
+        // Compter par type pour information (optionnel, pour les logs)
+        long lampCount = equipmentList.stream().filter(e -> e.getType().contains("Lampe")).count();
+        long plugCount = equipmentList.stream().filter(e -> e.getType().contains("Prise")).count();
+        long sensorCount = equipmentList.stream().filter(e -> e.getType().contains("Capteur")).count();
+        long heaterCount = equipmentList.stream().filter(e -> e.getType().contains("Radiateur")).count();
+        long windowCount = equipmentList.stream().filter(e -> e.getType().contains("Fenêtre")).count();
+        long doorCount = equipmentList.stream().filter(e -> e.getType().contains("Porte")).count();
+        long dataTableCount = equipmentList.stream().filter(e -> e.getType().contains("Table")).count();
+        long sirenCount = equipmentList.stream().filter(e -> e.getType().contains("Sirène")).count();
+        
+        // Optionnel: Log pour debug
+        System.out.println("Équipements chargés: " + equipmentList.size() + 
+                      " (Lampes: " + lampCount + ", Prises: " + plugCount + ", etc.)");
+    }
+
+    private String getRoomTypeName() {
+        if (currentRoom.getFkRoomTypeId() > 0) {
+            try {
+                RoomType roomType = roomTypeManager.getRoomTypeById(currentRoom.getFkRoomTypeId());
+                return roomType != null ? roomType.getName() : "Type inconnu";
+            } catch (Exception e) {
+                return "Erreur de chargement";
+            }
+        }
+        return "Aucun type défini";
+    }
+
+    private String formatPosition(Double x, Double y, Double z) {
+        if (x == null || y == null || z == null) {
+            return "Position non définie";
+        }
+        return String.format("%.1f, %.1f, %.1f", x, y, z);
+    }
+
+    private String formatSize(Double x, Double y, Double z) {
+        if (x == null || y == null || z == null) {
+            return "-";
+        }
+        return String.format("%.1f × %.1f × %.1f", x, y, z);
+    }
+
+    private void showErrorNotification(String title, String message) {
+        Notification notification = Notification.show("❌ " + title + ": " + message, 5000, Notification.Position.TOP_END);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+    }
+
+    // Classe interne pour représenter un équipement dans le grid
+    public static class EquipmentItem {
+        private String type;
+        private String name;
+        private String position;
+        private String size;
+
+        public EquipmentItem(String type, String name, String position, String size) {
+            this.type = type;
+            this.name = name;
+            this.position = position;
+            this.size = size;
+        }
+
+        public String getType() { return type; }
+        public String getName() { return name; }
+        public String getPosition() { return position; }
+        public String getSize() { return size; }
     }
 }

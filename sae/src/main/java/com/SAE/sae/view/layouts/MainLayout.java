@@ -150,8 +150,12 @@ public class MainLayout extends AppLayout {
             UI.getCurrent().navigate("lamps");
         });
         
-        Button sensorsBtn = createMenuButton("🌡️ Capteurs CO2", VaadinIcon.CHART, () -> {
+        Button sensorsBtnCo2 = createMenuButton("🌡️ Capteurs CO2", VaadinIcon.SIGNAL, () -> {
             UI.getCurrent().navigate("sensorco2");
+        });
+
+        Button sensors9Btn = createMenuButton("📡 Capteurs 9in1", VaadinIcon.SIGNAL, () -> {
+            UI.getCurrent().navigate("sensor9in1");
         });
         
         Button sensors6Btn = createMenuButton("📡 Capteurs 6-in-1", VaadinIcon.SIGNAL, () -> {
@@ -162,15 +166,27 @@ public class MainLayout extends AppLayout {
             UI.getCurrent().navigate("heaters");
         });
         
-        Button windowsBtn = createMenuButton("🪟 Fenêtres", VaadinIcon.VIEWPORT, () -> {
+        Button windowsBtn = createMenuButton("🪟 Fenêtres", VaadinIcon.HOME, () -> {
             UI.getCurrent().navigate("windows");
         });
         
         Button doorsBtn = createMenuButton("🚪 Portes", VaadinIcon.HOME, () -> {
             UI.getCurrent().navigate("doors");
         });
+
+        Button plugBtn = createMenuButton("🔌 Prises", VaadinIcon.PLUG, () -> {
+            UI.getCurrent().navigate("doors");
+        });
+
+        Button sirenBtn = createMenuButton("🚨 Alarmes", VaadinIcon.ALARM, () -> {
+            UI.getCurrent().navigate("doors");
+        });
+
+        Button tableBtn = createMenuButton("🗄 Tables", VaadinIcon.HOME, () -> {
+            UI.getCurrent().navigate("doors");
+        });
         
-        mainMenu.add(separator1, devicesLabel, lampsBtn, sensorsBtn, sensors6Btn, 
+        mainMenu.add(separator1, devicesLabel, lampsBtn, sensorsBtnCo2, sensors6Btn, sensors9Btn, plugBtn, sirenBtn, tableBtn,
                     heatersBtn, windowsBtn, doorsBtn);
         
         menuContainer.add(mainMenu);

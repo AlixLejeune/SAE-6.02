@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.SAE.sae.entity.Building;
 import com.SAE.sae.repository.BuildingRepository;
+import com.SAE.sae.service.BuildingManager;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BuildingController {
     
-    private final BuildingRepository BuildingRepository;
+    private final BuildingManager buildingManager;
 
     /**
      * Récupère toutes les entités Building.
@@ -36,7 +38,7 @@ public class BuildingController {
      */
     @GetMapping
     public ResponseEntity<List<Building>> getAllBuildings() {
-        return ResponseEntity.ok(BuildingRepository.findAll());
+        return ResponseEntity.ok(buildingManager.getAllBuildings());
     }
 
     /**
@@ -46,9 +48,7 @@ public class BuildingController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Building> getBuildingById(@PathVariable Integer id) {
-        return BuildingRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(buildingManager.getBuildingById(id));
     }
 
     /**
@@ -58,7 +58,7 @@ public class BuildingController {
      */
     @GetMapping("/by-custom-name")
     public ResponseEntity<List<Building>> getByName(@RequestParam String name) {
-        return ResponseEntity.ok(BuildingRepository.findByName(name));
+        return ResponseEntity.ok(buildingManager.getBuildingByName(name));
     }
 
     /**
@@ -68,7 +68,7 @@ public class BuildingController {
      */
     @PostMapping
     public ResponseEntity<Building> createBuilding(@RequestBody Building Building) {
-        return ResponseEntity.ok(BuildingRepository.save(Building));
+        return ResponseEntity.ok(buildingManager.saveBuilding(Building));
     }
 
     /**
@@ -78,21 +78,18 @@ public class BuildingController {
      */
     @PutMapping
     public ResponseEntity<Building> updateBuilding(@RequestBody Building Building) {
-        return ResponseEntity.ok(BuildingRepository.save(Building));
+        return ResponseEntity.ok(buildingManager.updateBuilding(Building));
     }
 
     /**
-     * Supprime une Building par son identifiant.
+     * Supprime un Building par son identifiant.
      * @param id ID de la Building à supprimer.
      * @return Message de confirmation ou erreur 404.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBuilding(@PathVariable Integer id) {
-        if (!BuildingRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        BuildingRepository.deleteById(id);
-        return ResponseEntity.ok("Building supprimée avec succès");
+        buildingManager.deleteBuildingById(id);
+        return ResponseEntity.ok("Building supprimé avec succès");
     }
 
 
@@ -104,7 +101,7 @@ public class BuildingController {
     @DeleteMapping("/by-custom-name")
     @Transactional
     public ResponseEntity<String> deleteByName(@RequestParam String name) {
-        BuildingRepository.deleteByName(name);
+        buildingManager.deleteBuildingsByName(name);
         return ResponseEntity.ok("Tous les Buildings avec ce nom ont été supprimées");
     }
 }

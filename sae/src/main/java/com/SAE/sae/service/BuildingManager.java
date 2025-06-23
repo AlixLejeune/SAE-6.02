@@ -48,4 +48,14 @@ public class BuildingManager {
         buildingRepo.deleteById(id);
         log.info("building with id {} has been deleted sucessfully.", id);
     }
+
+    public List<Building> getBuildingByName(String name){
+        log.info("Return all buildings named " + name);
+        return buildingRepo.findByName(name);
+    }
+
+    public void deleteBuildingsByName(String name){
+        log.info("Deleted all buildings named " + name);
+        buildingRepo.deleteByName(name);
+    }
 }

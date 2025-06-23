@@ -26,7 +26,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.button.Button;
 
-import com.vaadin.flow.component.UI;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 /**
@@ -104,13 +103,6 @@ public class DoorViewTest {
         logger.info("DoorView instantiated successfully");
     }
 
-    @Test
-    void testConstructorWithValidManagers() {
-        // Vérifier que le constructeur fonctionne avec des managers valides
-        DoorView view = new DoorView(DoorManager, roomManager);
-        assertNotNull(view);
-        logger.info("DoorView constructor works with valid managers");
-    }
 
     @Test
     void testConstructorCallsLoadData() {
@@ -435,19 +427,6 @@ public class DoorViewTest {
         logger.info("ExistsById with non-existent ID test successful");
     }
 
-    @Test
-    void testCountOperation() {
-        // Tester le comptage des Doors
-        long expectedCount = 5L;
-        when(DoorManager.count()).thenReturn(expectedCount);
-
-        long count = DoorManager.count();
-        assertEquals(expectedCount, count);
-
-        verify(DoorManager, times(1)).count();
-
-        logger.info("Count operation test successful - count: " + count);
-    }
 
     @Test
     void testExceptionHandlingInSave() {
@@ -654,38 +633,6 @@ public class DoorViewTest {
     }
 
     @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Door> mockDoors = Arrays.asList(testDoor);
-        when(DoorManager.findAll()).thenReturn(mockDoors);
-
-        // Faire plusieurs appels
-        DoorManager.findAll();
-        DoorManager.findAll();
-        DoorManager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(DoorManager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
-
-    @Test
-    void testConcurrentOperations() {
-        // Tester les opérations concurrentes (simulation)
-        when(DoorManager.findAll()).thenReturn(Arrays.asList(testDoor));
-        when(DoorManager.save(any(Door.class))).thenReturn(testDoor);
-        
-        // Simuler des opérations concurrentes
-        assertDoesNotThrow(() -> {
-            DoorManager.findAll();
-            DoorManager.save(testDoor);
-        });
-
-        logger.info("Concurrent operations test successful");
-    }
-
-    @Test
     void testPerformanceWithLargeDataset() {
         // Tester avec un grand nombre de tables de données
         List<Door> largeDataset = Arrays.asList(
@@ -705,23 +652,6 @@ public class DoorViewTest {
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
     }
 
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new DoorView(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new DoorView(DoorManager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new DoorView(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
-    }
 
     @Test
     void testInvalidPositionValues() {

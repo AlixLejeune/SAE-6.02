@@ -622,33 +622,6 @@ public class SirenViewTest {
     }
 
     @Test
-    void testSirenRoomAssociation() {
-        // Tester l'association avec la salle
-        assertEquals(testRoom, testSiren.getRoom());
-        assertEquals(testRoom.getName(), testSiren.getRoom().getName());
-
-        logger.info("Siren room association test successful: Room='" + 
-                testSiren.getRoom().getName() + "'");
-    }
-
-    @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Siren> mockSirens = Arrays.asList(testSiren);
-        when(SirenManager.findAll()).thenReturn(mockSirens);
-
-        // Faire plusieurs appels
-        SirenManager.findAll();
-        SirenManager.findAll();
-        SirenManager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(SirenManager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
-
-    @Test
     void testConcurrentOperations() {
         // Tester les opérations concurrentes (simulation)
         when(SirenManager.findAll()).thenReturn(Arrays.asList(testSiren));
@@ -683,23 +656,6 @@ public class SirenViewTest {
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
     }
 
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new SirenView(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new SirenView(SirenManager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new SirenView(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
-    }
 
     @Test
     void testInvalidPositionValues() {

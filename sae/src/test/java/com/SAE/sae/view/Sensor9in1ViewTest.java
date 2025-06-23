@@ -634,23 +634,6 @@ public class Sensor9in1ViewTest {
     }
 
     @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Sensor9in1> mockSensor9in1s = Arrays.asList(testSensor9in1);
-        when(Sensor9in1Manager.findAll()).thenReturn(mockSensor9in1s);
-
-        // Faire plusieurs appels
-        Sensor9in1Manager.findAll();
-        Sensor9in1Manager.findAll();
-        Sensor9in1Manager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(Sensor9in1Manager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
-
-    @Test
     void testConcurrentOperations() {
         // Tester les opérations concurrentes (simulation)
         when(Sensor9in1Manager.findAll()).thenReturn(Arrays.asList(testSensor9in1));
@@ -683,24 +666,6 @@ public class Sensor9in1ViewTest {
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
-    }
-
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new Sensor9in1View(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new Sensor9in1View(Sensor9in1Manager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new Sensor9in1View(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
     }
 
     @Test

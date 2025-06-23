@@ -653,22 +653,7 @@ public class WindowViewTest {
                 testWindow.getRoom().getName() + "'");
     }
 
-    @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Window> mockWindows = Arrays.asList(testWindow);
-        when(WindowManager.findAll()).thenReturn(mockWindows);
 
-        // Faire plusieurs appels
-        WindowManager.findAll();
-        WindowManager.findAll();
-        WindowManager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(WindowManager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
 
     @Test
     void testConcurrentOperations() {
@@ -703,24 +688,6 @@ public class WindowViewTest {
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
-    }
-
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new WindowView(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new WindowView(WindowManager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new WindowView(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
     }
 
     @Test

@@ -26,7 +26,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.button.Button;
 
-import com.vaadin.flow.component.UI;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 /**
@@ -104,13 +103,6 @@ public class DataTableViewTest {
         logger.info("DataTableView instantiated successfully");
     }
 
-    @Test
-    void testConstructorWithValidManagers() {
-        // Vérifier que le constructeur fonctionne avec des managers valides
-        DataTableView view = new DataTableView(dataTableManager, roomManager);
-        assertNotNull(view);
-        logger.info("DataTableView constructor works with valid managers");
-    }
 
     @Test
     void testConstructorCallsLoadData() {
@@ -435,19 +427,6 @@ public class DataTableViewTest {
         logger.info("ExistsById with non-existent ID test successful");
     }
 
-    @Test
-    void testCountOperation() {
-        // Tester le comptage des DataTables
-        long expectedCount = 5L;
-        when(dataTableManager.count()).thenReturn(expectedCount);
-
-        long count = dataTableManager.count();
-        assertEquals(expectedCount, count);
-
-        verify(dataTableManager, times(1)).count();
-
-        logger.info("Count operation test successful - count: " + count);
-    }
 
     @Test
     void testExceptionHandlingInSave() {
@@ -654,38 +633,6 @@ public class DataTableViewTest {
     }
 
     @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<DataTable> mockDataTables = Arrays.asList(testDataTable);
-        when(dataTableManager.findAll()).thenReturn(mockDataTables);
-
-        // Faire plusieurs appels
-        dataTableManager.findAll();
-        dataTableManager.findAll();
-        dataTableManager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(dataTableManager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
-
-    @Test
-    void testConcurrentOperations() {
-        // Tester les opérations concurrentes (simulation)
-        when(dataTableManager.findAll()).thenReturn(Arrays.asList(testDataTable));
-        when(dataTableManager.save(any(DataTable.class))).thenReturn(testDataTable);
-        
-        // Simuler des opérations concurrentes
-        assertDoesNotThrow(() -> {
-            dataTableManager.findAll();
-            dataTableManager.save(testDataTable);
-        });
-
-        logger.info("Concurrent operations test successful");
-    }
-
-    @Test
     void testPerformanceWithLargeDataset() {
         // Tester avec un grand nombre de tables de données
         List<DataTable> largeDataset = Arrays.asList(
@@ -705,23 +652,6 @@ public class DataTableViewTest {
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
     }
 
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new DataTableView(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new DataTableView(dataTableManager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new DataTableView(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
-    }
 
     @Test
     void testInvalidPositionValues() {

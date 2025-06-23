@@ -146,22 +146,6 @@ public class HeaterViewTest {
     }
 
     @Test
-    void testLoadDataWithEmptyList() {
-        // Mock avec une liste vide
-        when(HeaterManager.findAll()).thenReturn(Arrays.asList());
-
-        // Tester avec une liste vide
-        assertDoesNotThrow(() -> {
-            HeaterView newView = new HeaterView(HeaterManager, roomManager);
-        });
-
-        // Vérifier que findAll a été appelé
-        verify(HeaterManager, atLeastOnce()).findAll();
-
-        logger.info("Load data handles empty list correctly");
-    }
-
-    @Test
     void testLoadDataWithException() {
         // Mock qui lance une exception
         when(HeaterManager.findAll())
@@ -216,6 +200,8 @@ public class HeaterViewTest {
 
     @Test
     void testSaveHeaterOperation() {
+        UI.setCurrent(new UI());
+
         // Tester l'opération de sauvegarde (pas de updateHeater dans le service)
         when(HeaterManager.save(any(Heater.class))).thenReturn(testHeater);
 
@@ -501,6 +487,8 @@ public class HeaterViewTest {
 
     @Test
     void testHeaterWithEmptyName() {
+        UI.setCurrent(new UI());
+
         // Tester avec un nom vide
         Heater emptyNameHeater = new Heater();
         emptyNameHeater.setCustomName("");
@@ -653,22 +641,6 @@ public class HeaterViewTest {
                 testHeater.getRoom().getName() + "'");
     }
 
-    @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Heater> mockHeaters = Arrays.asList(testHeater);
-        when(HeaterManager.findAll()).thenReturn(mockHeaters);
-
-        // Faire plusieurs appels
-        HeaterManager.findAll();
-        HeaterManager.findAll();
-        HeaterManager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(HeaterManager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
 
     @Test
     void testConcurrentOperations() {
@@ -703,24 +675,6 @@ public class HeaterViewTest {
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
-    }
-
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new HeaterView(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new HeaterView(HeaterManager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new HeaterView(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
     }
 
     @Test

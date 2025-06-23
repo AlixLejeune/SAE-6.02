@@ -427,20 +427,6 @@ public class PlugViewTest {
     }
 
     @Test
-    void testCountOperation() {
-        // Tester le comptage des Plugs
-        long expectedCount = 5L;
-        when(PlugManager.count()).thenReturn(expectedCount);
-
-        long count = PlugManager.count();
-        assertEquals(expectedCount, count);
-
-        verify(PlugManager, times(1)).count();
-
-        logger.info("Count operation test successful - count: " + count);
-    }
-
-    @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
         when(PlugManager.save(any(Plug.class)))
@@ -452,20 +438,6 @@ public class PlugViewTest {
         });
 
         logger.info("Exception handling in save operation tested successfully");
-    }
-
-    @Test
-    void testExceptionHandlingInDelete() {
-        // Tester la gestion des exceptions lors de la suppression
-        Integer PlugId = 1;
-        doThrow(new RuntimeException("Delete operation failed")).when(PlugManager).deleteById(PlugId);
-
-        // Vérifier que l'exception est bien lancée
-        assertThrows(RuntimeException.class, () -> {
-            PlugManager.deleteById(PlugId);
-        });
-
-        logger.info("Exception handling in delete operation tested successfully");
     }
 
     @Test

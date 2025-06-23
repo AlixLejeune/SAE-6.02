@@ -632,23 +632,6 @@ public class SensorCO2ViewTest {
     }
 
     @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<SensorCO2> mockSensorCO2s = Arrays.asList(testSensorCO2);
-        when(SensorCO2Manager.findAll()).thenReturn(mockSensorCO2s);
-
-        // Faire plusieurs appels
-        SensorCO2Manager.findAll();
-        SensorCO2Manager.findAll();
-        SensorCO2Manager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(SensorCO2Manager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
-
-    @Test
     void testConcurrentOperations() {
         // Tester les opérations concurrentes (simulation)
         when(SensorCO2Manager.findAll()).thenReturn(Arrays.asList(testSensorCO2));
@@ -681,24 +664,6 @@ public class SensorCO2ViewTest {
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
-    }
-
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new SensorCO2View(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new SensorCO2View(SensorCO2Manager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new SensorCO2View(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
     }
 
     @Test

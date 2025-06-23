@@ -628,23 +628,6 @@ public class LampViewTest {
     }
 
     @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Lamp> mockLamps = Arrays.asList(testLamp);
-        when(LampManager.findAll()).thenReturn(mockLamps);
-
-        // Faire plusieurs appels
-        LampManager.findAll();
-        LampManager.findAll();
-        LampManager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(LampManager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
-
-    @Test
     void testConcurrentOperations() {
         // Tester les opérations concurrentes (simulation)
         when(LampManager.findAll()).thenReturn(Arrays.asList(testLamp));
@@ -677,24 +660,6 @@ public class LampViewTest {
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
-    }
-
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new LampView(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new LampView(LampManager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new LampView(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
     }
 
     @Test

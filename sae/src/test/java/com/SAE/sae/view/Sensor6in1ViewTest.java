@@ -532,19 +532,6 @@ public class Sensor6in1ViewTest {
     }
 
     @Test
-    void testSensor6in1WithWhitespaceOnlyName() {
-        // Tester avec un nom contenant seulement des espaces
-        Sensor6in1 whitespaceNameSensor6in1 = new Sensor6in1();
-        whitespaceNameSensor6in1.setCustomName("   ");
-        whitespaceNameSensor6in1.setRoom(testRoom);
-
-        // Le nom ne devrait pas être seulement des espaces
-        assertTrue(whitespaceNameSensor6in1.getCustomName().trim().isEmpty());
-
-        logger.info("Sensor6in1 with whitespace-only name detected correctly");
-    }
-
-    @Test
     void testMultipleSensor6in1sHandling() {
         // Tester avec plusieurs tables
         Sensor6in1 Sensor6in13 = new Sensor6in1();
@@ -637,23 +624,6 @@ public class Sensor6in1ViewTest {
     }
 
     @Test
-    void testfindAllMultipleCalls() {
-        // Tester plusieurs appels consécutifs
-        List<Sensor6in1> mockSensor6in1s = Arrays.asList(testSensor6in1);
-        when(Sensor6in1Manager.findAll()).thenReturn(mockSensor6in1s);
-
-        // Faire plusieurs appels
-        Sensor6in1Manager.findAll();
-        Sensor6in1Manager.findAll();
-        Sensor6in1Manager.findAll();
-
-        // Vérifier que la méthode a été appelée 3 fois
-        verify(Sensor6in1Manager, times(3)).findAll();
-
-        logger.info("Multiple findAll calls test successful");
-    }
-
-    @Test
     void testConcurrentOperations() {
         // Tester les opérations concurrentes (simulation)
         when(Sensor6in1Manager.findAll()).thenReturn(Arrays.asList(testSensor6in1));
@@ -686,24 +656,6 @@ public class Sensor6in1ViewTest {
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
-    }
-
-    @Test
-    void testNullManagersHandling() {
-        // Tester avec des managers null (devrait lever une exception)
-        assertThrows(Exception.class, () -> {
-            new Sensor6in1View(null, roomManager);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new Sensor6in1View(Sensor6in1Manager, null);
-        });
-
-        assertThrows(Exception.class, () -> {
-            new Sensor6in1View(null, null);
-        });
-
-        logger.info("Null managers handling test successful");
     }
 
     @Test

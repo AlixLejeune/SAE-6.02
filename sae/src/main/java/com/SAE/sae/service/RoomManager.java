@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.SAE.sae.entity.Building;
 import com.SAE.sae.entity.Room;
 import com.SAE.sae.repository.RoomRepository;
 
@@ -52,5 +53,10 @@ public class RoomManager {
 
     public List<Room> getRoomsByBuildingId(int buildingId) {
         return roomRepo.findByBuilding_Id(buildingId);
+    }
+
+    public List<Room> getRoomsByName(String name){
+        log.info("Return all rooms named " + name);
+        return roomRepo.findByName(name);
     }
 }

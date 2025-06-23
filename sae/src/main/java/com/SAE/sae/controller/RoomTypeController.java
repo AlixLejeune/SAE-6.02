@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.SAE.sae.entity.RoomType;
-import com.SAE.sae.repository.RoomTypeRepository;
+import com.SAE.sae.service.RoomTypeManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoomTypeController {
 
-    private final RoomTypeRepository roomTypeRepository;
+    private final RoomTypeManager roomTypeManager;
 
     /**
      * Récupère toutes les entités RoomType.
@@ -34,7 +34,7 @@ public class RoomTypeController {
      */
     @GetMapping
     public ResponseEntity<List<RoomType>> getAllRoomTypes() {
-        return ResponseEntity.ok(roomTypeRepository.findAll());
+        return ResponseEntity.ok(roomTypeManager.getAllRoomTypes());
     }
 
     /**
@@ -44,9 +44,7 @@ public class RoomTypeController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<RoomType> getRoomTypeById(@PathVariable Integer id) {
-        return roomTypeRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(roomTypeManager.getRoomTypeById(id));
     }
 
     /**
@@ -56,7 +54,7 @@ public class RoomTypeController {
      */
     @PostMapping
     public ResponseEntity<RoomType> createRoomType(@RequestBody RoomType roomType) {
-        return ResponseEntity.ok(roomTypeRepository.save(roomType));
+        return ResponseEntity.ok(roomTypeManager.saveRoomType(roomType));
     }
 
     /**
@@ -66,7 +64,7 @@ public class RoomTypeController {
      */
     @PutMapping
     public ResponseEntity<RoomType> updateRoomType(@RequestBody RoomType roomType) {
-        return ResponseEntity.ok(roomTypeRepository.save(roomType));
+        return ResponseEntity.ok(roomTypeManager.updateRoomType(roomType));
     }
 
     /**
@@ -76,10 +74,7 @@ public class RoomTypeController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoomType(@PathVariable Integer id) {
-        if (!roomTypeRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        roomTypeRepository.deleteById(id);
+        roomTypeManager.deleteRoomTypeById(id);
         return ResponseEntity.ok("RoomType supprimée avec succès");
     }
 

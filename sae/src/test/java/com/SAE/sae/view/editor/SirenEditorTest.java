@@ -1,6 +1,7 @@
 package com.SAE.sae.view.editor;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,17 +27,18 @@ import com.vaadin.flow.component.UI;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 /**
  * Test class for the SirenEditor component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de l'éditeur de tables
+ * Tests de bout en bout pour vérifier le bon fonctionnement de l'éditeur de
+ * tables
  * et de ses interactions avec les services.
  */
 public class SirenEditorTest {
 
     @MockBean
     private SirenManager SirenManager;
-    
+
     @MockBean
     private RoomManager roomManager;
-    
+
     private SirenEditor SirenEditor;
     private Siren testSiren;
     private Room testRoom;
@@ -46,20 +48,20 @@ public class SirenEditorTest {
 
     @BeforeEach
     void setUp() {
-        UI.setCurrent(new UI()); 
+        UI.setCurrent(new UI());
         // Initialiser le SirenEditor avec les mocks
         SirenEditor = new SirenEditor(SirenManager, roomManager);
-        
+
         // Créer des données de test
         testBuilding = new Building();
         testBuilding.setId(1);
         testBuilding.setName("Test Building");
-        
+
         testRoom = new Room();
         testRoom.setId(1);
         testRoom.setName("Test Room");
         testRoom.setBuilding(testBuilding);
-        
+
         testSiren = new Siren();
         testSiren.setId(1);
         testSiren.setCustomName("Test Table");
@@ -67,8 +69,13 @@ public class SirenEditorTest {
         testSiren.setPosX(1.0);
         testSiren.setPosY(2.0);
         testSiren.setPosZ(3.0);
-        
+
         logger.info("SirenEditor test setup completed");
+    }
+
+    @AfterEach
+    void tearDown() {
+        UI.setCurrent(null);
     }
 
     @Test
@@ -90,11 +97,11 @@ public class SirenEditorTest {
     void testSetOnDataChangedCallback() {
         // Tester la configuration du callback
         Runnable testCallback = () -> logger.info("Callback executed");
-        
+
         assertDoesNotThrow(() -> {
             SirenEditor.setOnDataChanged(testCallback);
         });
-        
+
         logger.info("OnDataChanged callback set successfully");
     }
 
@@ -104,7 +111,7 @@ public class SirenEditorTest {
         assertDoesNotThrow(() -> {
             SirenEditor.setOnDataChanged(null);
         });
-        
+
         logger.info("OnDataChanged handles null callback correctly");
     }
 
@@ -113,15 +120,15 @@ public class SirenEditorTest {
         // Mock des données nécessaires pour le dialog
         List<Room> mockRooms = Arrays.asList(testRoom);
         when(roomManager.getAllRooms()).thenReturn(mockRooms);
-        
+
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
             SirenEditor.openAddDialog();
         });
-        
+
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
         verify(roomManager, atLeastOnce()).getAllRooms();
-        
+
         logger.info("Add dialog opened successfully with mocked room data");
     }
 
@@ -130,15 +137,15 @@ public class SirenEditorTest {
         // Mock des données nécessaires
         List<Room> mockRooms = Arrays.asList(testRoom);
         when(roomManager.getAllRooms()).thenReturn(mockRooms);
-        
+
         // Tester l'ouverture du dialog d'édition avec une table valide
         assertDoesNotThrow(() -> {
             SirenEditor.openEditDialog(testSiren);
         });
-        
+
         // Vérifier que getAllRooms a été appelé
         verify(roomManager, atLeastOnce()).getAllRooms();
-        
+
         logger.info("Edit dialog opened successfully for table: " + testSiren.getCustomName());
     }
 
@@ -149,10 +156,10 @@ public class SirenEditorTest {
         assertDoesNotThrow(() -> {
             SirenEditor.openEditDialog(null);
         });
-        
+
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
         verify(roomManager, never()).getAllRooms();
-        
+
         logger.info("Edit dialog correctly handles null Siren input");
     }
 
@@ -162,7 +169,7 @@ public class SirenEditorTest {
         assertDoesNotThrow(() -> {
             SirenEditor.confirmDelete(testSiren);
         });
-        
+
         logger.info("Delete confirmation dialog opened for table: " + testSiren.getCustomName());
     }
 
@@ -172,7 +179,7 @@ public class SirenEditorTest {
         assertDoesNotThrow(() -> {
             SirenEditor.confirmDelete(null);
         });
-        
+
         logger.info("Delete confirmation correctly handles null Siren input");
     }
 
@@ -180,17 +187,17 @@ public class SirenEditorTest {
     void testSirenManagerIntegration() {
         // Tester l'intégration avec SirenManager
         assertNotNull(SirenManager);
-        
+
         // Mock du comportement de sauvegarde
         when(SirenManager.save(any(Siren.class))).thenReturn(testSiren);
-        
+
         Siren savedTable = SirenManager.save(testSiren);
         assertNotNull(savedTable);
         assertEquals(testSiren.getCustomName(), savedTable.getCustomName());
-        
+
         // Vérifier que save a été appelé
         verify(SirenManager, times(1)).save(testSiren);
-        
+
         logger.info("SirenManager integration test successful");
     }
 
@@ -198,20 +205,20 @@ public class SirenEditorTest {
     void testRoomManagerIntegration() {
         // Tester l'intégration avec RoomManager
         assertNotNull(roomManager);
-        
+
         // Mock du comportement getAllRooms
         List<Room> mockRooms = Arrays.asList(testRoom);
         when(roomManager.getAllRooms()).thenReturn(mockRooms);
-        
+
         List<Room> rooms = roomManager.getAllRooms();
         assertNotNull(rooms);
         assertFalse(rooms.isEmpty());
         assertEquals(1, rooms.size());
         assertEquals(testRoom.getName(), rooms.get(0).getName());
-        
+
         // Vérifier que getAllRooms a été appelé
         verify(roomManager, times(1)).getAllRooms();
-        
+
         logger.info("RoomManager integration test successful - returned " + rooms.size() + " rooms");
     }
 
@@ -225,12 +232,11 @@ public class SirenEditorTest {
         validTable.setPosY(1.0);
         validTable.setPosZ(1.0);
 
-        
         // Les données devraient être valides
         assertNotNull(validTable.getCustomName());
         assertNotNull(validTable.getRoom());
         assertNotNull(validTable.getPosX());
-        
+
         logger.info("Siren validation test - all required fields present");
     }
 
@@ -240,10 +246,10 @@ public class SirenEditorTest {
         Siren emptyNameTable = new Siren();
         emptyNameTable.setCustomName("");
         emptyNameTable.setRoom(testRoom);
-        
+
         // Le nom ne devrait pas être vide
         assertTrue(emptyNameTable.getCustomName().isEmpty());
-        
+
         logger.info("Siren with empty name handled correctly");
     }
 
@@ -253,10 +259,10 @@ public class SirenEditorTest {
         Siren nullRoomTable = new Siren();
         nullRoomTable.setCustomName("Test Table");
         nullRoomTable.setRoom(null);
-        
+
         // La salle ne devrait pas être null pour une table valide
         assertNull(nullRoomTable.getRoom());
-        
+
         logger.info("Siren with null room detected correctly");
     }
 
@@ -264,18 +270,18 @@ public class SirenEditorTest {
     void testDeleteOperationMocking() {
         // Tester l'opération de suppression
         Integer tableId = 1;
-        
+
         // Mock de la méthode deleteById
         doNothing().when(SirenManager).deleteById(tableId);
-        
+
         // Simuler la suppression
         assertDoesNotThrow(() -> {
             SirenManager.deleteById(tableId);
         });
-        
+
         // Vérifier que deleteById a été appelé
         verify(SirenManager, times(1)).deleteById(tableId);
-        
+
         logger.info("Delete operation mock test successful for table ID: " + tableId);
     }
 
@@ -283,18 +289,18 @@ public class SirenEditorTest {
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
         when(SirenManager.save(any(Siren.class))).thenReturn(testSiren);
-        
+
         // Simuler la sauvegarde
         Siren result = assertDoesNotThrow(() -> {
             return SirenManager.save(testSiren);
         });
-        
+
         assertNotNull(result);
         assertEquals(testSiren.getId(), result.getId());
-        
+
         // Vérifier que save a été appelé
         verify(SirenManager, times(1)).save(testSiren);
-        
+
         logger.info("Save operation mock test successful for table: " + result.getCustomName());
     }
 
@@ -302,13 +308,13 @@ public class SirenEditorTest {
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
         when(SirenManager.save(any(Siren.class)))
-            .thenThrow(new RuntimeException("Database error"));
-        
+                .thenThrow(new RuntimeException("Database error"));
+
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
             SirenManager.save(testSiren);
         });
-        
+
         logger.info("Exception handling in save operation tested successfully");
     }
 
@@ -317,12 +323,12 @@ public class SirenEditorTest {
         // Tester la gestion des exceptions lors de la suppression
         Integer tableId = 1;
         doThrow(new RuntimeException("Delete error")).when(SirenManager).deleteById(tableId);
-        
+
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
             SirenManager.deleteById(tableId);
         });
-        
+
         logger.info("Exception handling in delete operation tested successfully");
     }
 
@@ -333,14 +339,14 @@ public class SirenEditorTest {
         room2.setId(2);
         room2.setName("Test Room 2");
         room2.setBuilding(testBuilding);
-        
+
         List<Room> multipleRooms = Arrays.asList(testRoom, room2);
         when(roomManager.getAllRooms()).thenReturn(multipleRooms);
-        
+
         List<Room> result = roomManager.getAllRooms();
         assertNotNull(result);
         assertEquals(2, result.size());
-        
+
         logger.info("Multiple rooms handling test successful - " + result.size() + " rooms");
     }
 
@@ -348,11 +354,11 @@ public class SirenEditorTest {
     void testEmptyRoomsHandling() {
         // Tester avec une liste vide de salles
         when(roomManager.getAllRooms()).thenReturn(Arrays.asList());
-        
+
         List<Room> result = roomManager.getAllRooms();
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        
+
         logger.info("Empty rooms list handling test successful");
     }
 
@@ -362,27 +368,27 @@ public class SirenEditorTest {
         assertEquals(1.0, testSiren.getPosX());
         assertEquals(2.0, testSiren.getPosY());
         assertEquals(3.0, testSiren.getPosZ());
-        
-        logger.info("Siren position values test successful: X=" + 
-                   testSiren.getPosX() + ", Y=" + testSiren.getPosY() + 
-                   ", Z=" + testSiren.getPosZ());
+
+        logger.info("Siren position values test successful: X=" +
+                testSiren.getPosX() + ", Y=" + testSiren.getPosY() +
+                ", Z=" + testSiren.getPosZ());
     }
 
     @Test
     void testCallbackExecution() {
         // Tester l'exécution du callback
-        boolean[] callbackExecuted = {false};
-        
+        boolean[] callbackExecuted = { false };
+
         Runnable testCallback = () -> {
             callbackExecuted[0] = true;
             logger.info("Test callback executed successfully");
         };
-        
+
         SirenEditor.setOnDataChanged(testCallback);
-        
+
         // Simuler l'exécution du callback
         testCallback.run();
-        
+
         assertTrue(callbackExecuted[0]);
         logger.info("Callback execution test successful");
     }

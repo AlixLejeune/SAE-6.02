@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import com.SAE.sae.entity.transform.IPosition;
-import com.SAE.sae.entity.transform.ISize;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +15,7 @@ import jakarta.persistence.Table;
 @Table(name = "t_e_lamp_lam")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Lamp extends RoomObject implements IPosition, ISize{
+public class Lamp extends RoomObject implements IPosition{
     @Column(name = "lam_posx")
     private Double posX;
 

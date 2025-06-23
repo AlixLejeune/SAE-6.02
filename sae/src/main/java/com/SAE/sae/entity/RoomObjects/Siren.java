@@ -1,7 +1,6 @@
 package com.SAE.sae.entity.RoomObjects;
 
 import com.SAE.sae.entity.transform.IPosition;
-import com.SAE.sae.entity.transform.ISize;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +15,7 @@ import lombok.Data;
 @Table(name = "t_e_siren_sir")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Siren  extends RoomObject implements IPosition, ISize{
+public class Siren  extends RoomObject implements IPosition{
     @Column(name = "sir_posx")
     private Double posX;
 
@@ -25,4 +24,8 @@ public class Siren  extends RoomObject implements IPosition, ISize{
 
     @Column(name = "sir_posz")
     private Double posZ;
+
+    public Siren(String name){
+        this.customName = name;
+    }
 }

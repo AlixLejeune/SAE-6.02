@@ -1,7 +1,6 @@
 package com.SAE.sae.entity.RoomObjects;
 
 import com.SAE.sae.entity.transform.IPosition;
-import com.SAE.sae.entity.transform.ISize;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +15,7 @@ import lombok.Data;
 @Table(name = "t_e_sensorco2_co2")
 @NoArgsConstructor
 @AllArgsConstructor
-public class SensorCO2  extends RoomObject implements IPosition, ISize{
+public class SensorCO2  extends RoomObject implements IPosition{
     @Column(name = "co2_posx")
     private Double posX;
 

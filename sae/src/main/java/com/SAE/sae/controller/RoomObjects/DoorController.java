@@ -1,6 +1,5 @@
 package com.SAE.sae.controller.RoomObjects;
 
-import com.SAE.sae.entity.RoomObjects.DataTable;
 import com.SAE.sae.entity.RoomObjects.Door;
 import com.SAE.sae.service.RoomObjects.DoorManager;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,6 @@
 package com.SAE.sae.entity.RoomObjects;
 
 import com.SAE.sae.entity.transform.IPosition;
-import com.SAE.sae.entity.transform.ISize;
 
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,7 @@ import jakarta.persistence.Table;
 @Table(name = "t_e_plug_plu")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Plug extends RoomObject implements IPosition, ISize{
+public class Plug extends RoomObject implements IPosition{
      @Column(name = "plu_posx")
     private Double posX;
 

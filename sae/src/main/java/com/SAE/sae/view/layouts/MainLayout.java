@@ -175,15 +175,15 @@ public class MainLayout extends AppLayout {
         });
 
         Button plugBtn = createMenuButton("🔌 Prises", VaadinIcon.PLUG, () -> {
-            UI.getCurrent().navigate("doors");
+            UI.getCurrent().navigate("plugs");
         });
 
         Button sirenBtn = createMenuButton("🚨 Alarmes", VaadinIcon.ALARM, () -> {
-            UI.getCurrent().navigate("doors");
+            UI.getCurrent().navigate("sirens");
         });
 
         Button tableBtn = createMenuButton("🗄 Tables", VaadinIcon.HOME, () -> {
-            UI.getCurrent().navigate("doors");
+            UI.getCurrent().navigate("data-tables");
         });
         
         mainMenu.add(separator1, devicesLabel, lampsBtn, sensorsBtnCo2, sensors6Btn, sensors9Btn, plugBtn, sirenBtn, tableBtn,

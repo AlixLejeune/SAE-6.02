@@ -35,12 +35,12 @@ import com.vaadin.flow.component.UI;
 public class LampViewTest {
 
     @Mock
-    private LampManager LampManager;
+    private LampManager lampManager;
 
     @Mock
     private RoomManager roomManager;
 
-    private LampView LampView;
+    private LampView lampView;
     private Lamp testLamp;
     private Lamp testLamp2;
     private Room testRoom;
@@ -78,8 +78,8 @@ public class LampViewTest {
         testLamp2.setPosY(3.0);
         testLamp2.setPosZ(4.0);
 
-        // Initialiser la LampView avec les mocks
-        LampView = new LampView(LampManager, roomManager);
+        // Initialiser la lampView avec les mocks
+        lampView = new LampView(lampManager, roomManager);
 
         logger.info("LampView test setup completed");
     }
@@ -91,15 +91,15 @@ public class LampViewTest {
 
     @Test
     void testLampViewInstantiation() {
-        // Vérifier que la LampView peut être instanciée correctement
-        assertNotNull(LampView);
+        // Vérifier que la lampView peut être instanciée correctement
+        assertNotNull(lampView);
         logger.info("LampView instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        LampView view = new LampView(LampManager, roomManager);
+        LampView view = new LampView(lampManager, roomManager);
         assertNotNull(view);
         logger.info("LampView constructor works with valid managers");
     }
@@ -108,13 +108,13 @@ public class LampViewTest {
     void testConstructorCallsLoadData() {
         // Mock des données pour vérifier l'appel à findAll lors de l'initialisation
         List<Lamp> mockLamps = Arrays.asList(testLamp, testLamp2);
-        when(LampManager.findAll()).thenReturn(mockLamps);
+        when(lampManager.findAll()).thenReturn(mockLamps);
 
         // Créer une nouvelle instance pour tester l'initialisation
-        LampView newView = new LampView(LampManager, roomManager);
+        LampView newView = new LampView(lampManager, roomManager);
 
         // Vérifier que findAll a été appelé pendant l'initialisation
-        verify(LampManager, atLeastOnce()).findAll();
+        verify(lampManager, atLeastOnce()).findAll();
 
         logger.info("Constructor correctly calls loadData method");
     }
@@ -123,16 +123,16 @@ public class LampViewTest {
     void testLoadDataWithValidLamps() {
         // Mock des données
         List<Lamp> mockLamps = Arrays.asList(testLamp, testLamp2);
-        when(LampManager.findAll()).thenReturn(mockLamps);
+        when(lampManager.findAll()).thenReturn(mockLamps);
 
         // Tester le chargement des données
         assertDoesNotThrow(() -> {
             // La méthode loadData est privée, on teste via l'effet du constructeur
-            LampView newView = new LampView(LampManager, roomManager);
+            LampView newView = new LampView(lampManager, roomManager);
         });
 
         // Vérifier que findAll a été appelé
-        verify(LampManager, atLeastOnce()).findAll();
+        verify(lampManager, atLeastOnce()).findAll();
 
         logger.info("Load data successful with " + mockLamps.size() + " data tables");
     }
@@ -140,15 +140,15 @@ public class LampViewTest {
     @Test
     void testLoadDataWithEmptyList() {
         // Mock avec une liste vide
-        when(LampManager.findAll()).thenReturn(Arrays.asList());
+        when(lampManager.findAll()).thenReturn(Arrays.asList());
 
         // Tester avec une liste vide
         assertDoesNotThrow(() -> {
-            LampView newView = new LampView(LampManager, roomManager);
+            LampView newView = new LampView(lampManager, roomManager);
         });
 
         // Vérifier que findAll a été appelé
-        verify(LampManager, atLeastOnce()).findAll();
+        verify(lampManager, atLeastOnce()).findAll();
 
         logger.info("Load data handles empty list correctly");
     }
@@ -156,12 +156,12 @@ public class LampViewTest {
     @Test
     void testLoadDataWithException() {
         // Mock qui lance une exception
-        when(LampManager.findAll())
+        when(lampManager.findAll())
                 .thenThrow(new RuntimeException("Database connection error"));
 
         // La vue devrait gérer l'exception sans planter
         assertDoesNotThrow(() -> {
-            LampView newView = new LampView(LampManager, roomManager);
+            LampView newView = new LampView(lampManager, roomManager);
         });
 
         logger.info("Load data handles exceptions correctly");
@@ -169,18 +169,18 @@ public class LampViewTest {
 
     @Test
     void testLampManagerIntegration() {
-        // Tester l'intégration avec LampManager
-        assertNotNull(LampManager);
+        // Tester l'intégration avec lampManager
+        assertNotNull(lampManager);
 
         // Mock du comportement de sauvegarde
-        when(LampManager.save(any(Lamp.class))).thenReturn(testLamp);
+        when(lampManager.save(any(Lamp.class))).thenReturn(testLamp);
 
-        Lamp savedLamp = LampManager.save(testLamp);
+        Lamp savedLamp = lampManager.save(testLamp);
         assertNotNull(savedLamp);
         assertEquals(testLamp.getCustomName(), savedLamp.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(LampManager, times(1)).save(testLamp);
+        verify(lampManager, times(1)).save(testLamp);
 
         logger.info("LampManager integration test successful");
     }
@@ -209,18 +209,18 @@ public class LampViewTest {
     @Test
     void testSaveLampOperation() {
         // Tester l'opération de sauvegarde (pas de updateLamp dans le service)
-        when(LampManager.save(any(Lamp.class))).thenReturn(testLamp);
+        when(lampManager.save(any(Lamp.class))).thenReturn(testLamp);
 
         // Simuler la sauvegarde
         Lamp result = assertDoesNotThrow(() -> {
-            return LampManager.save(testLamp);
+            return lampManager.save(testLamp);
         });
 
         assertNotNull(result);
         assertEquals(testLamp.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(LampManager, times(1)).save(testLamp);
+        verify(lampManager, times(1)).save(testLamp);
 
         logger.info("Save operation test successful for data table: " + result.getCustomName());
     }
@@ -228,37 +228,37 @@ public class LampViewTest {
     @Test
     void testDeleteLampOperation() {
         // Tester l'opération de suppression
-        Integer LampId = 1;
+        Integer lampId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(LampManager).deleteById(LampId);
+        doNothing().when(lampManager).deleteById(lampId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            LampManager.deleteById(LampId);
+            lampManager.deleteById(lampId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(LampManager, times(1)).deleteById(LampId);
+        verify(lampManager, times(1)).deleteById(lampId);
 
-        logger.info("Delete operation test successful for data table ID: " + LampId);
+        logger.info("Delete operation test successful for data table ID: " + lampId);
     }
 
     @Test
     void testFindByIdOperation() {
         // Tester l'opération de recherche par ID
-        Integer LampId = 1;
-        when(LampManager.findById(LampId)).thenReturn(testLamp);
+        Integer lampId = 1;
+        when(lampManager.findById(lampId)).thenReturn(testLamp);
 
         Lamp result = assertDoesNotThrow(() -> {
-            return LampManager.findById(LampId);
+            return lampManager.findById(lampId);
         });
 
         assertNotNull(result);
         assertEquals(testLamp.getId(), result.getId());
         assertEquals(testLamp.getCustomName(), result.getCustomName());
 
-        verify(LampManager, times(1)).findById(LampId);
+        verify(lampManager, times(1)).findById(lampId);
 
         logger.info("FindById operation test successful for data table: " + result.getCustomName());
     }
@@ -267,11 +267,11 @@ public class LampViewTest {
     void testFindByIdWithInvalidId() {
         // Tester avec un ID invalide
         Integer invalidId = 999;
-        when(LampManager.findById(invalidId))
+        when(lampManager.findById(invalidId))
                 .thenThrow(new IllegalArgumentException("Aucune Lamp trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
-            LampManager.findById(invalidId);
+            lampManager.findById(invalidId);
         });
 
         logger.info("FindById with invalid ID test successful");
@@ -282,13 +282,13 @@ public class LampViewTest {
         // Tester la recherche par ID de salle (Integer)
         Integer roomId = 1;
         List<Lamp> mockLamps = Arrays.asList(testLamp, testLamp2);
-        when(LampManager.findByRoomId(roomId)).thenReturn(mockLamps);
+        when(lampManager.findByRoomId(roomId)).thenReturn(mockLamps);
 
-        List<Lamp> result = LampManager.findByRoomId(roomId);
+        List<Lamp> result = lampManager.findByRoomId(roomId);
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        verify(LampManager, times(1)).findByRoomId(roomId);
+        verify(lampManager, times(1)).findByRoomId(roomId);
 
         logger.info("FindByRoomId (Integer) operation test successful");
     }
@@ -298,13 +298,13 @@ public class LampViewTest {
         // Tester la recherche par ID de salle (Long)
         Long roomId = 1L;
         List<Lamp> mockLamps = Arrays.asList(testLamp);
-        when(LampManager.findByRoomId(roomId)).thenReturn(mockLamps);
+        when(lampManager.findByRoomId(roomId)).thenReturn(mockLamps);
 
-        List<Lamp> result = LampManager.findByRoomId(roomId);
+        List<Lamp> result = lampManager.findByRoomId(roomId);
         assertNotNull(result);
         assertEquals(1, result.size());
 
-        verify(LampManager, times(1)).findByRoomId(roomId);
+        verify(lampManager, times(1)).findByRoomId(roomId);
 
         logger.info("FindByRoomId (Long) operation test successful");
     }
@@ -314,14 +314,14 @@ public class LampViewTest {
         // Tester la recherche par nom personnalisé
         String customName = "Test Lamp 1";
         List<Lamp> mockLamps = Arrays.asList(testLamp);
-        when(LampManager.findByCustomName(customName)).thenReturn(mockLamps);
+        when(lampManager.findByCustomName(customName)).thenReturn(mockLamps);
 
-        List<Lamp> result = LampManager.findByCustomName(customName);
+        List<Lamp> result = lampManager.findByCustomName(customName);
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(customName, result.get(0).getCustomName());
 
-        verify(LampManager, times(1)).findByCustomName(customName);
+        verify(lampManager, times(1)).findByCustomName(customName);
 
         logger.info("FindByCustomName operation test successful");
     }
@@ -329,14 +329,14 @@ public class LampViewTest {
     @Test
     void testSaveAllOperation() {
         // Tester la sauvegarde de plusieurs Lamps
-        List<Lamp> LampList = Arrays.asList(testLamp, testLamp2);
-        when(LampManager.saveAll(LampList)).thenReturn(LampList);
+        List<Lamp> lampList = Arrays.asList(testLamp, testLamp2);
+        when(lampManager.saveAll(lampList)).thenReturn(lampList);
 
-        List<Lamp> result = LampManager.saveAll(LampList);
+        List<Lamp> result = lampManager.saveAll(lampList);
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        verify(LampManager, times(1)).saveAll(LampList);
+        verify(lampManager, times(1)).saveAll(lampList);
 
         logger.info("SaveAll operation test successful - saved " + result.size() + " data tables");
     }
@@ -344,13 +344,13 @@ public class LampViewTest {
     @Test
     void testDeleteOperation() {
         // Tester la suppression d'un objet Lamp
-        doNothing().when(LampManager).delete(testLamp);
+        doNothing().when(lampManager).delete(testLamp);
 
         assertDoesNotThrow(() -> {
-            LampManager.delete(testLamp);
+            lampManager.delete(testLamp);
         });
 
-        verify(LampManager, times(1)).delete(testLamp);
+        verify(lampManager, times(1)).delete(testLamp);
 
         logger.info("Delete operation test successful");
     }
@@ -358,13 +358,13 @@ public class LampViewTest {
     @Test
     void testDeleteAllOperation() {
         // Tester la suppression de toutes les Lamps
-        doNothing().when(LampManager).deleteAll();
+        doNothing().when(lampManager).deleteAll();
 
         assertDoesNotThrow(() -> {
-            LampManager.deleteAll();
+            lampManager.deleteAll();
         });
 
-        verify(LampManager, times(1)).deleteAll();
+        verify(lampManager, times(1)).deleteAll();
 
         logger.info("DeleteAll operation test successful");
     }
@@ -373,13 +373,13 @@ public class LampViewTest {
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test Lamp 1";
-        doNothing().when(LampManager).deleteByCustomName(customName);
+        doNothing().when(lampManager).deleteByCustomName(customName);
 
         assertDoesNotThrow(() -> {
-            LampManager.deleteByCustomName(customName);
+            lampManager.deleteByCustomName(customName);
         });
 
-        verify(LampManager, times(1)).deleteByCustomName(customName);
+        verify(lampManager, times(1)).deleteByCustomName(customName);
 
         logger.info("DeleteByCustomName operation test successful");
     }
@@ -387,13 +387,13 @@ public class LampViewTest {
     @Test
     void testExistsByIdOperation() {
         // Tester la vérification d'existence par ID
-        Integer LampId = 1;
-        when(LampManager.existsById(LampId)).thenReturn(true);
+        Integer lampId = 1;
+        when(lampManager.existsById(lampId)).thenReturn(true);
 
-        boolean exists = LampManager.existsById(LampId);
+        boolean exists = lampManager.existsById(lampId);
         assertTrue(exists);
 
-        verify(LampManager, times(1)).existsById(LampId);
+        verify(lampManager, times(1)).existsById(lampId);
 
         logger.info("ExistsById operation test successful");
     }
@@ -402,12 +402,12 @@ public class LampViewTest {
     void testExistsByIdWithNonExistentId() {
         // Tester avec un ID qui n'existe pas
         Integer nonExistentId = 999;
-        when(LampManager.existsById(nonExistentId)).thenReturn(false);
+        when(lampManager.existsById(nonExistentId)).thenReturn(false);
 
-        boolean exists = LampManager.existsById(nonExistentId);
+        boolean exists = lampManager.existsById(nonExistentId);
         assertFalse(exists);
 
-        verify(LampManager, times(1)).existsById(nonExistentId);
+        verify(lampManager, times(1)).existsById(nonExistentId);
 
         logger.info("ExistsById with non-existent ID test successful");
     }
@@ -416,12 +416,12 @@ public class LampViewTest {
     void testCountOperation() {
         // Tester le comptage des Lamps
         long expectedCount = 5L;
-        when(LampManager.count()).thenReturn(expectedCount);
+        when(lampManager.count()).thenReturn(expectedCount);
 
-        long count = LampManager.count();
+        long count = lampManager.count();
         assertEquals(expectedCount, count);
 
-        verify(LampManager, times(1)).count();
+        verify(lampManager, times(1)).count();
 
         logger.info("Count operation test successful - count: " + count);
     }
@@ -429,12 +429,12 @@ public class LampViewTest {
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(LampManager.save(any(Lamp.class)))
+        when(lampManager.save(any(Lamp.class)))
                 .thenThrow(new RuntimeException("Save operation failed"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            LampManager.save(testLamp);
+            lampManager.save(testLamp);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -443,12 +443,12 @@ public class LampViewTest {
     @Test
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
-        Integer LampId = 1;
-        doThrow(new RuntimeException("Delete operation failed")).when(LampManager).deleteById(LampId);
+        Integer lampId = 1;
+        doThrow(new RuntimeException("Delete operation failed")).when(lampManager).deleteById(lampId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            LampManager.deleteById(LampId);
+            lampManager.deleteById(lampId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -527,15 +527,15 @@ public class LampViewTest {
     @Test
     void testMultipleLampsHandling() {
         // Tester avec plusieurs tables
-        Lamp Lamp3 = new Lamp();
-        Lamp3.setId(3);
-        Lamp3.setCustomName("Test Lamp 3");
-        Lamp3.setRoom(testRoom);
+        Lamp lamp3 = new Lamp();
+        lamp3.setId(3);
+        lamp3.setCustomName("Test Lamp 3");
+        lamp3.setRoom(testRoom);
 
-        List<Lamp> multipleLamps = Arrays.asList(testLamp, testLamp2, Lamp3);
-        when(LampManager.findAll()).thenReturn(multipleLamps);
+        List<Lamp> multipleLamps = Arrays.asList(testLamp, testLamp2, lamp3);
+        when(lampManager.findAll()).thenReturn(multipleLamps);
 
-        List<Lamp> result = LampManager.findAll();
+        List<Lamp> result = lampManager.findAll();
         assertNotNull(result);
         assertEquals(3, result.size());
 
@@ -623,11 +623,11 @@ public class LampViewTest {
                 createTestLamp(4, "Lamp 4"),
                 createTestLamp(5, "Lamp 5"));
 
-        when(LampManager.findAll()).thenReturn(largeDataset);
+        when(lampManager.findAll()).thenReturn(largeDataset);
 
         // La vue devrait gérer un dataset plus large sans problème
         assertDoesNotThrow(() -> {
-            LampView newView = new LampView(LampManager, roomManager);
+            LampView newView = new LampView(lampManager, roomManager);
         });
 
         logger.info("Performance test with large dataset successful - " + largeDataset.size() + " data tables");
@@ -653,13 +653,13 @@ public class LampViewTest {
 
     // Méthode utilitaire pour créer des tables de données de test
     private Lamp createTestLamp(Integer id, String name) {
-        Lamp Lamp = new Lamp();
-        Lamp.setId(id);
-        Lamp.setCustomName(name);
-        Lamp.setRoom(testRoom);
-        Lamp.setPosX(1.0);
-        Lamp.setPosY(1.0);
-        Lamp.setPosZ(1.0);
-        return Lamp;
+        Lamp lamp = new Lamp();
+        lamp.setId(id);
+        lamp.setCustomName(name);
+        lamp.setRoom(testRoom);
+        lamp.setPosX(1.0);
+        lamp.setPosY(1.0);
+        lamp.setPosZ(1.0);
+        return lamp;
     }
 }

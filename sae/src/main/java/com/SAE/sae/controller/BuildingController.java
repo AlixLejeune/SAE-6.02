@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.SAE.sae.entity.Building;
-import com.SAE.sae.repository.BuildingRepository;
 import com.SAE.sae.service.BuildingManager;
 
 

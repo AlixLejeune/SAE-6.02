@@ -22,7 +22,6 @@ public class DataTableController {
 
     /**
      * Récupère toutes les entités DataTable.
-     * 
      * @return Liste de toutes les DataTables.
      */
     @GetMapping

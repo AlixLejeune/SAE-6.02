@@ -11,6 +11,14 @@ import jakarta.persistence.Table;
 import com.SAE.sae.entity.transform.IPosition;
 import com.SAE.sae.entity.transform.ISize;
 
+/**
+ * CLasse représentant les fenêtres
+ * @param customName String hérité de RoomObject
+ * @param room object Room hérité de RoomObject
+ * @param pos x,y,z valeurs numériques indiquant la position dans la pièce
+ * @param size x,y,z valeurs numériques indiquant la taille de l'objet
+ */
+
 @Data
 @Entity
 @Table(name = "t_e_window_win")

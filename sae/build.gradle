@@ -63,3 +63,7 @@ jacocoTestReport {
         csv.required = false
     }
 }
+
+javadoc{
+    destinationDir = file("${buildDir}/docs/javadoc")
+}

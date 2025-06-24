@@ -34,12 +34,12 @@ import com.vaadin.flow.component.UI;
 public class SensorCO2EditorTest {
 
     @MockBean
-    private SensorCO2Manager SensorCO2Manager;
+    private SensorCO2Manager sensorCO2Manager;
 
     @MockBean
     private RoomManager roomManager;
 
-    private SensorCO2Editor SensorCO2Editor;
+    private SensorCO2Editor sensorCO2Editor;
     private SensorCO2 testSensorCO2;
     private Room testRoom;
     private Building testBuilding;
@@ -50,7 +50,7 @@ public class SensorCO2EditorTest {
     void setUp() {
         UI.setCurrent(new UI());
         // Initialiser le SensorCO2Editor avec les mocks
-        SensorCO2Editor = new SensorCO2Editor(SensorCO2Manager, roomManager);
+        sensorCO2Editor = new SensorCO2Editor(sensorCO2Manager, roomManager);
 
         // Créer des données de test
         testBuilding = new Building();
@@ -81,14 +81,14 @@ public class SensorCO2EditorTest {
     @Test
     void testSensorCO2EditorInstantiation() {
         // Vérifier que le SensorCO2Editor peut être instancié correctement
-        assertNotNull(SensorCO2Editor);
+        assertNotNull(sensorCO2Editor);
         logger.info("SensorCO2Editor instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        SensorCO2Editor editor = new SensorCO2Editor(SensorCO2Manager, roomManager);
+        SensorCO2Editor editor = new SensorCO2Editor(sensorCO2Manager, roomManager);
         assertNotNull(editor);
         logger.info("SensorCO2Editor constructor works with valid managers");
     }
@@ -99,7 +99,7 @@ public class SensorCO2EditorTest {
         Runnable testCallback = () -> logger.info("Callback executed");
 
         assertDoesNotThrow(() -> {
-            SensorCO2Editor.setOnDataChanged(testCallback);
+            sensorCO2Editor.setOnDataChanged(testCallback);
         });
 
         logger.info("OnDataChanged callback set successfully");
@@ -109,7 +109,7 @@ public class SensorCO2EditorTest {
     void testSetOnDataChangedWithNullCallback() {
         // Tester avec un callback null
         assertDoesNotThrow(() -> {
-            SensorCO2Editor.setOnDataChanged(null);
+            sensorCO2Editor.setOnDataChanged(null);
         });
 
         logger.info("OnDataChanged handles null callback correctly");
@@ -123,7 +123,7 @@ public class SensorCO2EditorTest {
 
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
-            SensorCO2Editor.openAddDialog();
+            sensorCO2Editor.openAddDialog();
         });
 
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
@@ -140,7 +140,7 @@ public class SensorCO2EditorTest {
 
         // Tester l'ouverture du dialog d'édition avec une table valide
         assertDoesNotThrow(() -> {
-            SensorCO2Editor.openEditDialog(testSensorCO2);
+            sensorCO2Editor.openEditDialog(testSensorCO2);
         });
 
         // Vérifier que getAllRooms a été appelé
@@ -154,7 +154,7 @@ public class SensorCO2EditorTest {
         // Tester l'ouverture du dialog d'édition avec une table null
         // Cela devrait afficher une notification d'avertissement
         assertDoesNotThrow(() -> {
-            SensorCO2Editor.openEditDialog(null);
+            sensorCO2Editor.openEditDialog(null);
         });
 
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
@@ -167,7 +167,7 @@ public class SensorCO2EditorTest {
     void testConfirmDeleteWithValidSensorCO2() {
         // Tester la confirmation de suppression avec une table valide
         assertDoesNotThrow(() -> {
-            SensorCO2Editor.confirmDelete(testSensorCO2);
+            sensorCO2Editor.confirmDelete(testSensorCO2);
         });
 
         logger.info("Delete confirmation dialog opened for table: " + testSensorCO2.getCustomName());
@@ -177,7 +177,7 @@ public class SensorCO2EditorTest {
     void testConfirmDeleteWithNullSensorCO2() {
         // Tester la confirmation de suppression avec une table null
         assertDoesNotThrow(() -> {
-            SensorCO2Editor.confirmDelete(null);
+            sensorCO2Editor.confirmDelete(null);
         });
 
         logger.info("Delete confirmation correctly handles null SensorCO2 input");
@@ -186,17 +186,17 @@ public class SensorCO2EditorTest {
     @Test
     void testSensorCO2ManagerIntegration() {
         // Tester l'intégration avec SensorCO2Manager
-        assertNotNull(SensorCO2Manager);
+        assertNotNull(sensorCO2Manager);
 
         // Mock du comportement de sauvegarde
-        when(SensorCO2Manager.save(any(SensorCO2.class))).thenReturn(testSensorCO2);
+        when(sensorCO2Manager.save(any(SensorCO2.class))).thenReturn(testSensorCO2);
 
-        SensorCO2 savedTable = SensorCO2Manager.save(testSensorCO2);
+        SensorCO2 savedTable = sensorCO2Manager.save(testSensorCO2);
         assertNotNull(savedTable);
         assertEquals(testSensorCO2.getCustomName(), savedTable.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(SensorCO2Manager, times(1)).save(testSensorCO2);
+        verify(sensorCO2Manager, times(1)).save(testSensorCO2);
 
         logger.info("SensorCO2Manager integration test successful");
     }
@@ -272,15 +272,15 @@ public class SensorCO2EditorTest {
         Integer tableId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(SensorCO2Manager).deleteById(tableId);
+        doNothing().when(sensorCO2Manager).deleteById(tableId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            SensorCO2Manager.deleteById(tableId);
+            sensorCO2Manager.deleteById(tableId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(SensorCO2Manager, times(1)).deleteById(tableId);
+        verify(sensorCO2Manager, times(1)).deleteById(tableId);
 
         logger.info("Delete operation mock test successful for table ID: " + tableId);
     }
@@ -288,18 +288,18 @@ public class SensorCO2EditorTest {
     @Test
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
-        when(SensorCO2Manager.save(any(SensorCO2.class))).thenReturn(testSensorCO2);
+        when(sensorCO2Manager.save(any(SensorCO2.class))).thenReturn(testSensorCO2);
 
         // Simuler la sauvegarde
         SensorCO2 result = assertDoesNotThrow(() -> {
-            return SensorCO2Manager.save(testSensorCO2);
+            return sensorCO2Manager.save(testSensorCO2);
         });
 
         assertNotNull(result);
         assertEquals(testSensorCO2.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(SensorCO2Manager, times(1)).save(testSensorCO2);
+        verify(sensorCO2Manager, times(1)).save(testSensorCO2);
 
         logger.info("Save operation mock test successful for table: " + result.getCustomName());
     }
@@ -307,12 +307,12 @@ public class SensorCO2EditorTest {
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(SensorCO2Manager.save(any(SensorCO2.class)))
+        when(sensorCO2Manager.save(any(SensorCO2.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            SensorCO2Manager.save(testSensorCO2);
+            sensorCO2Manager.save(testSensorCO2);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -322,11 +322,11 @@ public class SensorCO2EditorTest {
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
         Integer tableId = 1;
-        doThrow(new RuntimeException("Delete error")).when(SensorCO2Manager).deleteById(tableId);
+        doThrow(new RuntimeException("Delete error")).when(sensorCO2Manager).deleteById(tableId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            SensorCO2Manager.deleteById(tableId);
+            sensorCO2Manager.deleteById(tableId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -384,7 +384,7 @@ public class SensorCO2EditorTest {
             logger.info("Test callback executed successfully");
         };
 
-        SensorCO2Editor.setOnDataChanged(testCallback);
+        sensorCO2Editor.setOnDataChanged(testCallback);
 
         // Simuler l'exécution du callback
         testCallback.run();

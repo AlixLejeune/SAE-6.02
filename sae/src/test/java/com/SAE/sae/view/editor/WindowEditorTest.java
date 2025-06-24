@@ -27,19 +27,18 @@ import com.vaadin.flow.component.UI;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 /**
  * Test class for the WindowEditor component.
- * Tests de bout en bout pour vérifier le bon fonctionnement de l'éditeur de
- * tables
+ * Tests de bout en bout pour vérifier le bon fonctionnement de l'éditeur de fenêtres
  * et de ses interactions avec les services.
  */
 public class WindowEditorTest {
 
     @MockBean
-    private WindowManager WindowManager;
+    private WindowManager windowManager;
 
     @MockBean
     private RoomManager roomManager;
 
-    private WindowEditor WindowEditor;
+    private WindowEditor windowEditor;
     private Window testWindow;
     private Room testRoom;
     private Building testBuilding;
@@ -50,7 +49,7 @@ public class WindowEditorTest {
     void setUp() {
         UI.setCurrent(new UI());
         // Initialiser le WindowEditor avec les mocks
-        WindowEditor = new WindowEditor(WindowManager, roomManager);
+        windowEditor = new WindowEditor(windowManager, roomManager);
 
         // Créer des données de test
         testBuilding = new Building();
@@ -64,7 +63,7 @@ public class WindowEditorTest {
 
         testWindow = new Window();
         testWindow.setId(1);
-        testWindow.setCustomName("Test Table");
+        testWindow.setCustomName("Test Window");
         testWindow.setRoom(testRoom);
         testWindow.setPosX(1.0);
         testWindow.setPosY(2.0);
@@ -81,14 +80,14 @@ public class WindowEditorTest {
     @Test
     void testWindowEditorInstantiation() {
         // Vérifier que le WindowEditor peut être instancié correctement
-        assertNotNull(WindowEditor);
+        assertNotNull(windowEditor);
         logger.info("WindowEditor instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        WindowEditor editor = new WindowEditor(WindowManager, roomManager);
+        WindowEditor editor = new WindowEditor(windowManager, roomManager);
         assertNotNull(editor);
         logger.info("WindowEditor constructor works with valid managers");
     }
@@ -99,7 +98,7 @@ public class WindowEditorTest {
         Runnable testCallback = () -> logger.info("Callback executed");
 
         assertDoesNotThrow(() -> {
-            WindowEditor.setOnDataChanged(testCallback);
+            windowEditor.setOnDataChanged(testCallback);
         });
 
         logger.info("OnDataChanged callback set successfully");
@@ -109,7 +108,7 @@ public class WindowEditorTest {
     void testSetOnDataChangedWithNullCallback() {
         // Tester avec un callback null
         assertDoesNotThrow(() -> {
-            WindowEditor.setOnDataChanged(null);
+            windowEditor.setOnDataChanged(null);
         });
 
         logger.info("OnDataChanged handles null callback correctly");
@@ -123,7 +122,7 @@ public class WindowEditorTest {
 
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
-            WindowEditor.openAddDialog();
+            windowEditor.openAddDialog();
         });
 
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
@@ -138,23 +137,23 @@ public class WindowEditorTest {
         List<Room> mockRooms = Arrays.asList(testRoom);
         when(roomManager.getAllRooms()).thenReturn(mockRooms);
 
-        // Tester l'ouverture du dialog d'édition avec une table valide
+        // Tester l'ouverture du dialog d'édition avec une fenêtre valide
         assertDoesNotThrow(() -> {
-            WindowEditor.openEditDialog(testWindow);
+            windowEditor.openEditDialog(testWindow);
         });
 
         // Vérifier que getAllRooms a été appelé
         verify(roomManager, atLeastOnce()).getAllRooms();
 
-        logger.info("Edit dialog opened successfully for table: " + testWindow.getCustomName());
+        logger.info("Edit dialog opened successfully for window: " + testWindow.getCustomName());
     }
 
     @Test
     void testOpenEditDialogWithNullWindow() {
-        // Tester l'ouverture du dialog d'édition avec une table null
+        // Tester l'ouverture du dialog d'édition avec une fenêtre null
         // Cela devrait afficher une notification d'avertissement
         assertDoesNotThrow(() -> {
-            WindowEditor.openEditDialog(null);
+            windowEditor.openEditDialog(null);
         });
 
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
@@ -165,19 +164,19 @@ public class WindowEditorTest {
 
     @Test
     void testConfirmDeleteWithValidWindow() {
-        // Tester la confirmation de suppression avec une table valide
+        // Tester la confirmation de suppression avec une fenêtre valide
         assertDoesNotThrow(() -> {
-            WindowEditor.confirmDelete(testWindow);
+            windowEditor.confirmDelete(testWindow);
         });
 
-        logger.info("Delete confirmation dialog opened for table: " + testWindow.getCustomName());
+        logger.info("Delete confirmation dialog opened for window: " + testWindow.getCustomName());
     }
 
     @Test
     void testConfirmDeleteWithNullWindow() {
-        // Tester la confirmation de suppression avec une table null
+        // Tester la confirmation de suppression avec une fenêtre null
         assertDoesNotThrow(() -> {
-            WindowEditor.confirmDelete(null);
+            windowEditor.confirmDelete(null);
         });
 
         logger.info("Delete confirmation correctly handles null Window input");
@@ -186,17 +185,17 @@ public class WindowEditorTest {
     @Test
     void testWindowManagerIntegration() {
         // Tester l'intégration avec WindowManager
-        assertNotNull(WindowManager);
+        assertNotNull(windowManager);
 
         // Mock du comportement de sauvegarde
-        when(WindowManager.save(any(Window.class))).thenReturn(testWindow);
+        when(windowManager.save(any(Window.class))).thenReturn(testWindow);
 
-        Window savedTable = WindowManager.save(testWindow);
-        assertNotNull(savedTable);
-        assertEquals(testWindow.getCustomName(), savedTable.getCustomName());
+        Window savedWindow = windowManager.save(testWindow);
+        assertNotNull(savedWindow);
+        assertEquals(testWindow.getCustomName(), savedWindow.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(WindowManager, times(1)).save(testWindow);
+        verify(windowManager, times(1)).save(testWindow);
 
         logger.info("WindowManager integration test successful");
     }
@@ -224,18 +223,18 @@ public class WindowEditorTest {
 
     @Test
     void testWindowValidation() {
-        // Tester la validation des données de table
-        Window validTable = new Window();
-        validTable.setCustomName("Valid Table");
-        validTable.setRoom(testRoom);
-        validTable.setPosX(1.0);
-        validTable.setPosY(1.0);
-        validTable.setPosZ(1.0);
+        // Tester la validation des données de fenêtre
+        Window validWindow = new Window();
+        validWindow.setCustomName("Valid Window");
+        validWindow.setRoom(testRoom);
+        validWindow.setPosX(1.0);
+        validWindow.setPosY(1.0);
+        validWindow.setPosZ(1.0);
 
         // Les données devraient être valides
-        assertNotNull(validTable.getCustomName());
-        assertNotNull(validTable.getRoom());
-        assertNotNull(validTable.getPosX());
+        assertNotNull(validWindow.getCustomName());
+        assertNotNull(validWindow.getRoom());
+        assertNotNull(validWindow.getPosX());
 
         logger.info("Window validation test - all required fields present");
     }
@@ -243,12 +242,12 @@ public class WindowEditorTest {
     @Test
     void testWindowWithEmptyName() {
         // Tester avec un nom vide
-        Window emptyNameTable = new Window();
-        emptyNameTable.setCustomName("");
-        emptyNameTable.setRoom(testRoom);
+        Window emptyNameWindow = new Window();
+        emptyNameWindow.setCustomName("");
+        emptyNameWindow.setRoom(testRoom);
 
         // Le nom ne devrait pas être vide
-        assertTrue(emptyNameTable.getCustomName().isEmpty());
+        assertTrue(emptyNameWindow.getCustomName().isEmpty());
 
         logger.info("Window with empty name handled correctly");
     }
@@ -256,12 +255,12 @@ public class WindowEditorTest {
     @Test
     void testWindowWithNullRoom() {
         // Tester avec une salle null
-        Window nullRoomTable = new Window();
-        nullRoomTable.setCustomName("Test Table");
-        nullRoomTable.setRoom(null);
+        Window nullRoomWindow = new Window();
+        nullRoomWindow.setCustomName("Test Window");
+        nullRoomWindow.setRoom(null);
 
-        // La salle ne devrait pas être null pour une table valide
-        assertNull(nullRoomTable.getRoom());
+        // La salle ne devrait pas être null pour une fenêtre valide
+        assertNull(nullRoomWindow.getRoom());
 
         logger.info("Window with null room detected correctly");
     }
@@ -269,50 +268,50 @@ public class WindowEditorTest {
     @Test
     void testDeleteOperationMocking() {
         // Tester l'opération de suppression
-        Integer tableId = 1;
+        Integer windowId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(WindowManager).deleteById(tableId);
+        doNothing().when(windowManager).deleteById(windowId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            WindowManager.deleteById(tableId);
+            windowManager.deleteById(windowId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(WindowManager, times(1)).deleteById(tableId);
+        verify(windowManager, times(1)).deleteById(windowId);
 
-        logger.info("Delete operation mock test successful for table ID: " + tableId);
+        logger.info("Delete operation mock test successful for window ID: " + windowId);
     }
 
     @Test
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
-        when(WindowManager.save(any(Window.class))).thenReturn(testWindow);
+        when(windowManager.save(any(Window.class))).thenReturn(testWindow);
 
         // Simuler la sauvegarde
         Window result = assertDoesNotThrow(() -> {
-            return WindowManager.save(testWindow);
+            return windowManager.save(testWindow);
         });
 
         assertNotNull(result);
         assertEquals(testWindow.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(WindowManager, times(1)).save(testWindow);
+        verify(windowManager, times(1)).save(testWindow);
 
-        logger.info("Save operation mock test successful for table: " + result.getCustomName());
+        logger.info("Save operation mock test successful for window: " + result.getCustomName());
     }
 
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(WindowManager.save(any(Window.class)))
+        when(windowManager.save(any(Window.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            WindowManager.save(testWindow);
+            windowManager.save(testWindow);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -321,12 +320,12 @@ public class WindowEditorTest {
     @Test
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
-        Integer tableId = 1;
-        doThrow(new RuntimeException("Delete error")).when(WindowManager).deleteById(tableId);
+        Integer windowId = 1;
+        doThrow(new RuntimeException("Delete error")).when(windowManager).deleteById(windowId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            WindowManager.deleteById(tableId);
+            windowManager.deleteById(windowId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -384,7 +383,7 @@ public class WindowEditorTest {
             logger.info("Test callback executed successfully");
         };
 
-        WindowEditor.setOnDataChanged(testCallback);
+        windowEditor.setOnDataChanged(testCallback);
 
         // Simuler l'exécution du callback
         testCallback.run();

@@ -68,7 +68,6 @@ public class RoomTypeManager {
     /**
      * Supprime un roomType par id
      * @param id du roomType à supprimer
-     * @return void
      */
     public void deleteRoomTypeById(int id){
         roomTypeRepo.deleteById(id);

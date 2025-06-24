@@ -12,9 +12,6 @@ import lombok.Data;
 
 /**
  * CLasse représentant les capteurs de CO2
- * @param customName String hérité de RoomObject
- * @param room object Room hérité de RoomObject
- * @param pos x,y,z valeurs numériques indiquant la position dans la pièce
  */
 
 @Data

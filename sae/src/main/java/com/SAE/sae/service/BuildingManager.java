@@ -64,7 +64,6 @@ public class BuildingManager {
     /**
      * Supprime un building par id
      * @param id du building à supprimer
-     * @return void
      */
     public void deleteBuildingById(int id){
         buildingRepo.deleteById(id);
@@ -84,7 +83,6 @@ public class BuildingManager {
     /**
      * Supprime les buildings avec ce nom
      * @param name des buildings à supprimer
-     * @return void
      */
     public void deleteBuildingsByName(String name){
         log.info("Deleted all buildings named " + name);

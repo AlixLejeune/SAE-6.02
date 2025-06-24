@@ -67,7 +67,6 @@ public class RoomManager {
     /**
      * Supprime une room par id
      * @param id du room à supprimer
-     * @return void
      */
     public void deleteRoomById(int id){
         roomRepo.deleteById(id);
@@ -76,7 +75,7 @@ public class RoomManager {
 
     /**
      * Récupère tous les rooms d'un bâtiment spécifié
-     * @param id l'ID du bâtiment recherché
+     * @param buildingId l'ID du bâtiment recherché
      * @return une liste des Rooms trouvés, vide si aucune
      */
     public List<Room> getRoomsByBuildingId(int buildingId) {

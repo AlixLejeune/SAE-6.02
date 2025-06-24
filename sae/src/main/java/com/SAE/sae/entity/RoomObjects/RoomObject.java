@@ -19,8 +19,6 @@ import lombok.Data;
 
 /**
  * CLasse abstraite généralisant tous les objets dans les pièces
- * @param customName String permettant d'enregistrer un nom personnalisé
- * @param room object Room permettant d'effectuer la jointure
  */
 
 @Data

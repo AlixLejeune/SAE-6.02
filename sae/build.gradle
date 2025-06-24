@@ -66,4 +66,5 @@ jacocoTestReport {
 
 javadoc{
     destinationDir = file("${buildDir}/docs/javadoc")
+    exclude 'com/SAE/sae/view/*'
 }

@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 /** 
  * Classe représentant les types de pièces
- * @param name String qui contient le nom du type
  */
 
 @NoArgsConstructor

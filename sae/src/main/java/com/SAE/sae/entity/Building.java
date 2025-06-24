@@ -13,6 +13,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/** 
+ * Classe représentant les bâtiments
+ * @param name String qui contient le nom du bâtiment
+ * @param rooms Liste des pièces du bâtiment permettant d'effectuer la jointure
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

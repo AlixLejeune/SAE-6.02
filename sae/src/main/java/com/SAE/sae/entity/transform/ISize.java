@@ -1,5 +1,9 @@
 package com.SAE.sae.entity.transform;
 
+/**
+ * Interface déclarant la taille à implémenter
+ */
+
 public interface ISize
     {
         public double sizeX = 0;

@@ -11,6 +11,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
+
+/**
+ * CLasse représentant les tables (à cause des mots-clés déjà utilisés, il a été impossible de la nommer Table)
+ * @param customName String hérité de RoomObject
+ * @param room object Room hérité de RoomObject
+ * @param pos x,y,z valeurs numériques indiquant la position dans la pièce
+ * @param size x,y,z valeurs numériques indiquant la taille de l'objet
+ */
+
 @Data
 @Entity
 @Table(name = "t_e_table_tab")

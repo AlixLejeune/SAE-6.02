@@ -34,12 +34,12 @@ import com.vaadin.flow.component.UI;
 public class SirenEditorTest {
 
     @MockBean
-    private SirenManager SirenManager;
+    private SirenManager sirenManager;
 
     @MockBean
     private RoomManager roomManager;
 
-    private SirenEditor SirenEditor;
+    private SirenEditor sirenEditor;
     private Siren testSiren;
     private Room testRoom;
     private Building testBuilding;
@@ -50,7 +50,7 @@ public class SirenEditorTest {
     void setUp() {
         UI.setCurrent(new UI());
         // Initialiser le SirenEditor avec les mocks
-        SirenEditor = new SirenEditor(SirenManager, roomManager);
+        sirenEditor = new SirenEditor(sirenManager, roomManager);
 
         // Créer des données de test
         testBuilding = new Building();
@@ -81,14 +81,14 @@ public class SirenEditorTest {
     @Test
     void testSirenEditorInstantiation() {
         // Vérifier que le SirenEditor peut être instancié correctement
-        assertNotNull(SirenEditor);
+        assertNotNull(sirenEditor);
         logger.info("SirenEditor instantiated successfully");
     }
 
     @Test
     void testConstructorWithValidManagers() {
         // Vérifier que le constructeur fonctionne avec des managers valides
-        SirenEditor editor = new SirenEditor(SirenManager, roomManager);
+        SirenEditor editor = new SirenEditor(sirenManager, roomManager);
         assertNotNull(editor);
         logger.info("SirenEditor constructor works with valid managers");
     }
@@ -99,7 +99,7 @@ public class SirenEditorTest {
         Runnable testCallback = () -> logger.info("Callback executed");
 
         assertDoesNotThrow(() -> {
-            SirenEditor.setOnDataChanged(testCallback);
+            sirenEditor.setOnDataChanged(testCallback);
         });
 
         logger.info("OnDataChanged callback set successfully");
@@ -109,7 +109,7 @@ public class SirenEditorTest {
     void testSetOnDataChangedWithNullCallback() {
         // Tester avec un callback null
         assertDoesNotThrow(() -> {
-            SirenEditor.setOnDataChanged(null);
+            sirenEditor.setOnDataChanged(null);
         });
 
         logger.info("OnDataChanged handles null callback correctly");
@@ -123,7 +123,7 @@ public class SirenEditorTest {
 
         // Tester l'ouverture du dialog d'ajout
         assertDoesNotThrow(() -> {
-            SirenEditor.openAddDialog();
+            sirenEditor.openAddDialog();
         });
 
         // Vérifier que getAllRooms a été appelé pour peupler la ComboBox
@@ -140,7 +140,7 @@ public class SirenEditorTest {
 
         // Tester l'ouverture du dialog d'édition avec une table valide
         assertDoesNotThrow(() -> {
-            SirenEditor.openEditDialog(testSiren);
+            sirenEditor.openEditDialog(testSiren);
         });
 
         // Vérifier que getAllRooms a été appelé
@@ -154,7 +154,7 @@ public class SirenEditorTest {
         // Tester l'ouverture du dialog d'édition avec une table null
         // Cela devrait afficher une notification d'avertissement
         assertDoesNotThrow(() -> {
-            SirenEditor.openEditDialog(null);
+            sirenEditor.openEditDialog(null);
         });
 
         // Vérifier que getAllRooms n'a pas été appelé car le dialog ne s'ouvre pas
@@ -167,7 +167,7 @@ public class SirenEditorTest {
     void testConfirmDeleteWithValidSiren() {
         // Tester la confirmation de suppression avec une table valide
         assertDoesNotThrow(() -> {
-            SirenEditor.confirmDelete(testSiren);
+            sirenEditor.confirmDelete(testSiren);
         });
 
         logger.info("Delete confirmation dialog opened for table: " + testSiren.getCustomName());
@@ -177,7 +177,7 @@ public class SirenEditorTest {
     void testConfirmDeleteWithNullSiren() {
         // Tester la confirmation de suppression avec une table null
         assertDoesNotThrow(() -> {
-            SirenEditor.confirmDelete(null);
+            sirenEditor.confirmDelete(null);
         });
 
         logger.info("Delete confirmation correctly handles null Siren input");
@@ -186,17 +186,17 @@ public class SirenEditorTest {
     @Test
     void testSirenManagerIntegration() {
         // Tester l'intégration avec SirenManager
-        assertNotNull(SirenManager);
+        assertNotNull(sirenManager);
 
         // Mock du comportement de sauvegarde
-        when(SirenManager.save(any(Siren.class))).thenReturn(testSiren);
+        when(sirenManager.save(any(Siren.class))).thenReturn(testSiren);
 
-        Siren savedTable = SirenManager.save(testSiren);
+        Siren savedTable = sirenManager.save(testSiren);
         assertNotNull(savedTable);
         assertEquals(testSiren.getCustomName(), savedTable.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(SirenManager, times(1)).save(testSiren);
+        verify(sirenManager, times(1)).save(testSiren);
 
         logger.info("SirenManager integration test successful");
     }
@@ -272,15 +272,15 @@ public class SirenEditorTest {
         Integer tableId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(SirenManager).deleteById(tableId);
+        doNothing().when(sirenManager).deleteById(tableId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            SirenManager.deleteById(tableId);
+            sirenManager.deleteById(tableId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(SirenManager, times(1)).deleteById(tableId);
+        verify(sirenManager, times(1)).deleteById(tableId);
 
         logger.info("Delete operation mock test successful for table ID: " + tableId);
     }
@@ -288,18 +288,18 @@ public class SirenEditorTest {
     @Test
     void testSaveOperationMocking() {
         // Tester l'opération de sauvegarde
-        when(SirenManager.save(any(Siren.class))).thenReturn(testSiren);
+        when(sirenManager.save(any(Siren.class))).thenReturn(testSiren);
 
         // Simuler la sauvegarde
         Siren result = assertDoesNotThrow(() -> {
-            return SirenManager.save(testSiren);
+            return sirenManager.save(testSiren);
         });
 
         assertNotNull(result);
         assertEquals(testSiren.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(SirenManager, times(1)).save(testSiren);
+        verify(sirenManager, times(1)).save(testSiren);
 
         logger.info("Save operation mock test successful for table: " + result.getCustomName());
     }
@@ -307,12 +307,12 @@ public class SirenEditorTest {
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(SirenManager.save(any(Siren.class)))
+        when(sirenManager.save(any(Siren.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            SirenManager.save(testSiren);
+            sirenManager.save(testSiren);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -322,11 +322,11 @@ public class SirenEditorTest {
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
         Integer tableId = 1;
-        doThrow(new RuntimeException("Delete error")).when(SirenManager).deleteById(tableId);
+        doThrow(new RuntimeException("Delete error")).when(sirenManager).deleteById(tableId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            SirenManager.deleteById(tableId);
+            sirenManager.deleteById(tableId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -384,7 +384,7 @@ public class SirenEditorTest {
             logger.info("Test callback executed successfully");
         };
 
-        SirenEditor.setOnDataChanged(testCallback);
+        sirenEditor.setOnDataChanged(testCallback);
 
         // Simuler l'exécution du callback
         testCallback.run();

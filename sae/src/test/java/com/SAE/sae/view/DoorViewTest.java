@@ -33,18 +33,18 @@ import com.vaadin.flow.component.button.Button;
 /**
  * Test class for the DoorView component.
  * Tests de bout en bout pour vérifier le bon fonctionnement de la vue de
- * gestion des tables de données
+ * gestion des portes
  * et de ses interactions avec les services.
  */
 public class DoorViewTest {
 
     @Mock
-    private DoorManager DoorManager;
+    private DoorManager doorManager;
 
     @Mock
     private RoomManager roomManager;
 
-    private DoorView DoorView;
+    private DoorView doorView;
     private Door testDoor;
     private Door testDoor2;
     private Room testRoom;
@@ -89,7 +89,7 @@ public class DoorViewTest {
         testDoor2.setSizeZ(1.0);
 
         // Initialiser la DoorView avec les mocks
-        DoorView = new DoorView(DoorManager, roomManager);
+        doorView = new DoorView(doorManager, roomManager);
 
         logger.info("DoorView test setup completed");
     }
@@ -102,7 +102,7 @@ public class DoorViewTest {
     @Test
     void testDoorViewInstantiation() {
         // Vérifier que la DoorView peut être instanciée correctement
-        assertNotNull(DoorView);
+        assertNotNull(doorView);
         logger.info("DoorView instantiated successfully");
     }
 
@@ -110,13 +110,13 @@ public class DoorViewTest {
     void testConstructorCallsLoadData() {
         // Mock des données pour vérifier l'appel à findAll lors de l'initialisation
         List<Door> mockDoors = Arrays.asList(testDoor, testDoor2);
-        when(DoorManager.findAll()).thenReturn(mockDoors);
+        when(doorManager.findAll()).thenReturn(mockDoors);
 
         // Créer une nouvelle instance pour tester l'initialisation
-        DoorView newView = new DoorView(DoorManager, roomManager);
+        DoorView newView = new DoorView(doorManager, roomManager);
 
         // Vérifier que findAll a été appelé pendant l'initialisation
-        verify(DoorManager, atLeastOnce()).findAll();
+        verify(doorManager, atLeastOnce()).findAll();
 
         logger.info("Constructor correctly calls loadData method");
     }
@@ -125,32 +125,32 @@ public class DoorViewTest {
     void testLoadDataWithValidDoors() {
         // Mock des données
         List<Door> mockDoors = Arrays.asList(testDoor, testDoor2);
-        when(DoorManager.findAll()).thenReturn(mockDoors);
+        when(doorManager.findAll()).thenReturn(mockDoors);
 
         // Tester le chargement des données
         assertDoesNotThrow(() -> {
             // La méthode loadData est privée, on teste via l'effet du constructeur
-            DoorView newView = new DoorView(DoorManager, roomManager);
+            DoorView newView = new DoorView(doorManager, roomManager);
         });
 
         // Vérifier que findAll a été appelé
-        verify(DoorManager, atLeastOnce()).findAll();
+        verify(doorManager, atLeastOnce()).findAll();
 
-        logger.info("Load data successful with " + mockDoors.size() + " data tables");
+        logger.info("Load data successful with " + mockDoors.size() + " doors");
     }
 
     @Test
     void testLoadDataWithEmptyList() {
         // Mock avec une liste vide
-        when(DoorManager.findAll()).thenReturn(Arrays.asList());
+        when(doorManager.findAll()).thenReturn(Arrays.asList());
 
         // Tester avec une liste vide
         assertDoesNotThrow(() -> {
-            DoorView newView = new DoorView(DoorManager, roomManager);
+            DoorView newView = new DoorView(doorManager, roomManager);
         });
 
         // Vérifier que findAll a été appelé
-        verify(DoorManager, atLeastOnce()).findAll();
+        verify(doorManager, atLeastOnce()).findAll();
 
         logger.info("Load data handles empty list correctly");
     }
@@ -158,12 +158,12 @@ public class DoorViewTest {
     @Test
     void testLoadDataWithException() {
         // Mock qui lance une exception
-        when(DoorManager.findAll())
+        when(doorManager.findAll())
                 .thenThrow(new RuntimeException("Database connection error"));
 
         // La vue devrait gérer l'exception sans planter
         assertDoesNotThrow(() -> {
-            DoorView newView = new DoorView(DoorManager, roomManager);
+            DoorView newView = new DoorView(doorManager, roomManager);
         });
 
         logger.info("Load data handles exceptions correctly");
@@ -172,17 +172,17 @@ public class DoorViewTest {
     @Test
     void testDoorManagerIntegration() {
         // Tester l'intégration avec DoorManager
-        assertNotNull(DoorManager);
+        assertNotNull(doorManager);
 
         // Mock du comportement de sauvegarde
-        when(DoorManager.save(any(Door.class))).thenReturn(testDoor);
+        when(doorManager.save(any(Door.class))).thenReturn(testDoor);
 
-        Door savedDoor = DoorManager.save(testDoor);
+        Door savedDoor = doorManager.save(testDoor);
         assertNotNull(savedDoor);
         assertEquals(testDoor.getCustomName(), savedDoor.getCustomName());
 
         // Vérifier que save a été appelé
-        verify(DoorManager, times(1)).save(testDoor);
+        verify(doorManager, times(1)).save(testDoor);
 
         logger.info("DoorManager integration test successful");
     }
@@ -210,70 +210,70 @@ public class DoorViewTest {
 
     @Test
     void testSaveDoorOperation() {
-        // Tester l'opération de sauvegarde (pas de updateDoor dans le service)
-        when(DoorManager.save(any(Door.class))).thenReturn(testDoor);
+        // Tester l'opération de sauvegarde
+        when(doorManager.save(any(Door.class))).thenReturn(testDoor);
 
         // Simuler la sauvegarde
         Door result = assertDoesNotThrow(() -> {
-            return DoorManager.save(testDoor);
+            return doorManager.save(testDoor);
         });
 
         assertNotNull(result);
         assertEquals(testDoor.getId(), result.getId());
 
         // Vérifier que save a été appelé
-        verify(DoorManager, times(1)).save(testDoor);
+        verify(doorManager, times(1)).save(testDoor);
 
-        logger.info("Save operation test successful for data table: " + result.getCustomName());
+        logger.info("Save operation test successful for door: " + result.getCustomName());
     }
 
     @Test
     void testDeleteDoorOperation() {
         // Tester l'opération de suppression
-        Integer DoorId = 1;
+        Integer doorId = 1;
 
         // Mock de la méthode deleteById
-        doNothing().when(DoorManager).deleteById(DoorId);
+        doNothing().when(doorManager).deleteById(doorId);
 
         // Simuler la suppression
         assertDoesNotThrow(() -> {
-            DoorManager.deleteById(DoorId);
+            doorManager.deleteById(doorId);
         });
 
         // Vérifier que deleteById a été appelé
-        verify(DoorManager, times(1)).deleteById(DoorId);
+        verify(doorManager, times(1)).deleteById(doorId);
 
-        logger.info("Delete operation test successful for data table ID: " + DoorId);
+        logger.info("Delete operation test successful for door ID: " + doorId);
     }
 
     @Test
     void testFindByIdOperation() {
         // Tester l'opération de recherche par ID
-        Integer DoorId = 1;
-        when(DoorManager.findById(DoorId)).thenReturn(testDoor);
+        Integer doorId = 1;
+        when(doorManager.findById(doorId)).thenReturn(testDoor);
 
         Door result = assertDoesNotThrow(() -> {
-            return DoorManager.findById(DoorId);
+            return doorManager.findById(doorId);
         });
 
         assertNotNull(result);
         assertEquals(testDoor.getId(), result.getId());
         assertEquals(testDoor.getCustomName(), result.getCustomName());
 
-        verify(DoorManager, times(1)).findById(DoorId);
+        verify(doorManager, times(1)).findById(doorId);
 
-        logger.info("FindById operation test successful for data table: " + result.getCustomName());
+        logger.info("FindById operation test successful for door: " + result.getCustomName());
     }
 
     @Test
     void testFindByIdWithInvalidId() {
         // Tester avec un ID invalide
         Integer invalidId = 999;
-        when(DoorManager.findById(invalidId))
+        when(doorManager.findById(invalidId))
                 .thenThrow(new IllegalArgumentException("Aucune Door trouvée avec l'ID : " + invalidId));
 
         assertThrows(IllegalArgumentException.class, () -> {
-            DoorManager.findById(invalidId);
+            doorManager.findById(invalidId);
         });
 
         logger.info("FindById with invalid ID test successful");
@@ -284,13 +284,13 @@ public class DoorViewTest {
         // Tester la recherche par ID de salle (Integer)
         Integer roomId = 1;
         List<Door> mockDoors = Arrays.asList(testDoor, testDoor2);
-        when(DoorManager.findByRoomId(roomId)).thenReturn(mockDoors);
+        when(doorManager.findByRoomId(roomId)).thenReturn(mockDoors);
 
-        List<Door> result = DoorManager.findByRoomId(roomId);
+        List<Door> result = doorManager.findByRoomId(roomId);
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        verify(DoorManager, times(1)).findByRoomId(roomId);
+        verify(doorManager, times(1)).findByRoomId(roomId);
 
         logger.info("FindByRoomId (Integer) operation test successful");
     }
@@ -300,13 +300,13 @@ public class DoorViewTest {
         // Tester la recherche par ID de salle (Long)
         Long roomId = 1L;
         List<Door> mockDoors = Arrays.asList(testDoor);
-        when(DoorManager.findByRoomId(roomId)).thenReturn(mockDoors);
+        when(doorManager.findByRoomId(roomId)).thenReturn(mockDoors);
 
-        List<Door> result = DoorManager.findByRoomId(roomId);
+        List<Door> result = doorManager.findByRoomId(roomId);
         assertNotNull(result);
         assertEquals(1, result.size());
 
-        verify(DoorManager, times(1)).findByRoomId(roomId);
+        verify(doorManager, times(1)).findByRoomId(roomId);
 
         logger.info("FindByRoomId (Long) operation test successful");
     }
@@ -316,43 +316,43 @@ public class DoorViewTest {
         // Tester la recherche par nom personnalisé
         String customName = "Test Door 1";
         List<Door> mockDoors = Arrays.asList(testDoor);
-        when(DoorManager.findByCustomName(customName)).thenReturn(mockDoors);
+        when(doorManager.findByCustomName(customName)).thenReturn(mockDoors);
 
-        List<Door> result = DoorManager.findByCustomName(customName);
+        List<Door> result = doorManager.findByCustomName(customName);
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(customName, result.get(0).getCustomName());
 
-        verify(DoorManager, times(1)).findByCustomName(customName);
+        verify(doorManager, times(1)).findByCustomName(customName);
 
         logger.info("FindByCustomName operation test successful");
     }
 
     @Test
     void testSaveAllOperation() {
-        // Tester la sauvegarde de plusieurs Doors
-        List<Door> DoorList = Arrays.asList(testDoor, testDoor2);
-        when(DoorManager.saveAll(DoorList)).thenReturn(DoorList);
+        // Tester la sauvegarde de plusieurs portes
+        List<Door> doorList = Arrays.asList(testDoor, testDoor2);
+        when(doorManager.saveAll(doorList)).thenReturn(doorList);
 
-        List<Door> result = DoorManager.saveAll(DoorList);
+        List<Door> result = doorManager.saveAll(doorList);
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        verify(DoorManager, times(1)).saveAll(DoorList);
+        verify(doorManager, times(1)).saveAll(doorList);
 
-        logger.info("SaveAll operation test successful - saved " + result.size() + " data tables");
+        logger.info("SaveAll operation test successful - saved " + result.size() + " doors");
     }
 
     @Test
     void testDeleteAllOperation() {
-        // Tester la suppression de toutes les Doors
-        doNothing().when(DoorManager).deleteAll();
+        // Tester la suppression de toutes les portes
+        doNothing().when(doorManager).deleteAll();
 
         assertDoesNotThrow(() -> {
-            DoorManager.deleteAll();
+            doorManager.deleteAll();
         });
 
-        verify(DoorManager, times(1)).deleteAll();
+        verify(doorManager, times(1)).deleteAll();
 
         logger.info("DeleteAll operation test successful");
     }
@@ -361,13 +361,13 @@ public class DoorViewTest {
     void testDeleteByCustomNameOperation() {
         // Tester la suppression par nom personnalisé
         String customName = "Test Door 1";
-        doNothing().when(DoorManager).deleteByCustomName(customName);
+        doNothing().when(doorManager).deleteByCustomName(customName);
 
         assertDoesNotThrow(() -> {
-            DoorManager.deleteByCustomName(customName);
+            doorManager.deleteByCustomName(customName);
         });
 
-        verify(DoorManager, times(1)).deleteByCustomName(customName);
+        verify(doorManager, times(1)).deleteByCustomName(customName);
 
         logger.info("DeleteByCustomName operation test successful");
     }
@@ -375,13 +375,13 @@ public class DoorViewTest {
     @Test
     void testExistsByIdOperation() {
         // Tester la vérification d'existence par ID
-        Integer DoorId = 1;
-        when(DoorManager.existsById(DoorId)).thenReturn(true);
+        Integer doorId = 1;
+        when(doorManager.existsById(doorId)).thenReturn(true);
 
-        boolean exists = DoorManager.existsById(DoorId);
+        boolean exists = doorManager.existsById(doorId);
         assertTrue(exists);
 
-        verify(DoorManager, times(1)).existsById(DoorId);
+        verify(doorManager, times(1)).existsById(doorId);
 
         logger.info("ExistsById operation test successful");
     }
@@ -390,12 +390,12 @@ public class DoorViewTest {
     void testExistsByIdWithNonExistentId() {
         // Tester avec un ID qui n'existe pas
         Integer nonExistentId = 999;
-        when(DoorManager.existsById(nonExistentId)).thenReturn(false);
+        when(doorManager.existsById(nonExistentId)).thenReturn(false);
 
-        boolean exists = DoorManager.existsById(nonExistentId);
+        boolean exists = doorManager.existsById(nonExistentId);
         assertFalse(exists);
 
-        verify(DoorManager, times(1)).existsById(nonExistentId);
+        verify(doorManager, times(1)).existsById(nonExistentId);
 
         logger.info("ExistsById with non-existent ID test successful");
     }
@@ -403,12 +403,12 @@ public class DoorViewTest {
     @Test
     void testExceptionHandlingInSave() {
         // Tester la gestion des exceptions lors de la sauvegarde
-        when(DoorManager.save(any(Door.class)))
+        when(doorManager.save(any(Door.class)))
                 .thenThrow(new RuntimeException("Save operation failed"));
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            DoorManager.save(testDoor);
+            doorManager.save(testDoor);
         });
 
         logger.info("Exception handling in save operation tested successfully");
@@ -417,12 +417,12 @@ public class DoorViewTest {
     @Test
     void testExceptionHandlingInDelete() {
         // Tester la gestion des exceptions lors de la suppression
-        Integer DoorId = 1;
-        doThrow(new RuntimeException("Delete operation failed")).when(DoorManager).deleteById(DoorId);
+        Integer doorId = 1;
+        doThrow(new RuntimeException("Delete operation failed")).when(doorManager).deleteById(doorId);
 
         // Vérifier que l'exception est bien lancée
         assertThrows(RuntimeException.class, () -> {
-            DoorManager.deleteById(DoorId);
+            doorManager.deleteById(doorId);
         });
 
         logger.info("Exception handling in delete operation tested successfully");
@@ -430,7 +430,7 @@ public class DoorViewTest {
 
     @Test
     void testDoorValidation() {
-        // Tester la validation des données de table
+        // Tester la validation des données de porte
         Door validDoor = new Door();
         validDoor.setCustomName("Valid Door");
         validDoor.setRoom(testRoom);
@@ -470,7 +470,7 @@ public class DoorViewTest {
         nullRoomDoor.setCustomName("Test Door");
         nullRoomDoor.setRoom(null);
 
-        // La salle ne devrait pas être null pour une table valide
+        // La salle ne devrait pas être null pour une porte valide
         assertNull(nullRoomDoor.getRoom());
 
         logger.info("Door with null room detected correctly");
@@ -483,7 +483,7 @@ public class DoorViewTest {
         nullNameDoor.setCustomName(null);
         nullNameDoor.setRoom(testRoom);
 
-        // Le nom ne devrait pas être null pour une table valide
+        // Le nom ne devrait pas être null pour une porte valide
         assertNull(nullNameDoor.getCustomName());
 
         logger.info("Door with null name detected correctly");
@@ -504,20 +504,20 @@ public class DoorViewTest {
 
     @Test
     void testMultipleDoorsHandling() {
-        // Tester avec plusieurs tables
-        Door Door3 = new Door();
-        Door3.setId(3);
-        Door3.setCustomName("Test Door 3");
-        Door3.setRoom(testRoom);
+        // Tester avec plusieurs portes
+        Door door3 = new Door();
+        door3.setId(3);
+        door3.setCustomName("Test Door 3");
+        door3.setRoom(testRoom);
 
-        List<Door> multipleDoors = Arrays.asList(testDoor, testDoor2, Door3);
-        when(DoorManager.findAll()).thenReturn(multipleDoors);
+        List<Door> multipleDoors = Arrays.asList(testDoor, testDoor2, door3);
+        when(doorManager.findAll()).thenReturn(multipleDoors);
 
-        List<Door> result = DoorManager.findAll();
+        List<Door> result = doorManager.findAll();
         assertNotNull(result);
         assertEquals(3, result.size());
 
-        logger.info("Multiple data tables handling test successful - " + result.size() + " data tables");
+        logger.info("Multiple doors handling test successful - " + result.size() + " doors");
     }
 
     @Test
@@ -640,18 +640,18 @@ public class DoorViewTest {
         logger.info("Invalid size values test successful");
     }
 
-    // Méthode utilitaire pour créer des tables de données de test
+    // Méthode utilitaire pour créer des portes de test
     private Door createTestDoor(Integer id, String name) {
-        Door Door = new Door();
-        Door.setId(id);
-        Door.setCustomName(name);
-        Door.setRoom(testRoom);
-        Door.setPosX(1.0);
-        Door.setPosY(1.0);
-        Door.setPosZ(1.0);
-        Door.setSizeX(1.0);
-        Door.setSizeY(1.0);
-        Door.setSizeZ(1.0);
-        return Door;
+        Door door = new Door();
+        door.setId(id);
+        door.setCustomName(name);
+        door.setRoom(testRoom);
+        door.setPosX(1.0);
+        door.setPosY(1.0);
+        door.setPosZ(1.0);
+        door.setSizeX(1.0);
+        door.setSizeY(1.0);
+        door.setSizeZ(1.0);
+        return door;
     }
 }

@@ -1,6 +1,5 @@
 package com.SAE.sae.controller.RoomObjects;
 
-import com.SAE.sae.entity.RoomObjects.Sensor6in1;
 import com.SAE.sae.entity.RoomObjects.SensorCO2;
 import com.SAE.sae.service.RoomObjects.SensorCO2Manager;
 import lombok.RequiredArgsConstructor;

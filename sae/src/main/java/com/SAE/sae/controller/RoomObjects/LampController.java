@@ -1,6 +1,5 @@
 package com.SAE.sae.controller.RoomObjects;
 
-import com.SAE.sae.entity.RoomObjects.Heater;
 import com.SAE.sae.entity.RoomObjects.Lamp;
 import com.SAE.sae.service.RoomObjects.LampManager;
 import lombok.RequiredArgsConstructor;

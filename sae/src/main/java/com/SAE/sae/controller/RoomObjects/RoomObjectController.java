@@ -1,6 +1,5 @@
 package com.SAE.sae.controller.RoomObjects;
 
-import com.SAE.sae.entity.RoomObjects.Plug;
 import com.SAE.sae.entity.RoomObjects.RoomObject;
 import com.SAE.sae.service.RoomObjects.RoomObjectManager;
 import lombok.RequiredArgsConstructor;

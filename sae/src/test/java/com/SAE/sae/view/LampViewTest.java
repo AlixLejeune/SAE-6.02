@@ -14,9 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
 import com.SAE.sae.entity.RoomObjects.Lamp;
 import com.SAE.sae.entity.Room;
 import com.SAE.sae.entity.Building;

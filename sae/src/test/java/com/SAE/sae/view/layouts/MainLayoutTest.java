@@ -13,19 +13,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
 import com.SAE.sae.entity.Building;
 import com.SAE.sae.entity.Room;
 import com.SAE.sae.repository.BuildingRepository;
 import com.SAE.sae.repository.RoomRepository;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 @ExtendWith(MockitoExtension.class)
 /**
